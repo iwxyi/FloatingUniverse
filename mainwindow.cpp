@@ -48,13 +48,13 @@ void MainWindow::initView()
 
 
     ui->settingsTabWidget->clear();
-    ui->settingsTabWidget->addTab(new QWidget(this), QIcon("://icons/startup.png"), "Tab1");
+    ui->settingsTabWidget->addTab(new QWidget(this), QIcon("://icons/tab1.png"), "Tab1");
 
     ui->auxiliaryTabWidget->clear();
-    ui->auxiliaryTabWidget->addTab(new QWidget(this), QIcon("://icons/model.png"), "Tab2");
+    ui->auxiliaryTabWidget->addTab(new QWidget(this), QIcon("://icons/tab2.png"), "Tab2");
 
     ui->dataTabWidget->clear();
-    ui->dataTabWidget->addTab(new QWidget(this), QIcon("://icons/history_message.png"), "Tab3");
+    ui->dataTabWidget->addTab(new QWidget(this), QIcon("://icons/tab3.png"), "Tab3");
 
     ui->sideButtons->setCurrentRow(qMin(us->i("mainwindow/sideIndex"), ui->sideButtons->count() - 1));
     ui->settingsTabWidget->setCurrentIndex(qMin(us->i("mainwindow/settingsTabIndex"), ui->settingsTabWidget->count() - 1));

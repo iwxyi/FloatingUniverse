@@ -14,7 +14,7 @@
    <string>悬浮宇宙</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources/resources.qrc">
+   <iconset>
     <normaloff>:/appicon</normaloff>:/appicon</iconset>
   </property>
   <property name="styleSheet">
@@ -123,7 +123,7 @@
        </property>
        <property name="icon">
         <iconset resource="resources/resources.qrc">
-         <normaloff>:/icons/settings.png</normaloff>:/icons/settings.png</iconset>
+         <normaloff>:/icons/icons/settings.png</normaloff>:/icons/icons/settings.png</iconset>
        </property>
       </item>
       <item>
@@ -132,7 +132,7 @@
        </property>
        <property name="icon">
         <iconset resource="resources/resources.qrc">
-         <normaloff>:/icons/auxiliary.png</normaloff>:/icons/auxiliary.png</iconset>
+         <normaloff>:/icons/icons/auxiliary.png</normaloff>:/icons/icons/auxiliary.png</iconset>
        </property>
       </item>
       <item>
@@ -141,7 +141,7 @@
        </property>
        <property name="icon">
         <iconset resource="resources/resources.qrc">
-         <normaloff>:/icons/data.png</normaloff>:/icons/data.png</iconset>
+         <normaloff>:/icons/icons/data.png</normaloff>:/icons/icons/data.png</iconset>
        </property>
       </item>
      </widget>
