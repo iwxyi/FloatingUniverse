@@ -12,14 +12,6 @@ enum Side
     SideBottom
 };
 
-enum Direction
-{
-    LeftToRight,
-    RightToLeft,
-    TopToBottom,
-    BottomToTop
-};
-
 class USettings : public MySettings
 {
 public:
@@ -31,9 +23,16 @@ private:
 public:
 
 public:
-    Side bannerFloatSide = SideRight; // 边：0上，1左，2右，3下，-1任意
-    Direction bannerFloatDirection = TopToBottom; // 方向：0从左到右，1从右到左，2从上到下，3从下到上
+    Side panelFloatSide = SideTop; // 边：0上，1左，2右，3下，-1任意
+    int panelCenterOffset = 0; // 中心点偏移
+    int panelWidth = 1000;
+    int panelHeight = 200;
+    int panelBangHeight = 1;
+    int panelBangWidth = 800;
+    QColor panelBg = QColor(255, 255, 250);
+    QColor panelBangBg = QColor(128, 128, 128);
 
+    int fluentRadius = 5;
 };
 
 extern USettings* us;

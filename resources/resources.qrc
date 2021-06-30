@@ -4,6 +4,6 @@
         <file>icons/data.png</file>
         <file>icons/settings.png</file>
         <file>icons/appicon.ico</file>
-        <file>icons/universe.png</file>
+        <file alias="appicon">icons/universe.png</file>
     </qresource>
 </RCC>

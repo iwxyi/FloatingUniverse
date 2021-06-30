@@ -8,6 +8,7 @@
 #include "qxtglobalshortcut.h"
 #endif
 #include "interactivebuttonbase.h"
+#include "panel/universepanel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,12 +31,14 @@ private:
     void initView();
     void initTray();
     void initKey();
+    void initPanel();
 
     QRect screenGeometry() const;
 
 public slots:
 
 protected:
+    void showEvent(QShowEvent* e) override;
     void closeEvent(QCloseEvent* e) override;
     void resizeEvent(QResizeEvent* e) override;
 
@@ -50,7 +53,7 @@ private:
 #ifdef Q_OS_WIN32
     HWND prevWindow = nullptr;
 #endif
-
+    UniversePanel* panel = nullptr;
     InteractiveButtonBase *confirmButton = nullptr;
 };
 #endif // MAINWINDOW_H

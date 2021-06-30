@@ -19,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     initView();
-
+    initTray();
+    initPanel();
 }
 
 MainWindow::~MainWindow()
@@ -75,8 +76,9 @@ void MainWindow::initView()
     confirmButton = new InteractiveButtonBase("应用更改", this);
     confirmButton->setBorderColor(Qt::gray);
     confirmButton->setFixedForeSize();
+    confirmButton->setCursor(Qt::PointingHandCursor);
     confirmButton->setFixedForePos();
-    confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width(), confirmButton->height()));
+    confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.1, confirmButton->height() + confirmButton->width()*0.1));
     confirmButton->setFocusPolicy(Qt::StrongFocus);
     if (ui->sideButtons->currentRow() == 2)
         confirmButton->hide();
@@ -108,10 +110,24 @@ QRect MainWindow::screenGeometry() const
     return screens.at(index)->geometry();
 }
 
+void MainWindow::showEvent(QShowEvent *e)
+{
+    QMainWindow::showEvent(e);
+    us->set("mainwindow/hide", false);
+
+    static bool first = true;
+    if (first)
+    {
+        first = false;
+        restoreGeometry(us->value("mainwindow/geometry").toByteArray());
+        restoreState(us->value("mainwindow/state").toByteArray());
+    }
+}
+
 void MainWindow::initTray()
 {
     QSystemTrayIcon* tray = new QSystemTrayIcon(this);
-    tray->setIcon(QIcon("://appicon"));
+    tray->setIcon(QIcon(":/icons/appicon"));
     tray->setToolTip(APPLICATION_NAME);
     tray->show();
 
@@ -166,13 +182,25 @@ void MainWindow::initKey()
 #endif
 }
 
+void MainWindow::initPanel()
+{
+    panel = new UniversePanel(nullptr);
+    panel->show();
+}
+
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     us->setValue("mainwindow/geometry", this->saveGeometry());
+    us->setValue("mainwindow/state", this->saveState());
 
 #if defined(ENABLE_TRAY)
     e->ignore();
     this->hide();
+
+    // 因为关闭程序也会触发这个，所以需要定时一下
+    QTimer::singleShot(5000, [=]{
+        us->set("mainwindow/hide", true);
+    });
 
     QTimer::singleShot(5000, [=]{
         if (!this->isHidden())
@@ -187,6 +215,9 @@ void MainWindow::closeEvent(QCloseEvent *e)
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
     QMainWindow::resizeEvent(e);
+
+    if (confirmButton)
+        confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.1, confirmButton->height() + confirmButton->width()*0.1));
 }
 
 void MainWindow::returnToPrevWindow()

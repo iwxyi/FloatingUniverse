@@ -39,7 +39,8 @@ int main(int argc, char *argv[])
     ensureDirExist(rt->CACHE_IMAGE_PATH);
 
     MainWindow w;
-    w.show();
+    if (!us->b("mainwindow/hide", false))
+        w.show();
 
     return a.exec();
 }
