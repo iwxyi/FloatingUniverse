@@ -5,10 +5,12 @@
 #include <QPainterPath>
 #include <QDebug>
 #include <QDateTime>
+#include <QMouseEvent>
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
 #include "signaltransfer.h"
+#include "facilemenu.h"
 
 UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 {
@@ -19,6 +21,7 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
     setWindowFlag(Qt::WindowStaysOnTopHint, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
     setAutoFillBackground(true);
+    setAcceptDrops(true);
 
     initPanel();
 }
@@ -78,18 +81,28 @@ QRect UniversePanel::screenGeometry() const
     return screens.at(index)->geometry();
 }
 
+void UniversePanel::closeEvent(QCloseEvent *)
+{
+    return ;
+}
+
 void UniversePanel::enterEvent(QEvent *event)
 {
     QWidget::enterEvent(event);
 
-    expandPanel();
+    if (!expanding)
+        expandPanel();
 }
 
 void UniversePanel::leaveEvent(QEvent *event)
 {
+    if (currentMenu && currentMenu->hasFocus())
+        return ;
+
     QWidget::leaveEvent(event);
 
-    foldPanel();
+    if (expanding)
+        foldPanel();
 }
 
 void UniversePanel::paintEvent(QPaintEvent *)
@@ -110,4 +123,101 @@ void UniversePanel::paintEvent(QPaintEvent *)
         path.addRect(QRect((width() - us->panelBangWidth) / 2, height() - us->panelBangHeight, us->panelBangWidth, us->panelBangHeight));
         painter.fillPath(path, us->panelBangBg);
     }
+
+    // 画选中
+    if (pressing)
+    {
+        if (pressPos != draggingPos)
+        {
+            QRect rect(pressPos, draggingPos);
+            QPainterPath path;
+            path.addRoundedRect(rect, us->fluentRadius, us->fluentRadius);
+            painter.fillPath(path, us->panelSelectBg);
+        }
+    }
+}
+
+void UniversePanel::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        pressing = true;
+        pressPos = draggingPos = event->pos();
+        update();
+    }
+
+    QWidget::mousePressEvent(event);
+}
+
+void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        pressing = false;
+
+        // 批量选中
+
+        draggingPos = pressPos;
+        update();
+    }
+
+    QWidget::mouseReleaseEvent(event);
+}
+
+void UniversePanel::mouseMoveEvent(QMouseEvent *event)
+{
+    if (pressing)
+    {
+        draggingPos = event->pos();
+        update();
+    }
+
+    QWidget::mouseMoveEvent(event);
+}
+
+void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    QWidget::mouseDoubleClickEvent(event);
+}
+
+void UniversePanel::focusOutEvent(QFocusEvent *event)
+{
+    if (pressing)
+    {
+        // 拖拽的时候突然失去焦点
+        pressing = false;
+        update();
+    }
+
+    QWidget::focusOutEvent(event);
+}
+
+void UniversePanel::contextMenuEvent(QContextMenuEvent *)
+{
+    FacileMenu* menu = new FacileMenu(this);
+    currentMenu = menu;
+
+    auto addMenu = menu->addMenu("添加");
+    addMenu->addAction("文件", [=]{
+
+    });
+    addMenu->addAction("文件夹", [=]{
+
+    });
+    addMenu->addAction("文件链接", [=]{
+
+    });
+    addMenu->addAction("文件夹链接", [=]{
+
+    });
+    addMenu->addAction("网址", [=]{
+
+    });
+
+    menu->exec();
+    menu->finished([=]{
+        currentMenu = nullptr;
+        if (!this->hasFocus())
+            foldPanel();
+    });
 }

@@ -31,6 +31,7 @@ public:
     int panelBangWidth = 800;
     QColor panelBg = QColor(255, 255, 250);
     QColor panelBangBg = QColor(128, 128, 128);
+    QColor panelSelectBg = QColor(102, 255, 230);
 
     int fluentRadius = 5;
 };

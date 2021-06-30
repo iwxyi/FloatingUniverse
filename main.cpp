@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(APPLICATION_NAME);
     QCoreApplication::setApplicationVersion(VERSION_CODE);
+    a.setQuitOnLastWindowClosed(false);
 
     QFont font(a.font());
     font.setFamily("微软雅黑");

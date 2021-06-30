@@ -709,6 +709,15 @@ FacileMenu* FacileMenu::finished(FuncType func)
     return this;
 }
 
+bool FacileMenu::hasFocus() const
+{
+    if (QWidget::hasFocus())
+        return true;
+    if (current_sub_menu && current_sub_menu->hasFocus())
+        return true;
+    return false;
+}
+
 /**
  * 添加可选菜单，快速添加多个单选项
  * @param texts  文字
@@ -1306,6 +1315,7 @@ void FacileMenu::startAnimationOnHidden(int focusIndex)
 void FacileMenu::hideEvent(QHideEvent *event)
 {
     emit signalHidden();
+    this->close();
     return QWidget::hideEvent(event);
 }
 

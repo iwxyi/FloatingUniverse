@@ -73,6 +73,7 @@ public:
     void execute();
     void toHide(int focusIndex = -1);
     FacileMenu* finished(FuncType func);
+    bool hasFocus() const;
 
     FacileMenu* addOptions(QList<QString>texts, QList<bool>states, FuncIntType clicked);
     FacileMenu* addOptions(QList<QString>texts, int select, FuncIntType clicked);
