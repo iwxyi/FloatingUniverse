@@ -17,7 +17,9 @@ public:
 private:
     void initPanel();
     void readItems();
-    PanelItem* createItem(QPoint pos, const QIcon &icon, const QString& text);
+    PanelItem* createItem(QPoint pos, const QString &iconName, const QString& text);
+    QString saveIcon(const QIcon& icon) const;
+    void deleteItem(PanelItem* item);
 
 signals:
 
@@ -27,6 +29,7 @@ public slots:
     void save();
     void selectAll();
     void unselectAll();
+    void triggerItem(PanelItem* item);
 
 public:
     QRect screenGeometry() const;

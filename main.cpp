@@ -33,10 +33,8 @@ int main(int argc, char *argv[])
 
     // 初始化全局配置
     rt->setAppPath(QApplication::applicationDirPath() + "/");
-    rt->DATA_PATH = QApplication::applicationDirPath() + "/data/";
-    rt->IMAGE_PATH = rt->DATA_PATH + "images/";
-    rt->CACHE_PATH = rt->DATA_PATH + "cache/";
-    rt->CACHE_IMAGE_PATH = rt->CACHE_PATH + "images/";
+    ensureDirExist(rt->ICON_PATH);
+    ensureDirExist(rt->PANEL_FILE_PATH);
     ensureDirExist(rt->CACHE_IMAGE_PATH);
 
     MainWindow w;

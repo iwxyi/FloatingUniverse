@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QMimeData>
 #include <QFileIconProvider>
+#include <QDesktopServices>
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
@@ -65,21 +66,8 @@ void UniversePanel::readItems()
     }
 }
 
-PanelItem *UniversePanel::createItem(QPoint pos, const QIcon& icon, const QString &text)
+PanelItem *UniversePanel::createItem(QPoint pos, const QString& iconName, const QString &text)
 {
-    QString iconName;
-    if (!icon.isNull())
-    {
-        // 保存到本地
-        int val = 1;
-        while (QFileInfo(rt->ICON_PATH + QString::number(val) + ".png").exists())
-            val++;
-        iconName = QString::number(val) + ".png";
-
-        QPixmap pixmap = icon.pixmap(us->pannelItemSize, us->pannelItemSize);
-        pixmap.save(rt->ICON_PATH + iconName);
-    }
-
     auto item = new PanelItem(this);
     item->setIcon(iconName);
     item->setText(text);
@@ -87,8 +75,34 @@ PanelItem *UniversePanel::createItem(QPoint pos, const QIcon& icon, const QStrin
     items.append(item);
     item->show();
 
+    connect(item, &PanelItem::triggered, this, [=]{
+        triggerItem(item);
+    });
+
     save();
     return item;
+}
+
+QString UniversePanel::saveIcon(const QIcon &icon) const
+{
+    // 保存到本地
+    int val = 1;
+    while (QFileInfo(rt->ICON_PATH + QString::number(val) + ".png").exists())
+        val++;
+    QString iconName = QString::number(val) + ".png";
+
+    QPixmap pixmap = icon.pixmap(us->pannelItemSize, us->pannelItemSize);
+    pixmap.save(rt->ICON_PATH + iconName);
+    return iconName;
+}
+
+void UniversePanel::deleteItem(PanelItem *item)
+{
+    if (!item->iconName.isEmpty())
+    {
+        deleteFile(rt->ICON_PATH + item->iconName);
+    }
+    item->deleteLater();
 }
 
 /// 从收起状态展开面板
@@ -155,6 +169,17 @@ void UniversePanel::unselectAll()
     foreach (auto item, selectedItems)
         item->showSelect(false);
     selectedItems.clear();
+}
+
+void UniversePanel::triggerItem(PanelItem *item)
+{
+    if (!item->link.isEmpty())
+    {
+        QString link = item->link;
+        if (QFileInfo(link).exists())
+            link = "file:///" +link;
+        QDesktopServices::openUrl(link);
+    }
 }
 
 QRect UniversePanel::screenGeometry() const
@@ -322,6 +347,28 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     newFacileMenu;
     currentMenu = menu;
 
+    if (selectedItems.size())
+    {
+        menu->addAction("打开", [=]{
+            foreach (auto item, selectedItems)
+            {
+                triggerItem(item);
+            }
+            unselectAll();
+        });
+
+        menu->addAction("删除", [=]{
+            foreach (auto item, selectedItems)
+            {
+                items.removeOne(item);
+                deleteItem(item);
+            }
+            selectedItems.clear();
+            save();
+        });
+        menu->split();
+    }
+
     auto addMenu = menu->addMenu("添加");
     addMenu->addAction("文件", [=]{
 
@@ -441,10 +488,23 @@ void UniversePanel::dropEvent(QDropEvent *event)
         {
             QString path = urls.at(i).toLocalFile();
             QIcon icon = icon_provider.icon(QFileInfo(path));
-            auto item = createItem(pos, icon, urls.at(i).fileName());
+            QString iconName = saveIcon(icon);
+            auto item = createItem(pos, iconName, urls.at(i).fileName());
             item->setLink(path);
             pos.rx() += item->width();
         }
+    }
+    else if (event->mimeData()->hasHtml())
+    {
+
+    }
+    else if (event->mimeData()->hasText())
+    {
+
+    }
+    else if (event->mimeData()->hasImage())
+    {
+
     }
     else
     {

@@ -19,6 +19,7 @@ public:
     void setLink(const QString& link);
 
 signals:
+    void triggered();
 
 public slots:
     void showSelect(bool sh);

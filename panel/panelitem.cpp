@@ -31,7 +31,7 @@ MyJson PanelItem::toJson() const
     json.insert("width", rect.width());
     json.insert("height", rect.height());
 
-    json.insert("icon", "");
+    json.insert("icon", iconName);
     json.insert("text", textLabel->text());
 
     if (link.isEmpty())
@@ -63,6 +63,7 @@ void PanelItem::setIcon(const QString &iconName)
 {
     if (iconName.isEmpty())
         return ;
+    this->iconName = iconName;
     QIcon icon(rt->ICON_PATH + iconName);
     if (!icon.isNull())
         iconLabel->setPixmap(icon.pixmap(us->pannelItemSize, us->pannelItemSize));
