@@ -17,6 +17,7 @@ public:
 private:
     void initPanel();
     void readItems();
+    PanelItem* createItem(QPoint pos, const QIcon &icon, const QString& text);
 
 signals:
 
@@ -24,6 +25,8 @@ public slots:
     void expandPanel();
     void foldPanel();
     void save();
+    void selectAll();
+    void unselectAll();
 
 public:
     QRect screenGeometry() const;
@@ -42,6 +45,7 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
     void contextMenuEvent(QContextMenuEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
@@ -58,6 +62,7 @@ private:
     FacileMenu* currentMenu = nullptr;
 
     QList<PanelItem*> items;
+    QList<PanelItem*> selectedItems;
 };
 
 #endif // UNIVERSEPANEL_H

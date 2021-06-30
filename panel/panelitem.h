@@ -11,10 +11,12 @@ class PanelItem : public QWidget
 public:
     explicit PanelItem(QWidget *parent = nullptr);
 
-    PanelItem(const QPixmap& pixmap, const QString& text, QWidget* parent = nullptr);
-
     MyJson toJson() const;
-    void fromJson(MyJson json);
+    static PanelItem* fromJson(const MyJson& json, QWidget* parent = nullptr);
+
+    void setIcon(const QString& iconName);
+    void setText(const QString& text);
+    void setLink(const QString& link);
 
 signals:
 
@@ -27,6 +29,10 @@ public:
     QWidget* selectWidget;
 
     const int selectBorder = 2;
+
+    QString iconName;
+    QString text;
+    QString link; // 文件或者网址
 };
 
 #endif // PANELITEM_H

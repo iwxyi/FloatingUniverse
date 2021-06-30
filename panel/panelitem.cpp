@@ -1,4 +1,5 @@
 #include <QVBoxLayout>
+#include <QIcon>
 #include "panelitem.h"
 #include "usettings.h"
 #include "runtime.h"
@@ -20,13 +21,6 @@ PanelItem::PanelItem(QWidget *parent) : QWidget(parent)
     selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid #FF0000");
 }
 
-PanelItem::PanelItem(const QPixmap &pixmap, const QString &text, QWidget *parent)
-    : PanelItem(parent)
-{
-    iconLabel->setPixmap(pixmap);
-    textLabel->setText(text);
-}
-
 MyJson PanelItem::toJson() const
 {
     MyJson json;
@@ -40,21 +34,49 @@ MyJson PanelItem::toJson() const
     json.insert("icon", "");
     json.insert("text", textLabel->text());
 
+    if (link.isEmpty())
+        json.insert("link", link);
+
     return json;
 }
 
-void PanelItem::fromJson(MyJson json)
+PanelItem *PanelItem::fromJson(const MyJson &json, QWidget *parent)
 {
+    PanelItem* item = new PanelItem(parent);
+
     // 位置
     QRect rect(json.i("left"), json.i("top"), json.i("width"), json.i("height"));
-    this->move(rect.topLeft());
+    item->move(rect.topLeft());
 
-    // 数据
+    // 基础数据
     QString iconName = json.s("icon");
-    QPixmap pixmap(rt->ICON_PATH + iconName);
-    if (!pixmap.isNull())
-        iconLabel->setPixmap(pixmap);
-    textLabel->setText(json.s("text"));
+    item->setIcon(iconName);
+    item->setText(json.s("text"));
+
+    // 扩展数据
+    item->link = json.s("link");
+
+    return item;
+}
+
+void PanelItem::setIcon(const QString &iconName)
+{
+    if (iconName.isEmpty())
+        return ;
+    QIcon icon(rt->ICON_PATH + iconName);
+    if (!icon.isNull())
+        iconLabel->setPixmap(icon.pixmap(us->pannelItemSize, us->pannelItemSize));
+}
+
+void PanelItem::setText(const QString &text)
+{
+    textLabel->setText(text);
+    this->text = text;
+}
+
+void PanelItem::setLink(const QString &link)
+{
+    this->link = link;
 }
 
 void PanelItem::showSelect(bool sh)

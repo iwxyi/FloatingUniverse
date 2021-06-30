@@ -7,6 +7,7 @@
 #include <QDateTime>
 #include <QMouseEvent>
 #include <QMimeData>
+#include <QFileIconProvider>
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
@@ -54,14 +55,40 @@ void UniversePanel::readItems()
     items.clear();
 
     // 读取设置
-    MyJson json(readTextFile(rt->PANEL_PATH).toLocal8Bit());
+    MyJson json(readTextFile(rt->PANEL_PATH).toUtf8());
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
     {
-        auto item = new PanelItem(this);
-        item->fromJson(ar.toObject());
+        auto item = PanelItem::fromJson(ar.toObject(), this);
+        items.append(item);
         item->show();
     }
+}
+
+PanelItem *UniversePanel::createItem(QPoint pos, const QIcon& icon, const QString &text)
+{
+    QString iconName;
+    if (!icon.isNull())
+    {
+        // 保存到本地
+        int val = 1;
+        while (QFileInfo(rt->ICON_PATH + QString::number(val) + ".png").exists())
+            val++;
+        iconName = QString::number(val) + ".png";
+
+        QPixmap pixmap = icon.pixmap(us->pannelItemSize, us->pannelItemSize);
+        pixmap.save(rt->ICON_PATH + iconName);
+    }
+
+    auto item = new PanelItem(this);
+    item->setIcon(iconName);
+    item->setText(text);
+    item->move(pos);
+    items.append(item);
+    item->show();
+
+    save();
+    return item;
 }
 
 /// 从收起状态展开面板
@@ -114,6 +141,20 @@ void UniversePanel::save()
     }
     json.insert("items", array);
     writeTextFile(rt->PANEL_PATH, json.toBa());
+}
+
+void UniversePanel::selectAll()
+{
+    foreach (auto item, items)
+        item->showSelect(true);
+    selectedItems = items;
+}
+
+void UniversePanel::unselectAll()
+{
+    foreach (auto item, selectedItems)
+        item->showSelect(false);
+    selectedItems.clear();
 }
 
 QRect UniversePanel::screenGeometry() const
@@ -201,6 +242,24 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
     {
         pressing = true;
         pressPos = draggingPos = event->pos();
+
+        // 判断点击位置
+        bool inSelectItem = false; // 点在选中图形上
+        foreach (auto item, selectedItems)
+        {
+            if (item->geometry().contains(pressPos))
+            {
+                inSelectItem = true;
+                break;
+            }
+        }
+
+        if (!inSelectItem) // 不在选中图形上
+        {
+            // 取消选中
+            unselectAll();
+        }
+
         update();
     }
 
@@ -211,11 +270,31 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
-        pressing = false;
+        if (pressing)
+        {
+            pressing = false;
+            draggingPos = event->pos();
 
-        // 批量选中
+            // 批量选中
+            if ((pressPos - draggingPos).manhattanLength() > QApplication::startDragDistance())
+            {
+                QRect range(pressPos, draggingPos);
+                foreach (auto item, items)
+                {
+                    if (range.contains(item->geometry()))
+                    {
+                        item->showSelect(true);
+                        selectedItems.append(item);
+                    }
+                }
+            }
+            else // 单击
+            {
 
-        draggingPos = pressPos;
+            }
+        }
+
+        pressPos = draggingPos = QPoint();
         update();
     }
 
@@ -276,6 +355,20 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     });
 }
 
+void UniversePanel::keyPressEvent(QKeyEvent *event)
+{
+    auto key = event->key();
+    if (key == Qt::Key_Escape)
+    {
+        if (selectedItems.size())
+            unselectAll();
+
+        event->ignore();
+    }
+
+    QWidget::keyPressEvent(event);
+}
+
 void UniversePanel::dragEnterEvent(QDragEnterEvent *event)
 {
     if (!expanding)
@@ -334,14 +427,23 @@ void UniversePanel::dragMoveEvent(QDragMoveEvent *event)
     event->acceptProposedAction();//接收该数据类型拖拽事件
 }
 
+/// 拖动到上面
+/// 创建对应的对象
+/// !注意可能是自己拖动的，作为移动
 void UniversePanel::dropEvent(QDropEvent *event)
 {
+    QPoint pos = event->pos();
     if(event->mimeData()->hasUrls())//处理期望数据类型
     {
+        QFileIconProvider icon_provider;
         QList<QUrl> urls = event->mimeData()->urls();//获取数据并保存到链表中
         for(int i = 0; i < urls.count(); i++)
         {
             QString path = urls.at(i).toLocalFile();
+            QIcon icon = icon_provider.icon(QFileInfo(path));
+            auto item = createItem(pos, icon, urls.at(i).fileName());
+            item->setLink(path);
+            pos.rx() += item->width();
         }
     }
     else
