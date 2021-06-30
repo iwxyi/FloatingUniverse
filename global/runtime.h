@@ -9,9 +9,12 @@ class Runtime : public QObject
 public:
     explicit Runtime(QObject *parent = nullptr);
 
+    void setAppPath(QString path);
 
 public:
     QString APP_PATH;
+    QString PANEL_PATH;
+    QString ICON_PATH;
     QString DATA_PATH;
     QString IMAGE_PATH;
 

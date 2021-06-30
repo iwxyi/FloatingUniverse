@@ -6,11 +6,13 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QMouseEvent>
+#include <QMimeData>
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
 #include "signaltransfer.h"
 #include "facilemenu.h"
+#include "fileutil.h"
 
 UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 {
@@ -26,11 +28,40 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
     initPanel();
 }
 
+UniversePanel::~UniversePanel()
+{
+    save();
+}
+
+/// 初始化面板所有数据
 void UniversePanel::initPanel()
 {
     QRect screen = screenGeometry();
     setFixedSize(us->panelWidth, us->panelHeight);
     move((screen.width() - width()) / 2 + us->panelCenterOffset, -height() + us->panelBangHeight); //
+
+    readItems();
+}
+
+/// 读取设置
+void UniversePanel::readItems()
+{
+    // 清理当前
+    foreach (auto item, items)
+    {
+        item->deleteLater();
+    }
+    items.clear();
+
+    // 读取设置
+    MyJson json(readTextFile(rt->PANEL_PATH).toLocal8Bit());
+    QJsonArray array = json.a("items");
+    foreach (auto ar, array)
+    {
+        auto item = new PanelItem(this);
+        item->fromJson(ar.toObject());
+        item->show();
+    }
 }
 
 /// 从收起状态展开面板
@@ -54,6 +85,9 @@ void UniversePanel::expandPanel()
 /// 从显示状态收起面板
 void UniversePanel::foldPanel()
 {
+    if (fixing) // 固定不隐藏
+        return ;
+
     QPropertyAnimation* ani = new QPropertyAnimation(this, "pos");
     ani->setStartValue(pos());
     ani->setEndValue(QPoint(pos().x(), -height() + us->panelBangHeight));
@@ -68,6 +102,18 @@ void UniversePanel::foldPanel()
     ani->start();
     expanding = false;
     animating = true;
+}
+
+void UniversePanel::save()
+{
+    MyJson json;
+    QJsonArray array;
+    foreach (auto item, items)
+    {
+        array.append(item->toJson());
+    }
+    json.insert("items", array);
+    writeTextFile(rt->PANEL_PATH, json.toBa());
 }
 
 QRect UniversePanel::screenGeometry() const
@@ -103,6 +149,18 @@ void UniversePanel::leaveEvent(QEvent *event)
 
     if (expanding)
         foldPanel();
+}
+
+void UniversePanel::focusOutEvent(QFocusEvent *event)
+{
+    if (pressing)
+    {
+        // 拖拽的时候突然失去焦点
+        pressing = false;
+        update();
+    }
+
+    QWidget::focusOutEvent(event);
 }
 
 void UniversePanel::paintEvent(QPaintEvent *)
@@ -180,21 +238,9 @@ void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
     QWidget::mouseDoubleClickEvent(event);
 }
 
-void UniversePanel::focusOutEvent(QFocusEvent *event)
-{
-    if (pressing)
-    {
-        // 拖拽的时候突然失去焦点
-        pressing = false;
-        update();
-    }
-
-    QWidget::focusOutEvent(event);
-}
-
 void UniversePanel::contextMenuEvent(QContextMenuEvent *)
 {
-    FacileMenu* menu = new FacileMenu(this);
+    newFacileMenu;
     currentMenu = menu;
 
     auto addMenu = menu->addMenu("添加");
@@ -214,10 +260,93 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
 
     });
 
+    menu->split()->addAction("固定", [=]{
+        fixing = !fixing;
+    })->check(fixing);
+
+    menu->addAction("刷新", [=]{
+        readItems();
+    });
+
     menu->exec();
     menu->finished([=]{
         currentMenu = nullptr;
         if (!this->hasFocus())
             foldPanel();
     });
+}
+
+void UniversePanel::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (!expanding)
+    {
+        expandPanel();
+    }
+
+    if(event->mimeData()->hasUrls())//判断数据类型
+    {
+
+    }
+    else if (event->mimeData()->hasHtml())
+    {
+
+    }
+    else if (event->mimeData()->hasText())
+    {
+
+    }
+    else if (event->mimeData()->hasImage())
+    {
+
+    }
+    else
+    {
+        event->ignore();//忽略
+        return ;
+    }
+
+    event->acceptProposedAction(); // 接收该数据类型拖拽事件
+}
+
+void UniversePanel::dragMoveEvent(QDragMoveEvent *event)
+{
+    if(event->mimeData()->hasUrls())//判断数据类型
+    {
+    }
+    else if (event->mimeData()->hasHtml())
+    {
+
+    }
+    else if (event->mimeData()->hasText())
+    {
+
+    }
+    else if (event->mimeData()->hasImage())
+    {
+
+    }
+    else
+    {
+        event->ignore();
+        return ;
+    }
+
+    event->acceptProposedAction();//接收该数据类型拖拽事件
+}
+
+void UniversePanel::dropEvent(QDropEvent *event)
+{
+    if(event->mimeData()->hasUrls())//处理期望数据类型
+    {
+        QList<QUrl> urls = event->mimeData()->urls();//获取数据并保存到链表中
+        for(int i = 0; i < urls.count(); i++)
+        {
+            QString path = urls.at(i).toLocalFile();
+        }
+    }
+    else
+    {
+        event->ignore();
+        return ;
+    }
 }

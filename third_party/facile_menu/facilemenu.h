@@ -17,6 +17,8 @@
 
 #define DEFAULT_MENU_BLUR_ALPHA 33
 
+#define newFacileMenu FacileMenu *menu = new FacileMenu(this)
+
 typedef std::function<void(int index, bool state)> const FuncCheckType;
 
 class FacileMenu : public QWidget
@@ -30,10 +32,9 @@ public:
     FacileMenuItem* addAction(QIcon icon, FuncType clicked = nullptr);
     FacileMenuItem* addAction(QString text, FuncType clicked = nullptr);
     FacileMenuItem* addAction(QAction* action, bool deleteWithMenu = false);
-    FacileMenuItem* addAction(QIcon icon, QString text, void (*func)());
     template <class T>
     FacileMenuItem* addAction(QIcon icon, QString text, T *obj, void (T::*func)());
-    FacileMenu* addNumberedActions(QString pattern, int numberStart, int numberEnd, FuncItemType config = nullptr, FuncIntType clicked = nullptr);
+    FacileMenu* addNumberedActions(QString pattern, int numberStart, int numberEnd, FuncItemType config = nullptr, FuncIntType clicked = nullptr, int step = 0);
     FacileMenu* addNumberedActions(QString pattern, int numberStart, int numberEnd, FuncItemIntType config, FuncIntType clicked = nullptr, int step = 0);
     FacileMenu* addActions(QList<QAction*> actions);
 
@@ -64,6 +65,7 @@ public:
     FacileMenuItem* addSeparator();
     FacileMenu* split();
     FacileMenuItem* lastAddedItem();
+    bool hasFocus() const;
 
     int indexOf(FacileMenuItem* item);
     FacileMenuItem* at(int index);
@@ -73,7 +75,6 @@ public:
     void execute();
     void toHide(int focusIndex = -1);
     FacileMenu* finished(FuncType func);
-    bool hasFocus() const;
 
     FacileMenu* addOptions(QList<QString>texts, QList<bool>states, FuncIntType clicked);
     FacileMenu* addOptions(QList<QString>texts, int select, FuncIntType clicked);
@@ -110,6 +111,7 @@ protected:
     void startAnimationOnShowed();
     void startAnimationOnHidden(int focusIndex);
 
+    void showEvent(QShowEvent *event) override;
     void hideEvent(QHideEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;

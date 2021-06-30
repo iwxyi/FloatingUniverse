@@ -94,27 +94,11 @@ FacileMenuItem *FacileMenu::addAction(QAction *action, bool deleteWithMenu)
     }
     else // 普通的action
     {
-        return addAction(action->icon(), action->text(), [=]{ action->trigger(); });
+        auto ac = addAction(action->icon(), action->text(), [=]{ action->trigger(); });
+        if (action->isChecked())
+            ac->check();
+        return ac;
     }
-}
-
-/**
- * 回调：普通/静态函数
- */
-FacileMenuItem *FacileMenu::addAction(QIcon icon, QString text, void (*func)())
-{
-    auto item = createMenuItem(icon, text);
-    connect(item, &InteractiveButtonBase::clicked, this, [=]{
-        if (_showing_animation)
-            return ;
-        func();
-        if (item->isLinger())
-            return ;
-        emit signalActionTriggered(item);
-        toHide(items.indexOf(item));
-    });
-    connect(item, &InteractiveButtonBase::signalMouseEnter, this, [=]{ itemMouseEntered(item); });
-    return item;
 }
 
 /**
@@ -141,10 +125,12 @@ FacileMenuItem *FacileMenu::addAction(QIcon icon, QString text, T *obj, void (T:
  * 批量添加带数字（可以不带）的action
  * 相当于只是少了个for循环……
  * @param pattern 例如 项目%1
+ * @param numberEnd 注意，结数值不包括结尾！
  */
-FacileMenu *FacileMenu::addNumberedActions(QString pattern, int numberStart, int numberEnd, FuncItemType config, FuncIntType clicked)
+FacileMenu *FacileMenu::addNumberedActions(QString pattern, int numberStart, int numberEnd, FuncItemType config, FuncIntType clicked, int step)
 {
-    int step = numberStart <= numberEnd ? 1 : -1;
+	if (!step)
+		step = numberStart <= numberEnd ? 1 : -1;
     for (int i = numberStart; i != numberEnd; i += step)
     {
         auto ac = addAction(pattern.arg(i), [=]{
@@ -159,12 +145,14 @@ FacileMenu *FacileMenu::addNumberedActions(QString pattern, int numberStart, int
 
 /**
  * 同上
+ * @param pattern 例如 项目%1
+ * @param numberEnd 注意，结数值不包括结尾！
  * @param config (Item*, int) 其中参数2表示number遍历的位置，不是当前item的index
  */
 FacileMenu *FacileMenu::addNumberedActions(QString pattern, int numberStart, int numberEnd, FuncItemIntType config, FuncIntType clicked, int step)
 {
-    if (!step)
-        step = numberStart <= numberEnd ? 1 : -1;
+	if (!step)
+    	step = numberStart <= numberEnd ? 1 : -1;
     for (int i = numberStart; i != numberEnd; i += step)
     {
         auto ac = addAction(pattern.arg(i), [=]{
@@ -497,6 +485,15 @@ FacileMenuItem *FacileMenu::lastAddedItem()
     return last_added_item;
 }
 
+bool FacileMenu::hasFocus() const
+{
+    if (QWidget::hasFocus())
+        return true;
+    if (current_sub_menu && current_sub_menu->hasFocus())
+        return true;
+    return false;
+}
+
 /**
  * 返回菜单项的索引
  * 不包括非菜单项的自定义控件、布局、分割线等
@@ -549,9 +546,10 @@ void FacileMenu::exec(QPoint pos)
     QPoint originPos = pos; // 不包含像素偏移的原始点
     main_vlayout->setEnabled(true);
     main_vlayout->activate(); // 先调整所有控件大小
-
+	this->adjustSize();
+	
     // setAttribute(Qt::WA_DontShowOnScreen); // 会触发 setMouseGrabEnabled 错误
-    show();
+    // show();
     // hide(); // 直接显示吧
     // setAttribute(Qt::WA_DontShowOnScreen, false);
 
@@ -591,6 +589,11 @@ void FacileMenu::exec(QRect expt, bool vertical, QPoint pos)
         pos = QCursor::pos();
     main_vlayout->setEnabled(true);
     main_vlayout->activate(); // 先调整所有控件大小
+
+    // setAttribute(Qt::WA_DontShowOnScreen); // 会触发 setMouseGrabEnabled 错误
+    show();
+    // hide(); // 直接显示吧
+    // setAttribute(Qt::WA_DontShowOnScreen, false);
 
     // 根据 rect 和 avai 自动调整范围
     QRect avai = window_rect;
@@ -707,15 +710,6 @@ FacileMenu* FacileMenu::finished(FuncType func)
 {
     this->finished_func = new FuncType(func);
     return this;
-}
-
-bool FacileMenu::hasFocus() const
-{
-    if (QWidget::hasFocus())
-        return true;
-    if (current_sub_menu && current_sub_menu->hasFocus())
-        return true;
-    return false;
 }
 
 /**
@@ -1213,7 +1207,7 @@ void FacileMenu::startAnimationOnHidden(int focusIndex)
     for (int i = 0; i < items.size(); i++)
     {
         InteractiveButtonBase* btn = items.at(i);
-        QPoint pos = btn->pos();
+        // QPoint pos = btn->pos();
         btn->setBlockHover(true);
         QPropertyAnimation* ani = new QPropertyAnimation(btn, "pos");
         ani->setStartValue(btn->pos());
@@ -1244,7 +1238,7 @@ void FacileMenu::startAnimationOnHidden(int focusIndex)
         connect(ani, SIGNAL(finished()), ani, SLOT(deleteLater()));
         connect(ani, &QPropertyAnimation::finished, btn, [=]{
             btn->setBlockHover(false);
-            btn->move(pos);
+            // btn->move(pos);
         });
         ani->start();
     }
@@ -1281,9 +1275,9 @@ void FacileMenu::startAnimationOnHidden(int focusIndex)
             ani->setDuration(dur_max);
         }
         connect(ani, SIGNAL(finished()), ani, SLOT(deleteLater()));
-        connect(ani, &QPropertyAnimation::finished, btn, [=]{
-            btn->move(pos);
-        });
+        // connect(ani, &QPropertyAnimation::finished, btn, [=]{
+        //     btn->move(pos);
+        // });
         ani->start();
     }
 
@@ -1312,10 +1306,17 @@ void FacileMenu::startAnimationOnHidden(int focusIndex)
     });
 }
 
+void FacileMenu::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+
+    main_vlayout->activate();
+}
+
 void FacileMenu::hideEvent(QHideEvent *event)
 {
     emit signalHidden();
-    this->close();
+    this->close(); // 子菜单关闭，不会导致自己关闭，需要手动close
     return QWidget::hideEvent(event);
 }
 
@@ -1347,6 +1348,7 @@ void FacileMenu::keyPressEvent(QKeyEvent *event)
     {
         if (item->isKey((Qt::Key)key))
         {
+            _showing_animation = false; // 在showing的时候，点击是无效的，所以要关掉
             item->simulateStatePress(); // 确定是这个action的快捷键
             return ;
         }

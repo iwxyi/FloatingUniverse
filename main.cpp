@@ -25,14 +25,14 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName(APPLICATION_NAME);
     QCoreApplication::setApplicationVersion(VERSION_CODE);
-    a.setQuitOnLastWindowClosed(false);
+    a.setQuitOnLastWindowClosed(false); // 关闭最后一个窗口的时候程序不退出（菜单也算窗口）
 
     QFont font(a.font());
     font.setFamily("微软雅黑");
     a.setFont(font);
 
     // 初始化全局配置
-    rt->APP_PATH = QApplication::applicationDirPath() + "/";
+    rt->setAppPath(QApplication::applicationDirPath() + "/");
     rt->DATA_PATH = QApplication::applicationDirPath() + "/data/";
     rt->IMAGE_PATH = rt->DATA_PATH + "images/";
     rt->CACHE_PATH = rt->DATA_PATH + "cache/";
