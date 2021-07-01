@@ -57,6 +57,7 @@ void UniversePanel::readItems()
         item->deleteLater();
     }
     items.clear();
+    selectedItems.clear();
 
     // 读取设置
     MyJson json(readTextFile(rt->PANEL_PATH).toUtf8());
@@ -475,25 +476,37 @@ void UniversePanel::mouseMoveEvent(QMouseEvent *event)
     {
 
     }
-    else if (pressing) // 拖拽出区域
+    else if (pressing) // 拖拽
     {
         draggingPos = event->pos();
-        update();
-
-        // 显示hover
-        QRect range(pressPos, draggingPos);
-        foreach (auto item, items)
+        if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) // 拖拽移动
         {
-            if (item->isSelected())
-                continue;
-
-            if (range.contains(item->geometry().center()))
+            QPoint delta = draggingPos - pressPos;
+            foreach (auto item, items)
             {
-                item->showHover(true);
+                item->move(item->pos() + delta);
             }
-            else
+            pressPos = draggingPos;
+        }
+        else // 拖拽出区域
+        {
+            update();
+
+            // 显示hover
+            QRect range(pressPos, draggingPos);
+            foreach (auto item, items)
             {
-                item->showHover(false);
+                if (item->isSelected())
+                    continue;
+
+                if (range.contains(item->geometry().center()))
+                {
+                    item->showHover(true);
+                }
+                else
+                {
+                    item->showHover(false);
+                }
             }
         }
     }
