@@ -33,6 +33,7 @@ public slots:
     void selectAll();
     void unselectAll();
     void selectItem(PanelItem* item);
+    void unselectItem(PanelItem* item);
     void triggerItem(PanelItem* item);
 
 private slots:

@@ -98,10 +98,28 @@ void UniversePanel::connectItem(PanelItem *item)
     });
 
     connect(item, &PanelItem::pressed, this, [=]{
-        if (!selectedItems.contains(item))
+        if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) // 多选
         {
-            unselectAll();
-            selectItem(item);
+            QPoint pos = mapFromGlobal(QCursor::pos());
+            foreach (auto item, items)
+            {
+                if (item->geometry().contains(pos))
+                {
+                    if (selectedItems.contains(item))
+                        unselectItem(item);
+                    else
+                        selectItem(item);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (!selectedItems.contains(item))
+            {
+                unselectAll();
+                selectItem(item);
+            }
         }
     });
 
@@ -216,6 +234,12 @@ void UniversePanel::selectItem(PanelItem *item)
 {
     item->showSelect(true);
     selectedItems.insert(item);
+}
+
+void UniversePanel::unselectItem(PanelItem *item)
+{
+    item->showSelect(false);
+    selectedItems.remove(item);
 }
 
 void UniversePanel::triggerItem(PanelItem *item)
@@ -364,6 +388,7 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
         pressPos = draggingPos = event->pos();
 
         // 判断点击位置
+        // 此时已经确保不是点在item上了
         bool inSelectItem = false; // 点在选中图形上
         foreach (auto item, selectedItems)
         {
@@ -465,7 +490,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     // 选中一个或者多个
     if (selectedItems.size())
     {
-        menu->addAction(QIcon(":/icons/open"), "打开", [=]{
+        menu->addAction(QIcon(":/icons/open (&O"), "打开", [=]{
             foreach (auto item, selectedItems)
             {
                 triggerItem(item);
@@ -473,7 +498,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             unselectAll();
         });
 
-        menu->addAction(QIcon(":/icons/delete"), "删除", [=]{
+        menu->addAction(QIcon(":/icons/delete (&D)"), "删除", [=]{
             foreach (auto item, selectedItems)
             {
                 items.removeOne(item);

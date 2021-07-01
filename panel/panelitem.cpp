@@ -121,6 +121,9 @@ void PanelItem::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
+        if (event->modifiers() & Qt::ControlModifier) // 多选，不进行操作
+            return ;
+
         if (dragged) // 拖拽移动结束
         {
             emit needSave();
