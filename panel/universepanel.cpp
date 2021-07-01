@@ -537,24 +537,25 @@ void UniversePanel::keyPressEvent(QKeyEvent *event)
 
 void UniversePanel::dragEnterEvent(QDragEnterEvent *event)
 {
+    auto mime = event->mimeData();
     if (!expanding)
     {
         expandPanel();
     }
 
-    if(event->mimeData()->hasUrls())//判断数据类型
+    if(mime->hasUrls())//判断数据类型
     {
 
     }
-    else if (event->mimeData()->hasHtml())
+    else if (mime->hasHtml())
     {
 
     }
-    else if (event->mimeData()->hasText())
+    else if (mime->hasText())
     {
 
     }
-    else if (event->mimeData()->hasImage())
+    else if (mime->hasImage())
     {
 
     }
@@ -569,18 +570,19 @@ void UniversePanel::dragEnterEvent(QDragEnterEvent *event)
 
 void UniversePanel::dragMoveEvent(QDragMoveEvent *event)
 {
-    if(event->mimeData()->hasUrls())//判断数据类型
+    auto mime = event->mimeData();
+    if(mime->hasUrls())//判断数据类型
     {
     }
-    else if (event->mimeData()->hasHtml())
-    {
-
-    }
-    else if (event->mimeData()->hasText())
+    else if (mime->hasHtml())
     {
 
     }
-    else if (event->mimeData()->hasImage())
+    else if (mime->hasText())
+    {
+
+    }
+    else if (mime->hasImage())
     {
 
     }
@@ -599,28 +601,57 @@ void UniversePanel::dragMoveEvent(QDragMoveEvent *event)
 void UniversePanel::dropEvent(QDropEvent *event)
 {
     QPoint pos = event->pos();
-    if(event->mimeData()->hasUrls())//处理期望数据类型
+    auto mime = event->mimeData();
+    if(mime->hasUrls())//处理期望数据类型
     {
         QFileIconProvider icon_provider;
-        QList<QUrl> urls = event->mimeData()->urls();//获取数据并保存到链表中
+        QList<QUrl> urls = mime->urls();//获取数据并保存到链表中
         for(int i = 0; i < urls.count(); i++)
         {
-            QString path = urls.at(i).toLocalFile();
-            QIcon icon = icon_provider.icon(QFileInfo(path));
-            auto item = createNewItem(pos, icon, urls.at(i).fileName());
-            item->setLink(path);
+            qInfo() << urls.at(i);
+            PanelItem* item = nullptr;
+            if (urls.at(i).isLocalFile())
+            {
+                QString path = urls.at(i).toLocalFile();
+                QIcon icon = icon_provider.icon(QFileInfo(path));
+                item = createNewItem(pos, icon, urls.at(i).fileName());
+                item->setLink(path);
+            }
+            else
+            {
+                QString path = urls.at(i).url();
+                item = createNewItem(pos, ":/icons/link", path);
+                item->setLink(path);
+            }
             pos.rx() += item->width();
         }
     }
-    else if (event->mimeData()->hasHtml())
+    else if (mime->hasHtml())
     {
 
     }
-    else if (event->mimeData()->hasText())
+    else if (mime->hasText())
     {
+        QString text = mime->text();
+        if (!text.contains("\n"))
+        {
+            if (text.startsWith("http://") || text.startsWith("https://"))
+            {
+                auto item = createNewItem(pos, ":/icons/link", text);
+                item->setLink(text);
+            }
+            else if (QFileInfo(text).exists())
+            {
+                QFileInfo info(text);
+                QString path = info.absoluteFilePath();
+                QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+                auto item = createNewItem(pos, icon, info.fileName());
+                item->setLink(path);
+            }
+        }
 
     }
-    else if (event->mimeData()->hasImage())
+    else if (mime->hasImage())
     {
 
     }
