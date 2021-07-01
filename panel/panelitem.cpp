@@ -18,6 +18,9 @@ PanelItem::PanelItem(QWidget *parent) : QWidget(parent)
     iconLabel->setScaledContents(false);
     iconLabel->setAlignment(Qt::AlignCenter);
     textLabel->setAlignment(Qt::AlignCenter);
+    textLabel->setWordWrap(true);
+
+    // textLabel->setMaximumWidth(us->pannelItemSize);
 
     selectWidget = new QWidget(this);
     selectWidget->hide();
@@ -69,7 +72,7 @@ void PanelItem::setIcon(const QString &iconName)
     if (iconName.isEmpty())
         return ;
     this->iconName = iconName;
-    QIcon icon(rt->ICON_PATH + iconName);
+    QIcon icon(iconName.startsWith(":") ? iconName : rt->ICON_PATH + iconName);
     if (!icon.isNull())
         iconLabel->setPixmap(icon.pixmap(us->pannelItemSize, us->pannelItemSize));
 }
@@ -126,18 +129,44 @@ void PanelItem::mouseReleaseEvent(QMouseEvent *event)
         {
             emit triggered();
         }
+        return ;
     }
+
+    QWidget::mouseReleaseEvent(event);
 }
 
 void PanelItem::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
     {
-        // 拖拽
         QPoint globalPos = event->pos() + this->pos();
         QPoint delta = globalPos - pressGlobalPos;
-        dragged = true;
-        emit moveItems(delta);
-        pressGlobalPos = globalPos;
+
+        if (!dragged) // 第一次拖拽
+        {
+            if (delta.manhattanLength() > QApplication::startDragDistance())
+                dragged = true;
+        }
+
+        if (dragged)
+        {
+            // 拖拽
+            emit moveItems(delta);
+            pressGlobalPos = globalPos;
+        }
+        return ;
+    }
+
+    QWidget::mouseMoveEvent(event);
+}
+
+void PanelItem::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    if (!selectWidget->isHidden())
+    {
+        showSelect(true);
     }
 }
+

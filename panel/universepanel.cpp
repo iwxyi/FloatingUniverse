@@ -10,6 +10,7 @@
 #include <QFileIconProvider>
 #include <QDesktopServices>
 #include <QInputDialog>
+#include <QFileDialog>
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
@@ -77,6 +78,7 @@ PanelItem *UniversePanel::createNewItem(QPoint pos, const QIcon &icon, const QSt
 PanelItem *UniversePanel::createNewItem(QPoint pos, const QString& iconName, const QString &text)
 {
     auto item = new PanelItem(this);
+    // item->textLabel->setMaximumWidth(us->pannelItemSize);
     item->setIcon(iconName);
     item->setText(text);
     item->move(pos);
@@ -194,7 +196,7 @@ void UniversePanel::selectAll()
 {
     foreach (auto item, items)
         item->showSelect(true);
-    selectedItems = items;
+    selectedItems = items.toSet();
 }
 
 void UniversePanel::unselectAll()
@@ -207,7 +209,7 @@ void UniversePanel::unselectAll()
 void UniversePanel::selectItem(PanelItem *item)
 {
     item->showSelect(true);
-    selectedItems.append(item);
+    selectedItems.insert(item);
 }
 
 void UniversePanel::triggerItem(PanelItem *item)
@@ -334,18 +336,16 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
     }
     else if (event->button() == Qt::RightButton) // 即将显示菜单
     {
-        if (selectedItems.size() == 1) // 如果选中一项，那么就相当于没选
-            unselectAll();
-        if (!selectedItems.size()) // 没有选中项
+        // 自动选中鼠标下面的菜单
+        QPoint pos = event->pos();
+        foreach (auto item, items)
         {
-            // 自动选中鼠标下面的菜单
-            QPoint pos = event->pos();
-            foreach (auto item, items)
+            if (item->geometry().contains(pos))
             {
-                if (item->geometry().contains(pos))
-                {
-                    selectItem(item);
-                }
+                if (!selectedItems.contains(item))
+                    unselectAll();
+                selectItem(item);
+                break;
             }
         }
     }
@@ -368,16 +368,16 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
                 QRect range(pressPos, draggingPos);
                 foreach (auto item, items)
                 {
-                    if (range.contains(item->geometry()))
+                    if (range.contains(item->geometry().center()))
                     {
                         item->showSelect(true);
-                        selectedItems.append(item);
+                        selectedItems.insert(item);
                     }
                 }
             }
             else // 单击
             {
-
+                // 什么都不做
             }
         }
 
@@ -412,11 +412,12 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
 {
     newFacileMenu;
     currentMenu = menu;
+    QPoint cursorPos = mapFromGlobal(QCursor::pos());
 
     // 选中一个或者多个
     if (selectedItems.size())
     {
-        menu->addAction("打开", [=]{
+        menu->addAction(QIcon(":/icons/open"), "打开", [=]{
             foreach (auto item, selectedItems)
             {
                 triggerItem(item);
@@ -424,7 +425,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             unselectAll();
         });
 
-        menu->addAction("删除", [=]{
+        menu->addAction(QIcon(":/icons/delete"), "删除", [=]{
             foreach (auto item, selectedItems)
             {
                 items.removeOne(item);
@@ -433,47 +434,82 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             selectedItems.clear();
             save();
         });
-        menu->split();
     }
 
     // 选中一个
     if (selectedItems.size() == 1)
     {
-        auto item = selectedItems.first();
-        menu->addAction("重命名", [=]{
+        auto item = selectedItems.toList().first();
+        menu->addAction(QIcon(":/icons/rename"), "重命名", [=]{
             bool ok = false;
             QString newName = QInputDialog::getText(this, "修改名字", "请输入新的名字", QLineEdit::Normal, item->text, &ok);
             if (!ok)
                 return ;
             item->setText(newName);
+            item->adjustSize();
             save();
         });
 
-        menu->split();
+        menu->addAction(QIcon(":/icons/link"), "链接", [=]{
+            bool ok = false;
+            QString newLink = QInputDialog::getText(this, "修改链接", "可以是文件路径、网址，点击项目后立即打开", QLineEdit::Normal, item->link, &ok);
+            if (!ok)
+                return ;
+            item->setLink(newLink);
+            save();
+        });
     }
 
-    auto addMenu = menu->addMenu("添加");
+    if (selectedItems.size())
+        menu->split();
+
+    auto addMenu = menu->addMenu(QIcon(":/icons/add"), "添加");
     addMenu->addAction("文件", [=]{
 
-    });
+    })->disable();
     addMenu->addAction("文件夹", [=]{
 
-    });
-    addMenu->addAction("文件链接", [=]{
-
+    })->disable();
+    addMenu->split()->addAction("文件链接", [=]{
+        menu->close();
+        QString prevPath = us->s("recent/selectFile");
+        QString path = QFileDialog::getOpenFileName(this, "添加文件", prevPath);
+        if (path.isEmpty())
+            return ;
+        us->set("recent/selectFile", path);
+        QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+        auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
+        item->setLink(path);
+        save();
     });
     addMenu->addAction("文件夹链接", [=]{
-
+        menu->close();
+        QString prevPath = us->s("recent/selectFile");
+        QString path = QFileDialog::getExistingDirectory(this, "添加文件夹", prevPath);
+        if (path.isEmpty())
+            return ;
+        us->set("recent/selectFile", path);
+        QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+        auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
+        item->setLink(path);
+        save();
     });
     addMenu->addAction("网址", [=]{
-
+        menu->close();
+        QString url = QInputDialog::getText(this, "添加网址", "请输入URL", QLineEdit::Normal);
+        if (url.isEmpty())
+            return ;
+        // TODO：获取网页名字
+        auto item = createNewItem(cursorPos, ":/icons/link", url);
+        item->setLink(url);
+        save();
     });
 
-    menu->split()->addAction("固定", [=]{
+    menu->split()->addAction(QIcon(":/icons/fix"), "固定", [=]{
         fixing = !fixing;
     })->check(fixing);
 
-    menu->addAction("刷新", [=]{
+    menu->addAction(QIcon(":/icons/refresh"), "刷新", [=]{
         readItems();
     });
 

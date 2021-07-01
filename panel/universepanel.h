@@ -72,7 +72,7 @@ private:
     FacileMenu* currentMenu = nullptr;
 
     QList<PanelItem*> items;
-    QList<PanelItem*> selectedItems;
+    QSet<PanelItem*> selectedItems;
 };
 
 #endif // UNIVERSEPANEL_H
