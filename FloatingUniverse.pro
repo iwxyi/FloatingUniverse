@@ -36,6 +36,7 @@ SOURCES += \
     global/usettings.cpp \
     panel/icontextitem.cpp \
     panel/panelitembase.cpp \
+    panel/resizeableitembase.cpp \
     panel/universepanel.cpp \
     third_party/color_octree/coloroctree.cpp \
     third_party/color_octree/imageutil.cpp \
@@ -56,6 +57,7 @@ HEADERS += \
     global/usettings.h \
     panel/icontextitem.h \
     panel/panelitembase.h \
+    panel/resizeableitembase.h \
     panel/universepanel.h \
     resources/resource.rc \
     third_party/utils/mysettings.h \

@@ -33,6 +33,7 @@ private:
     QString text;
     QString link; // 文件或者网址
 
+    bool closeAfterClick = true;
     bool fastOpen = false; // 左键快速打开
     int openLevel = 3; // 打开的级别，文件多的时候越大越慢
 };

@@ -39,6 +39,7 @@ signals:
     void triggered();
     void pressed();
     void modified();
+    void hidePanel();
     void moveItems(QPoint delta);
     void facileMenuUsed(FacileMenu* menu);
 

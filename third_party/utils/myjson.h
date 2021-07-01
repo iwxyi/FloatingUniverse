@@ -77,8 +77,22 @@ public:
         return QJsonObject::value(key).toBool();
     }
 
+    bool b(QString key, bool def) const
+    {
+        if (!contains(key))
+            return def;
+        return QJsonObject::value(key).toBool();
+    }
+
     double d(QString key) const
     {
+        return QJsonObject::value(key).toDouble();
+    }
+
+    double d(QString key, double def) const
+    {
+        if (!contains(key))
+            return def;
         return QJsonObject::value(key).toDouble();
     }
 
@@ -87,8 +101,22 @@ public:
         return QJsonObject::value(key).toInt();
     }
 
+    int i(QString key, int def) const
+    {
+        if (!contains(key))
+            return def;
+        return QJsonObject::value(key).toInt();
+    }
+
     qint64 l(QString key) const
     {
+        return qint64(QJsonObject::value(key).toDouble());
+    }
+
+    qint64 l(QString key, qint64 def) const
+    {
+        if (!contains(key))
+            return def;
         return qint64(QJsonObject::value(key).toDouble());
     }
 
@@ -99,6 +127,13 @@ public:
 
     QString s(QString key) const
     {
+        return QJsonObject::value(key).toString();
+    }
+
+    QString s(QString key, QString def) const
+    {
+        if (!contains(key))
+            return def;
         return QJsonObject::value(key).toString();
     }
 

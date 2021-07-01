@@ -166,6 +166,10 @@ void UniversePanel::connectItem(PanelItemBase *item)
         });
     });
 
+    connect(item, &PanelItemBase::hidePanel, this, [=] {
+        foldPanel();
+    });
+
 }
 
 QString UniversePanel::saveIcon(const QIcon &icon) const
@@ -559,8 +563,8 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     currentMenu = menu;
     QPoint cursorPos = mapFromGlobal(QCursor::pos());
 
-    // 选中一个或者多个
-    if (selectedItems.size())
+    // 选中多个，使用批量打开（暂且不管是不是选中的item都能打开）
+    if (selectedItems.size() > 1)
     {
         menu->addAction(QIcon(":/icons/open"), "打开 (&O)", [=]{
             foreach (auto item, selectedItems)
@@ -568,16 +572,6 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
                 triggerItem(item);
             }
             unselectAll();
-        });
-
-        menu->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
-            foreach (auto item, selectedItems)
-            {
-                items.removeOne(item);
-                deleteItem(item);
-            }
-            selectedItems.clear();
-            save();
         });
     }
 
@@ -589,9 +583,23 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         item->facileMenuEvent(menu);
     }
 
+    // 选中一个或者多个
+    if (selectedItems.size())
+    {
+        menu->split()->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
+            foreach (auto item, selectedItems)
+            {
+                items.removeOne(item);
+                deleteItem(item);
+            }
+            selectedItems.clear();
+            save();
+        });
+    }
+
     if (!selectedItems.size())
     {
-        auto addMenu = menu->addMenu(QIcon(":/icons/add"), "添加 (&A)");
+        auto addMenu = menu->addMenu(QIcon(":/icons/add"), "创建 (&A)");
         addMenu->addAction("文件 (&F)", [=]{
 
         })->disable();

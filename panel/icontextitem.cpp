@@ -33,6 +33,7 @@ MyJson IconTextItem::toJson() const
     json.insert("icon", iconName);
     json.insert("text", textLabel->text());
     json.insert("link", link);
+    json.insert("closeAfterClick", closeAfterClick);
     json.insert("fastOpen", fastOpen);
     json.insert("openLevel", openLevel);
 
@@ -50,9 +51,9 @@ void IconTextItem::fromJson(const MyJson &json)
 
     // 扩展数据
     link = json.s("link");
-    fastOpen = json.b("fastOpen");
-    if (json.contains("openLevel"))
-        openLevel = json.i("openLevel");
+    closeAfterClick = json.b("closeAfterClick", closeAfterClick);
+    fastOpen = json.b("fastOpen", fastOpen);
+    openLevel = json.i("openLevel", openLevel);
 }
 
 void IconTextItem::setIcon(const QString &iconName)
@@ -120,7 +121,24 @@ bool IconTextItem::isFastOpen() const
 
 void IconTextItem::facileMenuEvent(FacileMenu *menu)
 {
-    menu->addAction(QIcon(":/icons/rename"), "重命名 (&N)", [=]{
+    menu->addAction(QIcon(":/icons/open"), "打开 (&O)", [=]{
+        triggerEvent();
+    });
+
+    if (type == LocalFile)
+    {
+        QFileInfo info(link);
+        if (info.exists())
+        {
+            menu->addAction(QIcon(":/icons/open"), "打开文件夹", [=]{
+                QDesktopServices::openUrl("file:///" + info.dir().path());
+                if (closeAfterClick)
+                    emit hidePanel();
+            });
+        }
+    }
+
+    menu->split()->addAction(QIcon(":/icons/rename"), "重命名 (&N)", [=]{
         bool ok = false;
         QString newName = QInputDialog::getText(this, "修改名字", "请输入新的名字", QLineEdit::Normal, text, &ok);
         if (!ok)
@@ -139,15 +157,28 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         emit modified();
     });
 
+    menu->split();
+
+    if (type == LocalFile || type == WebUrl)
+    {
+        menu->addAction(QIcon(":/icons/eye"), "打开后隐藏", [=]{
+            closeAfterClick = !closeAfterClick;
+            emit modified();
+        })->check(closeAfterClick);
+    }
+
     if (type == LocalFile)
     {
-        menu->split()->addAction(QIcon(":/icons/fast_open"), "快速打开 (&Q)", [=]{
+        QFileInfo info(link);
+        bool isDir = info.exists() && info.isDir();
+
+        menu->addAction(QIcon(":/icons/fast_open"), "快速打开", [=]{
             fastOpen = !fastOpen;
             emit modified();
-        })->check(fastOpen);
+        })->check(fastOpen)->hide(!isDir);
 
         auto levelMenu = menu->addMenu(QIcon(":/icons/open_level"), "加载层数");
-        menu->lastAction()->hide(!fastOpen);
+        menu->lastAction()->hide(!fastOpen || !isDir);
         levelMenu->addNumberedActions("%1层", 1, 11, [=](FacileMenuItem* item){
             item->check(item->getText() == QString::number(openLevel) + "层");
         }, [=](int val){
@@ -175,6 +206,8 @@ void IconTextItem::triggerEvent()
             }
         }
         QDesktopServices::openUrl(link);
+        if (closeAfterClick)
+            emit hidePanel();
     }
 }
 
