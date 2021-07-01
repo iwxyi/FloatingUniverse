@@ -11,6 +11,10 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QFileDialog>
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#include <windowsx.h>
+#endif
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
@@ -42,7 +46,7 @@ UniversePanel::~UniversePanel()
 void UniversePanel::initPanel()
 {
     QRect screen = screenGeometry();
-    setFixedSize(us->panelWidth, us->panelHeight);
+    resize(us->panelWidth, us->panelHeight);
     move((screen.width() - width()) / 2 + us->panelCenterOffset, -height() + us->panelBangHeight); //
 
     readItems();
@@ -785,4 +789,53 @@ void UniversePanel::dropEvent(QDropEvent *event)
         event->ignore();
         return ;
     }
+}
+
+bool UniversePanel::nativeEvent(const QByteArray &eventType, void *message, long *result)
+{
+#ifdef Q_OS_WIN32
+    Q_UNUSED(eventType)
+    MSG* msg = static_cast<MSG*>(message);
+    switch(msg->message)
+    {
+    case WM_NCHITTEST:
+        if (!fixing) // 只有固定的时候才能调整
+            return false;
+        const auto ratio = devicePixelRatioF(); // 解决4K下的问题
+        int xPos = static_cast<int>(GET_X_LPARAM(msg->lParam) / ratio - this->frameGeometry().x());
+        int yPos = static_cast<int>(GET_Y_LPARAM(msg->lParam) / ratio - this->frameGeometry().y());
+        if(xPos < boundaryWidth && yPos < boundaryWidth)                    //左上角
+            *result = HTTOPLEFT;
+        else if(xPos >= width() - boundaryWidth && yPos < boundaryWidth)          //右上角
+            *result = HTTOPRIGHT;
+        else if(xPos < boundaryWidth && yPos >= height() - boundaryWidth)         //左下角
+            *result = HTBOTTOMLEFT;
+        else if(xPos >= width() - boundaryWidth && yPos >= height() - boundaryWidth)//右下角
+            *result = HTBOTTOMRIGHT;
+        else if(xPos < boundaryWidth)                                     //左边
+            *result =  HTLEFT;
+        else if(xPos >= width() - boundaryWidth)                              //右边
+            *result = HTRIGHT;
+        /*else if(yPos<boundaryWidth)                                       //上边
+            *result = HTTOP;*/
+        else if(yPos >= height() - boundaryWidth)                             //下边
+        {
+            if (xPos >= (width() - us->panelBangWidth) / 2 && xPos <= (width() + us->panelBangWidth) / 2) // 刘海部分
+                return false;
+            *result = HTBOTTOM;
+        }
+        else              //其他部分不做处理，返回false，留给其他事件处理器处理
+           return false;
+
+        QRect screen = screenGeometry();
+        us->set("panel/centerOffset", geometry().center().x() - screen.center().x());
+        us->set("panel/width", width());
+        us->set("panel/height", height());
+
+        return true;
+    }
+#else
+    return QWidget::nativeEvent(eventType, message, result);
+#endif
+    return false;         //此处返回false，留给其他事件处理器处理
 }

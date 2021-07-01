@@ -63,10 +63,14 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
+
 private:
     bool expanding = false;
     bool animating = false;
     bool fixing = false;
+
+    int boundaryWidth = 8;
 
     bool pressing = false; // 左键按下
     QPoint pressPos;
