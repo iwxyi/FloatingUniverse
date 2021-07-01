@@ -253,8 +253,60 @@ void UniversePanel::triggerItem(PanelItem *item)
     {
         QString link = item->link;
         if (QFileInfo(link).exists())
-            link = "file:///" +link;
+        {
+            if (QFileInfo(link).isDir() && us->useFacileDirMenu)
+            {
+                showFacileDir(link, nullptr, 0);
+                return ;
+            }
+            else
+            {
+                link = "file:///" +link;
+            }
+        }
         QDesktopServices::openUrl(link);
+    }
+}
+
+void UniversePanel::showFacileDir(QString path, FacileMenu* parentMenu, int level)
+{
+    if (level >= us->facileDirMenuLevel)
+        return ;
+
+    FacileMenu* menu = parentMenu;
+    if (!parentMenu)
+    {
+        menu = new FacileMenu(this);
+        currentMenu = menu;
+    }
+
+    auto infos = QDir(path).entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    QFileIconProvider provicer;
+    foreach (auto info, infos)
+    {
+        if (info.isDir())
+        {
+            auto m = menu->addMenu(provicer.icon(info), info.fileName(), [=]{
+                QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
+            });
+            showFacileDir(info.absoluteFilePath(), m, level+1);
+        }
+        else
+        {
+            menu->addAction(provicer.icon(info), info.fileName(), [=]{
+                QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
+            });
+        }
+    }
+
+    if (!parentMenu)
+    {
+        menu->exec();
+        menu->finished([=]{
+            currentMenu = nullptr;
+            if (!this->hasFocus())
+                foldPanel();
+        });
     }
 }
 

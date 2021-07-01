@@ -1027,6 +1027,9 @@ void FacileMenu::showSubMenu(FacileMenuItem *item)
         current_sub_menu->hide();
     }
 
+    if (item->subMenu()->items.count() == 0) // 没有菜单项，不显示
+        return ;
+
     current_sub_menu = item->subMenu();
     QPoint pos(-1, -1);
     if (using_keyboard) // 键盘模式，不是跟随鼠标位置来的

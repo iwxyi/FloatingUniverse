@@ -35,6 +35,7 @@ public slots:
     void selectItem(PanelItem* item);
     void unselectItem(PanelItem* item);
     void triggerItem(PanelItem* item);
+    void showFacileDir(QString path, FacileMenu *parentMenu, int level);
 
 private slots:
     void startDragSelectedItems();

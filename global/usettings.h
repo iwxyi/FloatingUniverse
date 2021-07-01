@@ -32,11 +32,14 @@ public:
     QColor panelBg = QColor(240, 248, 255);
     QColor panelBangBg = QColor(128, 128, 128, 128);
     QColor panelSelectBg = QColor(230, 230, 250);
-    QColor panelSelectEdge = QColor(0, 71, 125);
+    QColor panelSelectEdge = QColor(179, 153, 255);
     QColor panelHoverEdge = QColor(204, 204, 255);
     int pannelItemSize = 64;
 
     int fluentRadius = 5;
+
+    bool useFacileDirMenu = true;
+    int facileDirMenuLevel = 3; // 最多显示3级文件
 };
 
 extern USettings* us;

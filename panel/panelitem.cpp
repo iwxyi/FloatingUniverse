@@ -116,7 +116,7 @@ void PanelItem::showSelect(bool sh)
 {
     if (sh)
     {
-        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + ";");
+        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
         selectWidget->setGeometry(selectBorder / 2, selectBorder / 2, width() - selectBorder, height() - selectBorder);
         selectWidget->raise();
         selectWidget->show();
@@ -132,7 +132,7 @@ void PanelItem::showHover(bool sh)
 {
     if (sh)
     {
-        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdge).toString() + ";");
+        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
         selectWidget->setGeometry(selectBorder / 2, selectBorder / 2, width() - selectBorder, height() - selectBorder);
         selectWidget->raise();
         selectWidget->show();
