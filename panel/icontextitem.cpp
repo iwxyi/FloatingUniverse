@@ -5,6 +5,7 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QFileDialog>
+#include <QProcess>
 #include "icontextitem.h"
 #include "runtime.h"
 #include "usettings.h"
@@ -172,19 +173,32 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         QFileInfo info(link);
         bool isDir = info.exists() && info.isDir();
 
-        menu->addAction(QIcon(":/icons/fast_open"), "快速打开", [=]{
-            fastOpen = !fastOpen;
-            emit modified();
-        })->check(fastOpen)->hide(!isDir);
+        if (isDir)
+        {
+            // 这个命令行显示不了
+            menu->addAction(QIcon(), "命令行", [=]{
+                QProcess p(this);
+                p.setProgram("cmd");
+                p.setArguments(QStringList{"/c", "cd", "/d", link});
+                p.start();
+                p.waitForStarted();
+                p.waitForFinished();
+            })->hide();
 
-        auto levelMenu = menu->addMenu(QIcon(":/icons/open_level"), "加载层数");
-        menu->lastAction()->hide(!fastOpen || !isDir);
-        levelMenu->addNumberedActions("%1层", 1, 11, [=](FacileMenuItem* item){
-            item->check(item->getText() == QString::number(openLevel) + "层");
-        }, [=](int val){
-            openLevel = val;
-            emit modified();
-        });
+            menu->addAction(QIcon(":/icons/fast_open"), "快速打开", [=]{
+                fastOpen = !fastOpen;
+                emit modified();
+            })->check(fastOpen);
+
+            auto levelMenu = menu->addMenu(QIcon(":/icons/open_level"), "加载层数");
+            menu->lastAction()->hide(!fastOpen);
+            levelMenu->addNumberedActions("%1层", 1, 11, [=](FacileMenuItem* item){
+                item->check(item->getText() == QString::number(openLevel) + "层");
+            }, [=](int val){
+                openLevel = val;
+                emit modified();
+            });
+        }
     }
 }
 

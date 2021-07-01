@@ -442,8 +442,11 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
 
         update();
     }
-    else if (event->button() == Qt::RightButton) // 即将显示菜单
+    else if (event->button() == Qt::RightButton) // 移动画面，或者即将显示菜单
     {
+        pressing = true;
+        pressPos = draggingPos = event->pos();
+
         // 自动选中鼠标下面的菜单
         QPoint pos = event->pos();
         foreach (auto item, items)
@@ -453,9 +456,10 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
                 if (!selectedItems.contains(item))
                     unselectAll();
                 selectItem(item);
-                break;
+                return ;
             }
         }
+        // 没有选中的，可能是移动画面，或者空白菜单
     }
 
     QWidget::mousePressEvent(event);
@@ -471,9 +475,10 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
             draggingPos = event->pos();
 
             // 批量选中
-            if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) // 移动面板位置
+            if (scening) // 移动面板位置
             {
                 save();
+                scening = false;
             }
             else if ((pressPos - draggingPos).manhattanLength() > QApplication::startDragDistance()) // 拖拽选中结束
             {
@@ -504,6 +509,21 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
         pressPos = draggingPos = QPoint();
         update();
     }
+    else if (event->button() == Qt::RightButton)
+    {
+        pressing = false;
+        draggingPos = event->pos();
+        event->accept();
+        if (scening) // 拖拽完毕，不显示菜单
+        {
+            scening = false;
+            _block_menu = true;
+            QTimer::singleShot(10, [=]{
+                _block_menu = false;
+            });
+            return ;
+        }
+    }
 
     QWidget::mouseReleaseEvent(event);
 }
@@ -517,8 +537,9 @@ void UniversePanel::mouseMoveEvent(QMouseEvent *event)
     else if (pressing) // 拖拽
     {
         draggingPos = event->pos();
-        if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) // 拖拽移动
+        if (event->buttons() & Qt::RightButton || QGuiApplication::keyboardModifiers() & Qt::AltModifier) // 拖拽移动
         {
+            scening = true;
             QPoint delta = draggingPos - pressPos;
             foreach (auto item, items)
             {
@@ -526,7 +547,7 @@ void UniversePanel::mouseMoveEvent(QMouseEvent *event)
             }
             pressPos = draggingPos;
         }
-        else // 拖拽出区域
+        else if (event->buttons() & Qt::LeftButton) // 拖拽出区域
         {
             update();
 
@@ -559,6 +580,11 @@ void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
 
 void UniversePanel::contextMenuEvent(QContextMenuEvent *)
 {
+    if (_block_menu)
+    {
+        _block_menu = false;
+        return ;
+    }
     newFacileMenu;
     currentMenu = menu;
     QPoint cursorPos = mapFromGlobal(QCursor::pos());

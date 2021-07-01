@@ -75,8 +75,10 @@ private:
     bool pressing = false; // 左键按下
     QPoint pressPos;
     bool moving = false; // 正在移动items
+    bool scening = false; // 正在移动画面
     QPoint draggingPos;
     FacileMenu* currentMenu = nullptr;
+    bool _block_menu = false;
 
     QList<PanelItemBase*> items;
     QSet<PanelItemBase*> selectedItems;
