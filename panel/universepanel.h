@@ -21,6 +21,7 @@ private:
     PanelItem* createNewItem(QPoint pos, const QString &iconName, const QString& text);
     void connectItem(PanelItem* item);
     QString saveIcon(const QIcon& icon) const;
+    QString saveIcon(const QPixmap& pixmap) const;
     void deleteItem(PanelItem* item);
 
 signals:
@@ -39,6 +40,7 @@ private slots:
 
 public:
     QRect screenGeometry() const;
+    bool getWebPageNameAndIcon(QString url, QString& pageName, QPixmap &pageIcon);
 
 protected:
     void closeEvent(QCloseEvent *) override;

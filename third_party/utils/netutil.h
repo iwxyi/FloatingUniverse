@@ -39,6 +39,21 @@ public:
         return code_content;
     }
 
+    static QByteArray getWebBa(QString uri)
+    {
+        QUrl url(uri);
+        QNetworkAccessManager manager;
+        QEventLoop loop;
+        QNetworkReply *reply;
+
+        reply = manager.get(QNetworkRequest(url));
+        QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit())); //请求结束并下载完成后，退出子事件循环
+        loop.exec(); //开启子事件循环
+
+        reply->deleteLater();
+        return reply->readAll();
+    }
+
     static QString postWebData(QString uri, QString data)
     {
         QUrl url(uri);

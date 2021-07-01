@@ -17,6 +17,7 @@
 #include "signaltransfer.h"
 #include "facilemenu.h"
 #include "fileutil.h"
+#include "netutil.h"
 
 UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 {
@@ -119,13 +120,18 @@ void UniversePanel::connectItem(PanelItem *item)
 
 QString UniversePanel::saveIcon(const QIcon &icon) const
 {
+    QPixmap pixmap = icon.pixmap(us->pannelItemSize, us->pannelItemSize);
+    return saveIcon(pixmap);
+}
+
+QString UniversePanel::saveIcon(const QPixmap &pixmap) const
+{
     // 保存到本地
     int val = 1;
     while (QFileInfo(rt->ICON_PATH + QString::number(val) + ".png").exists())
         val++;
     QString iconName = QString::number(val) + ".png";
 
-    QPixmap pixmap = icon.pixmap(us->pannelItemSize, us->pannelItemSize);
     pixmap.save(rt->ICON_PATH + iconName);
     return iconName;
 }
@@ -238,6 +244,48 @@ QRect UniversePanel::screenGeometry() const
     if (index < 0)
         return QRect();
     return screens.at(index)->geometry();
+}
+
+bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixmap &pageIcon)
+{
+    // 获取网页标题
+    QString source = NetUtil::getWebData(url);
+    if (!source.isEmpty())
+    {
+        QRegularExpressionMatch match;
+        if (source.indexOf(QRegularExpression("<(?:title|TITLE)>(.+)</\\s*(?:title|TITLE)>"), 0, &match) > -1)
+        {
+            pageName = match.captured(1).trimmed();
+            qInfo() << "网页标题：" << pageName;
+            if (pageName.contains("-") && !pageName.startsWith("-"))
+                pageName = pageName.left(pageName.lastIndexOf("-")).trimmed();
+        }
+        else
+        {
+            qWarning() << "未找到标题" << source.indexOf(QRegularExpression("<(title|TITLE)>(.+)</\\s*(title|TITLE)>"));
+        }
+    }
+    else
+    {
+        qWarning() << "获取网页信息失败：" << url;
+    }
+
+    // 获取网页图标
+    QUrl urlObj(url);
+    QString host = urlObj.host();
+    QString faviconUrl = url.left(url.indexOf(host)) + host + "/favicon.ico";
+    QByteArray ba = NetUtil::getWebBa(faviconUrl);
+    if (ba.size())
+    {
+         pageIcon = QPixmap(us->pannelItemSize, us->pannelItemSize);
+         pageIcon.loadFromData(ba, 0, Qt::AutoColor);
+    }
+    else
+    {
+        qWarning() << "获取网页图标失败：" << faviconUrl;
+    }
+
+    return true;
 }
 
 void UniversePanel::closeEvent(QCloseEvent *)
@@ -499,8 +547,12 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         QString url = QInputDialog::getText(this, "添加网址", "请输入URL", QLineEdit::Normal);
         if (url.isEmpty())
             return ;
-        // TODO：获取网页名字
-        auto item = createNewItem(cursorPos, ":/icons/link", url);
+        QString pageName;
+        QPixmap pixmap;
+        getWebPageNameAndIcon(url, pageName, pixmap);
+        auto item = createNewItem(cursorPos,
+                                  pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                                  pageName.isEmpty() ? url : pageName);
         item->setLink(url);
         save();
     });
@@ -608,7 +660,7 @@ void UniversePanel::dropEvent(QDropEvent *event)
         QList<QUrl> urls = mime->urls();//获取数据并保存到链表中
         for(int i = 0; i < urls.count(); i++)
         {
-            qInfo() << urls.at(i);
+            qInfo() << "drop url:" << urls.at(i);
             PanelItem* item = nullptr;
             if (urls.at(i).isLocalFile())
             {
@@ -620,7 +672,12 @@ void UniversePanel::dropEvent(QDropEvent *event)
             else
             {
                 QString path = urls.at(i).url();
-                item = createNewItem(pos, ":/icons/link", path);
+                QString pageName;
+                QPixmap pixmap;
+                getWebPageNameAndIcon(path, pageName, pixmap);
+                item = createNewItem(pos,
+                                     pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                                     pageName.isEmpty() ? path : pageName);
                 item->setLink(path);
             }
             pos.rx() += item->width();
@@ -635,11 +692,17 @@ void UniversePanel::dropEvent(QDropEvent *event)
         QString text = mime->text();
         if (!text.contains("\n"))
         {
+            // 处理网址
             if (text.startsWith("http://") || text.startsWith("https://"))
             {
-                auto item = createNewItem(pos, ":/icons/link", text);
+                QString pageName;
+                QPixmap pixmap;
+                getWebPageNameAndIcon(text, pageName, pixmap);
+                auto item = createNewItem(pos, ":/icons/link", pageName.isEmpty() ? text : pageName);
                 item->setLink(text);
             }
+
+            // 处理本地文件
             else if (QFileInfo(text).exists())
             {
                 QFileInfo info(text);
