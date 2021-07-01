@@ -467,7 +467,11 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
             draggingPos = event->pos();
 
             // 批量选中
-            if ((pressPos - draggingPos).manhattanLength() > QApplication::startDragDistance())
+            if (QGuiApplication::keyboardModifiers() & Qt::AltModifier) // 移动面板位置
+            {
+                save();
+            }
+            else if ((pressPos - draggingPos).manhattanLength() > QApplication::startDragDistance()) // 拖拽选中结束
             {
                 // 取消hover状态
                 foreach (auto item, items)
@@ -580,66 +584,67 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     // 选中一个
     if (selectedItems.size() == 1)
     {
+        // 使用这个item的自定义menu
         auto item = selectedItems.toList().first();
         item->facileMenuEvent(menu);
     }
 
-    if (selectedItems.size())
-        menu->split();
+    if (!selectedItems.size())
+    {
+        auto addMenu = menu->addMenu(QIcon(":/icons/add"), "添加 (&A)");
+        addMenu->addAction("文件 (&F)", [=]{
 
-    auto addMenu = menu->addMenu(QIcon(":/icons/add"), "添加 (&A)");
-    addMenu->addAction("文件 (&F)", [=]{
+        })->disable();
+        addMenu->addAction("文件夹 (&D)", [=]{
 
-    })->disable();
-    addMenu->addAction("文件夹 (&D)", [=]{
+        })->disable();
+        addMenu->split()->addAction("文件链接 (&K)", [=]{
+            menu->close();
+            QString prevPath = us->s("recent/selectFile");
+            QString path = QFileDialog::getOpenFileName(this, "添加文件快捷方式", prevPath);
+            if (path.isEmpty())
+                return ;
+            us->set("recent/selectFile", path);
+            QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+            auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
+            item->setLink(path, PanelItemType::LocalFile);
+            save();
+        });
+        addMenu->addAction("文件夹链接 (&L)", [=]{
+            menu->close();
+            QString prevPath = us->s("recent/selectFile");
+            QString path = QFileDialog::getExistingDirectory(this, "添加文件夹快捷方式", prevPath);
+            if (path.isEmpty())
+                return ;
+            us->set("recent/selectFile", path);
+            QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+            auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
+            item->setLink(path, PanelItemType::LocalFile);
+            save();
+        });
+        addMenu->addAction("网址 (&U)", [=]{
+            menu->close();
+            QString url = QInputDialog::getText(this, "添加网址", "请输入URL", QLineEdit::Normal);
+            if (url.isEmpty())
+                return ;
+            QString pageName;
+            QPixmap pixmap;
+            getWebPageNameAndIcon(url, pageName, pixmap);
+            auto item = createNewItem(cursorPos,
+                                      pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                                      pageName.isEmpty() ? url : pageName);
+            item->setLink(url, PanelItemType::WebUrl);
+            save();
+        });
 
-    })->disable();
-    addMenu->split()->addAction("文件链接 (&K)", [=]{
-        menu->close();
-        QString prevPath = us->s("recent/selectFile");
-        QString path = QFileDialog::getOpenFileName(this, "添加文件快捷方式", prevPath);
-        if (path.isEmpty())
-            return ;
-        us->set("recent/selectFile", path);
-        QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-        auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
-        item->setLink(path, PanelItemType::LocalFile);
-        save();
-    });
-    addMenu->addAction("文件夹链接 (&L)", [=]{
-        menu->close();
-        QString prevPath = us->s("recent/selectFile");
-        QString path = QFileDialog::getExistingDirectory(this, "添加文件夹快捷方式", prevPath);
-        if (path.isEmpty())
-            return ;
-        us->set("recent/selectFile", path);
-        QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-        auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
-        item->setLink(path, PanelItemType::LocalFile);
-        save();
-    });
-    addMenu->addAction("网址 (&U)", [=]{
-        menu->close();
-        QString url = QInputDialog::getText(this, "添加网址", "请输入URL", QLineEdit::Normal);
-        if (url.isEmpty())
-            return ;
-        QString pageName;
-        QPixmap pixmap;
-        getWebPageNameAndIcon(url, pageName, pixmap);
-        auto item = createNewItem(cursorPos,
-                                  pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
-                                  pageName.isEmpty() ? url : pageName);
-        item->setLink(url, PanelItemType::WebUrl);
-        save();
-    });
+        menu->split()->addAction(QIcon(":/icons/fix"), "固定 (&F)", [=]{
+            fixing = !fixing;
+        })->check(fixing);
 
-    menu->split()->addAction(QIcon(":/icons/fix"), "固定 (&F)", [=]{
-        fixing = !fixing;
-    })->check(fixing);
-
-    menu->addAction(QIcon(":/icons/refresh"), "刷新 (&R)", [=]{
-        readItems();
-    });
+        menu->addAction(QIcon(":/icons/refresh"), "刷新 (&R)", [=]{
+            readItems();
+        });
+    }
 
     menu->exec();
     menu->finished([=]{

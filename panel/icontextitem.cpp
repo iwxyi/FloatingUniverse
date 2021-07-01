@@ -139,19 +139,22 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         emit modified();
     });
 
-    menu->addAction(QIcon(":/icons/fast_open"), "快速打开 (&F)", [=]{
-        fastOpen = !fastOpen;
-        emit modified();
-    })->check(fastOpen);
+    if (type == LocalFile)
+    {
+        menu->split()->addAction(QIcon(":/icons/fast_open"), "快速打开 (&Q)", [=]{
+            fastOpen = !fastOpen;
+            emit modified();
+        })->check(fastOpen);
 
-    auto levelMenu = menu->addMenu(QIcon(":/icons/open_level"), "加载层数");
-    menu->lastAction()->hide(!fastOpen);
-    levelMenu->addNumberedActions("%1层", 1, 11, [=](FacileMenuItem* item){
-        item->check(item->getText() == QString::number(openLevel) + "层");
-    }, [=](int val){
-        openLevel = val;
-        emit modified();
-    });
+        auto levelMenu = menu->addMenu(QIcon(":/icons/open_level"), "加载层数");
+        menu->lastAction()->hide(!fastOpen);
+        levelMenu->addNumberedActions("%1层", 1, 11, [=](FacileMenuItem* item){
+            item->check(item->getText() == QString::number(openLevel) + "层");
+        }, [=](int val){
+            openLevel = val;
+            emit modified();
+        });
+    }
 }
 
 void IconTextItem::triggerEvent()
