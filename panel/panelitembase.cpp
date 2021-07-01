@@ -1,34 +1,22 @@
-#include <QVBoxLayout>
+
 #include <QIcon>
 #include <QMouseEvent>
 #include <QApplication>
 #include <QDebug>
-#include "panelitem.h"
+#include "panelitembase.h"
 #include "usettings.h"
 #include "runtime.h"
 
-PanelItem::PanelItem(QWidget *parent) : QWidget(parent)
+PanelItemBase::PanelItemBase(QWidget *parent) : QWidget(parent)
 {
-    iconLabel = new QLabel(this);
-    textLabel = new QLabel(this);
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(iconLabel);
-    layout->addWidget(textLabel);
-
-    iconLabel->setScaledContents(false);
-    iconLabel->setAlignment(Qt::AlignCenter);
-    textLabel->setAlignment(Qt::AlignCenter);
-    textLabel->setWordWrap(true);
-
-    // textLabel->setMaximumWidth(us->pannelItemSize);
-
     selectWidget = new QWidget(this);
     selectWidget->hide();
 
     setCursor(Qt::PointingHandCursor);
+    type = PanelItemType::DefaultItem;
 }
 
-MyJson PanelItem::toJson() const
+MyJson PanelItemBase::toJson() const
 {
     MyJson json;
 
@@ -37,82 +25,51 @@ MyJson PanelItem::toJson() const
     json.insert("top", rect.top());
     json.insert("width", rect.width());
     json.insert("height", rect.height());
-
-    json.insert("icon", iconName);
-    json.insert("text", textLabel->text());
-
-    if (!link.isEmpty())
-        json.insert("link", link);
+    json.insert("type", int(type));
 
     return json;
 }
 
-PanelItem *PanelItem::fromJson(const MyJson &json, QWidget *parent)
+void PanelItemBase::fromJson(const MyJson &json)
 {
-    PanelItem* item = new PanelItem(parent);
-
     // 位置
     QRect rect(json.i("left"), json.i("top"), json.i("width"), json.i("height"));
-    item->move(rect.topLeft());
+    move(rect.topLeft());
 
-    // 基础数据
-    QString iconName = json.s("icon");
-    item->setIcon(iconName);
-    item->setText(json.s("text"));
-
-    // 扩展数据
-    item->link = json.s("link");
-
-    return item;
+    this->type = PanelItemType(json.i("type"));
 }
 
-void PanelItem::setIcon(const QString &iconName)
+void PanelItemBase::setType(PanelItemType type)
 {
-    this->iconName = iconName;
-    if (iconName.isEmpty())
-    {
-        iconLabel->hide();
-        return ;
-    }
-    else
-    {
-        iconLabel->show();
-    }
-
-    QIcon icon(iconName.startsWith(":") ? iconName : rt->ICON_PATH + iconName);
-    if (!icon.isNull())
-        iconLabel->setPixmap(icon.pixmap(us->pannelItemSize, us->pannelItemSize));
-    adjustSize();
+    this->type = type;
 }
 
-void PanelItem::setText(const QString &text)
+PanelItemType PanelItemBase::getType() const
 {
-    textLabel->setText(text);
-    this->text = text;
-
-    if (text.isEmpty())
-        textLabel->hide();
-    else
-        textLabel->show();
-    adjustSize();
+    return type;
 }
 
-void PanelItem::setLink(const QString &link)
-{
-    this->link = link;
-}
-
-bool PanelItem::isSelected() const
+bool PanelItemBase::isSelected() const
 {
     return selected;
 }
 
-bool PanelItem::isHovered() const
+bool PanelItemBase::isHovered() const
 {
     return hovered;
 }
 
-void PanelItem::showSelect(bool sh)
+void PanelItemBase::facileMenuEvent(FacileMenu *menu)
+{
+    Q_UNUSED(menu)
+}
+
+void PanelItemBase::triggerEvent()
+{
+
+}
+
+void PanelItemBase::showSelect(bool sh)
 {
     if (sh)
     {
@@ -128,7 +85,7 @@ void PanelItem::showSelect(bool sh)
     selected = sh;
 }
 
-void PanelItem::showHover(bool sh)
+void PanelItemBase::showHover(bool sh)
 {
     if (sh)
     {
@@ -144,7 +101,7 @@ void PanelItem::showHover(bool sh)
     hovered = sh;
 }
 
-void PanelItem::mousePressEvent(QMouseEvent *event)
+void PanelItemBase::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
@@ -159,7 +116,7 @@ void PanelItem::mousePressEvent(QMouseEvent *event)
     QWidget::mousePressEvent(event);
 }
 
-void PanelItem::mouseReleaseEvent(QMouseEvent *event)
+void PanelItemBase::mouseReleaseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
@@ -168,7 +125,7 @@ void PanelItem::mouseReleaseEvent(QMouseEvent *event)
 
         if (dragged) // 拖拽移动结束
         {
-            emit needSave();
+            emit modified();
         }
         else // 点击事件
         {
@@ -180,7 +137,7 @@ void PanelItem::mouseReleaseEvent(QMouseEvent *event)
     QWidget::mouseReleaseEvent(event);
 }
 
-void PanelItem::mouseMoveEvent(QMouseEvent *event)
+void PanelItemBase::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton)
     {
@@ -205,7 +162,7 @@ void PanelItem::mouseMoveEvent(QMouseEvent *event)
     QWidget::mouseMoveEvent(event);
 }
 
-void PanelItem::resizeEvent(QResizeEvent *event)
+void PanelItemBase::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 

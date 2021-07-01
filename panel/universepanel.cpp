@@ -22,6 +22,7 @@
 #include "facilemenu.h"
 #include "fileutil.h"
 #include "netutil.h"
+#include "icontextitem.h"
 
 UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 {
@@ -68,22 +69,39 @@ void UniversePanel::readItems()
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
     {
-        auto item = PanelItem::fromJson(ar.toObject(), this);
-        items.append(item);
-        item->show();
-        connectItem(item);
+        MyJson json = ar.toObject();
+        PanelItemType type = PanelItemType(json.i("type"));
+        switch (type)
+        {
+        case DefaultItem:
+            continue;
+        case IconText:
+        case LocalFile:
+        case WebUrl:
+        {
+            auto item = new IconTextItem(this);
+            item->fromJson(json);
+            items.append(item);
+            item->show();
+            connectItem(item);
+            break;
+        }
+        case LongText:
+        case ImageView:
+            break;
+        }
     }
 }
 
-PanelItem *UniversePanel::createNewItem(QPoint pos, const QIcon &icon, const QString &text)
+IconTextItem *UniversePanel::createNewItem(QPoint pos, const QIcon &icon, const QString &text)
 {
     QString iconName = saveIcon(icon);
     return createNewItem(pos, iconName, text);
 }
 
-PanelItem *UniversePanel::createNewItem(QPoint pos, const QString& iconName, const QString &text)
+IconTextItem *UniversePanel::createNewItem(QPoint pos, const QString& iconName, const QString &text)
 {
-    auto item = new PanelItem(this);
+    auto item = new IconTextItem(this);
     // item->textLabel->setMaximumWidth(us->pannelItemSize);
     item->setIcon(iconName);
     item->setText(text);
@@ -96,13 +114,13 @@ PanelItem *UniversePanel::createNewItem(QPoint pos, const QString& iconName, con
     return item;
 }
 
-void UniversePanel::connectItem(PanelItem *item)
+void UniversePanel::connectItem(PanelItemBase *item)
 {
-    connect(item, &PanelItem::triggered, this, [=]{
+    connect(item, &PanelItemBase::triggered, this, [=]{
         triggerItem(item);
     });
 
-    connect(item, &PanelItem::pressed, this, [=]{
+    connect(item, &PanelItemBase::pressed, this, [=]{
         if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) // 多选
         {
             QPoint pos = mapFromGlobal(QCursor::pos());
@@ -128,15 +146,24 @@ void UniversePanel::connectItem(PanelItem *item)
         }
     });
 
-    connect(item, &PanelItem::needSave, this, [=]{
+    connect(item, &PanelItemBase::modified, this, [=]{
         save();
     });
 
-    connect(item, &PanelItem::moveItems, this, [=](QPoint delta) {
+    connect(item, &PanelItemBase::moveItems, this, [=](QPoint delta) {
         foreach (auto item, selectedItems)
         {
             item->move(item->pos() + delta);
         }
+    });
+
+    connect(item, &PanelItemBase::facileMenuUsed, this, [=](FacileMenu* menu) {
+        currentMenu = menu;
+        menu->finished([=]{
+            currentMenu = nullptr;
+            if (!this->hasFocus())
+                foldPanel();
+        });
     });
 
 }
@@ -159,13 +186,18 @@ QString UniversePanel::saveIcon(const QPixmap &pixmap) const
     return iconName;
 }
 
-void UniversePanel::deleteItem(PanelItem *item)
+void UniversePanel::deleteItem(PanelItemBase *item)
 {
-    QString iconName = item->iconName;
-    if (!iconName.isEmpty())
+    if (qobject_cast<IconTextItem*>(item))
     {
-        deleteFile(rt->ICON_PATH + iconName);
+        auto it = qobject_cast<IconTextItem*>(item);
+        QString iconName = it->getIconName();
+        if (!iconName.isEmpty())
+        {
+            deleteFile(rt->ICON_PATH + iconName);
+        }
     }
+
     item->deleteLater();
 }
 
@@ -235,79 +267,21 @@ void UniversePanel::unselectAll()
     selectedItems.clear();
 }
 
-void UniversePanel::selectItem(PanelItem *item)
+void UniversePanel::selectItem(PanelItemBase *item)
 {
     item->showSelect(true);
     selectedItems.insert(item);
 }
 
-void UniversePanel::unselectItem(PanelItem *item)
+void UniversePanel::unselectItem(PanelItemBase *item)
 {
     item->showSelect(false);
     selectedItems.remove(item);
 }
 
-void UniversePanel::triggerItem(PanelItem *item)
+void UniversePanel::triggerItem(PanelItemBase *item)
 {
-    if (!item->link.isEmpty())
-    {
-        QString link = item->link;
-        if (QFileInfo(link).exists())
-        {
-            if (QFileInfo(link).isDir() && us->useFacileDirMenu)
-            {
-                showFacileDir(link, nullptr, 0);
-                return ;
-            }
-            else
-            {
-                link = "file:///" +link;
-            }
-        }
-        QDesktopServices::openUrl(link);
-    }
-}
-
-void UniversePanel::showFacileDir(QString path, FacileMenu* parentMenu, int level)
-{
-    if (level >= us->facileDirMenuLevel)
-        return ;
-
-    FacileMenu* menu = parentMenu;
-    if (!parentMenu)
-    {
-        menu = new FacileMenu(this);
-        currentMenu = menu;
-    }
-
-    auto infos = QDir(path).entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
-    QFileIconProvider provicer;
-    foreach (auto info, infos)
-    {
-        if (info.isDir())
-        {
-            auto m = menu->addMenu(provicer.icon(info), info.fileName(), [=]{
-                QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
-            });
-            showFacileDir(info.absoluteFilePath(), m, level+1);
-        }
-        else
-        {
-            menu->addAction(provicer.icon(info), info.fileName(), [=]{
-                QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
-            });
-        }
-    }
-
-    if (!parentMenu)
-    {
-        menu->exec();
-        menu->finished([=]{
-            currentMenu = nullptr;
-            if (!this->hasFocus())
-                foldPanel();
-        });
-    }
+    item->triggerEvent();
 }
 
 /// 选中多项，开始拖拽
@@ -359,7 +333,7 @@ bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixma
     if (ba.size())
     {
          pageIcon = QPixmap(us->pannelItemSize, us->pannelItemSize);
-         pageIcon.loadFromData(ba, 0, Qt::AutoColor);
+         pageIcon.loadFromData(ba, nullptr, Qt::AutoColor);
     }
     else
     {
@@ -607,23 +581,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     if (selectedItems.size() == 1)
     {
         auto item = selectedItems.toList().first();
-        menu->addAction(QIcon(":/icons/rename"), "重命名 (&N)", [=]{
-            bool ok = false;
-            QString newName = QInputDialog::getText(this, "修改名字", "请输入新的名字", QLineEdit::Normal, item->text, &ok);
-            if (!ok)
-                return ;
-            item->setText(newName);
-            save();
-        });
-
-        menu->addAction(QIcon(":/icons/link"), "链接 (&L)", [=]{
-            bool ok = false;
-            QString newLink = QInputDialog::getText(this, "修改链接", "可以是文件路径、网址，点击项目后立即打开", QLineEdit::Normal, item->link, &ok);
-            if (!ok)
-                return ;
-            item->setLink(newLink);
-            save();
-        });
+        item->facileMenuEvent(menu);
     }
 
     if (selectedItems.size())
@@ -645,7 +603,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         us->set("recent/selectFile", path);
         QIcon icon = QFileIconProvider().icon(QFileInfo(path));
         auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
-        item->setLink(path);
+        item->setLink(path, PanelItemType::LocalFile);
         save();
     });
     addMenu->addAction("文件夹链接 (&L)", [=]{
@@ -657,7 +615,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         us->set("recent/selectFile", path);
         QIcon icon = QFileIconProvider().icon(QFileInfo(path));
         auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
-        item->setLink(path);
+        item->setLink(path, PanelItemType::LocalFile);
         save();
     });
     addMenu->addAction("网址 (&U)", [=]{
@@ -671,7 +629,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         auto item = createNewItem(cursorPos,
                                   pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
                                   pageName.isEmpty() ? url : pageName);
-        item->setLink(url);
+        item->setLink(url, PanelItemType::WebUrl);
         save();
     });
 
@@ -779,15 +737,15 @@ void UniversePanel::dropEvent(QDropEvent *event)
         for(int i = 0; i < urls.count(); i++)
         {
             qInfo() << "drop url:" << urls.at(i);
-            PanelItem* item = nullptr;
-            if (urls.at(i).isLocalFile())
+            IconTextItem* item = nullptr;
+            if (urls.at(i).isLocalFile()) // 拖拽本地文件
             {
                 QString path = urls.at(i).toLocalFile();
                 QIcon icon = icon_provider.icon(QFileInfo(path));
                 item = createNewItem(pos, icon, urls.at(i).fileName());
-                item->setLink(path);
+                item->setLink(path, PanelItemType::LocalFile);
             }
-            else
+            else // 拖拽网络URL
             {
                 QString path = urls.at(i).url();
                 QString pageName;
@@ -796,10 +754,11 @@ void UniversePanel::dropEvent(QDropEvent *event)
                 item = createNewItem(pos,
                                      pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
                                      pageName.isEmpty() ? path : pageName);
-                item->setLink(path);
+                item->setLink(path, PanelItemType::WebUrl);
             }
             pos.rx() += item->width();
         }
+        save();
     }
     else if (mime->hasHtml())
     {
@@ -817,7 +776,7 @@ void UniversePanel::dropEvent(QDropEvent *event)
                 QPixmap pixmap;
                 getWebPageNameAndIcon(text, pageName, pixmap);
                 auto item = createNewItem(pos, ":/icons/link", pageName.isEmpty() ? text : pageName);
-                item->setLink(text);
+                item->setLink(text, PanelItemType::WebUrl);
             }
 
             // 处理本地文件
@@ -827,7 +786,7 @@ void UniversePanel::dropEvent(QDropEvent *event)
                 QString path = info.absoluteFilePath();
                 QIcon icon = QFileIconProvider().icon(QFileInfo(path));
                 auto item = createNewItem(pos, icon, info.fileName());
-                item->setLink(path);
+                item->setLink(path, PanelItemType::LocalFile);
             }
         }
 

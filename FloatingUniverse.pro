@@ -34,7 +34,8 @@ INCLUDEPATH += third_party/color_octree/\
 
 SOURCES += \
     global/usettings.cpp \
-    panel/panelitem.cpp \
+    panel/icontextitem.cpp \
+    panel/panelitembase.cpp \
     panel/universepanel.cpp \
     third_party/color_octree/coloroctree.cpp \
     third_party/color_octree/imageutil.cpp \
@@ -53,7 +54,8 @@ HEADERS += \
     global/defines.h \
     global/signaltransfer.h \
     global/usettings.h \
-    panel/panelitem.h \
+    panel/icontextitem.h \
+    panel/panelitembase.h \
     panel/universepanel.h \
     resources/resource.rc \
     third_party/utils/mysettings.h \

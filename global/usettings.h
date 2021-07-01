@@ -39,7 +39,7 @@ public:
     int fluentRadius = 5;
 
     bool useFacileDirMenu = true;
-    int facileDirMenuLevel = 3; // 最多显示3级文件
+    int facileDirMenuLevel = 5; // 最多显示3级文件
 };
 
 extern USettings* us;

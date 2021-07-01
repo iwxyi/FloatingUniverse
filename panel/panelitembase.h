@@ -5,27 +5,42 @@
 #include <QLabel>
 #include "myjson.h"
 
-class PanelItem : public QWidget
+class FacileMenu;
+
+enum PanelItemType
+{
+    DefaultItem,
+    IconText,
+    LocalFile,
+    WebUrl,
+    LongText,
+    ImageView
+};
+
+class PanelItemBase : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PanelItem(QWidget *parent = nullptr);
+    explicit PanelItemBase(QWidget *parent = nullptr);
 
-    MyJson toJson() const;
-    static PanelItem* fromJson(const MyJson& json, QWidget* parent = nullptr);
+    virtual MyJson toJson() const;
+    virtual void fromJson(const MyJson& json);
 
-    void setIcon(const QString& iconName);
-    void setText(const QString& text);
-    void setLink(const QString& link);
+    void setType(PanelItemType type);
+    PanelItemType getType() const;
 
     bool isSelected() const;
     bool isHovered() const;
 
+    virtual void facileMenuEvent(FacileMenu* menu);
+    virtual void triggerEvent();
+
 signals:
     void triggered();
     void pressed();
-    void needSave();
+    void modified();
     void moveItems(QPoint delta);
+    void facileMenuUsed(FacileMenu* menu);
 
 public slots:
     void showSelect(bool sh);
@@ -49,9 +64,7 @@ public:
     bool selected = false;
     bool hovered = false;
 
-    QString iconName;
-    QString text;
-    QString link; // 文件或者网址
+    PanelItemType type;
 };
 
 #endif // PANELITEM_H

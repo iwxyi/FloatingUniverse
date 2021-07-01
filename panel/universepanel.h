@@ -5,7 +5,7 @@
 #include <QWidget>
 #include "facilemenu.h"
 #include "myjson.h"
-#include "panelitem.h"
+#include "icontextitem.h"
 
 class UniversePanel : public QWidget
 {
@@ -17,12 +17,12 @@ public:
 private:
     void initPanel();
     void readItems();
-    PanelItem* createNewItem(QPoint pos, const QIcon &icon, const QString& text);
-    PanelItem* createNewItem(QPoint pos, const QString &iconName, const QString& text);
-    void connectItem(PanelItem* item);
+    IconTextItem *createNewItem(QPoint pos, const QIcon &icon, const QString& text);
+    IconTextItem *createNewItem(QPoint pos, const QString &iconName, const QString& text);
+    void connectItem(PanelItemBase* item);
     QString saveIcon(const QIcon& icon) const;
     QString saveIcon(const QPixmap& pixmap) const;
-    void deleteItem(PanelItem* item);
+    void deleteItem(PanelItemBase* item);
 
 signals:
 
@@ -32,10 +32,9 @@ public slots:
     void save();
     void selectAll();
     void unselectAll();
-    void selectItem(PanelItem* item);
-    void unselectItem(PanelItem* item);
-    void triggerItem(PanelItem* item);
-    void showFacileDir(QString path, FacileMenu *parentMenu, int level);
+    void selectItem(PanelItemBase* item);
+    void unselectItem(PanelItemBase* item);
+    void triggerItem(PanelItemBase* item);
 
 private slots:
     void startDragSelectedItems();
@@ -79,8 +78,8 @@ private:
     QPoint draggingPos;
     FacileMenu* currentMenu = nullptr;
 
-    QList<PanelItem*> items;
-    QSet<PanelItem*> selectedItems;
+    QList<PanelItemBase*> items;
+    QSet<PanelItemBase*> selectedItems;
 };
 
 #endif // UNIVERSEPANEL_H

@@ -13,5 +13,7 @@
         <file alias="refresh">icons/refresh.png</file>
         <file alias="rename">icons/rename.png</file>
         <file alias="link">icons/link.png</file>
+        <file alias="fast_open">icons/fast_open.png</file>
+        <file alias="open_level">icons/open_level.png</file>
     </qresource>
 </RCC>
