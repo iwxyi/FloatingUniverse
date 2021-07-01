@@ -17,7 +17,9 @@ public:
 private:
     void initPanel();
     void readItems();
-    PanelItem* createItem(QPoint pos, const QString &iconName, const QString& text);
+    PanelItem* createNewItem(QPoint pos, const QIcon &icon, const QString& text);
+    PanelItem* createNewItem(QPoint pos, const QString &iconName, const QString& text);
+    void connectItem(PanelItem* item);
     QString saveIcon(const QIcon& icon) const;
     void deleteItem(PanelItem* item);
 
@@ -29,7 +31,11 @@ public slots:
     void save();
     void selectAll();
     void unselectAll();
+    void selectItem(PanelItem* item);
     void triggerItem(PanelItem* item);
+
+private slots:
+    void startDragSelectedItems();
 
 public:
     QRect screenGeometry() const;
@@ -59,8 +65,9 @@ private:
     bool animating = false;
     bool fixing = false;
 
-    bool pressing = false;
+    bool pressing = false; // 左键按下
     QPoint pressPos;
+    bool moving = false; // 正在移动items
     QPoint draggingPos;
     FacileMenu* currentMenu = nullptr;
 

@@ -9,6 +9,7 @@
 #include <QMimeData>
 #include <QFileIconProvider>
 #include <QDesktopServices>
+#include <QInputDialog>
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
@@ -63,10 +64,17 @@ void UniversePanel::readItems()
         auto item = PanelItem::fromJson(ar.toObject(), this);
         items.append(item);
         item->show();
+        connectItem(item);
     }
 }
 
-PanelItem *UniversePanel::createItem(QPoint pos, const QString& iconName, const QString &text)
+PanelItem *UniversePanel::createNewItem(QPoint pos, const QIcon &icon, const QString &text)
+{
+    QString iconName = saveIcon(icon);
+    return createNewItem(pos, iconName, text);
+}
+
+PanelItem *UniversePanel::createNewItem(QPoint pos, const QString& iconName, const QString &text)
 {
     auto item = new PanelItem(this);
     item->setIcon(iconName);
@@ -74,13 +82,37 @@ PanelItem *UniversePanel::createItem(QPoint pos, const QString& iconName, const 
     item->move(pos);
     items.append(item);
     item->show();
+    connectItem(item);
 
+    save();
+    return item;
+}
+
+void UniversePanel::connectItem(PanelItem *item)
+{
     connect(item, &PanelItem::triggered, this, [=]{
         triggerItem(item);
     });
 
-    save();
-    return item;
+    connect(item, &PanelItem::pressed, this, [=]{
+        if (!selectedItems.contains(item))
+        {
+            unselectAll();
+            selectItem(item);
+        }
+    });
+
+    connect(item, &PanelItem::needSave, this, [=]{
+        save();
+    });
+
+    connect(item, &PanelItem::moveItems, this, [=](QPoint delta) {
+        foreach (auto item, selectedItems)
+        {
+            item->move(item->pos() + delta);
+        }
+    });
+
 }
 
 QString UniversePanel::saveIcon(const QIcon &icon) const
@@ -98,9 +130,10 @@ QString UniversePanel::saveIcon(const QIcon &icon) const
 
 void UniversePanel::deleteItem(PanelItem *item)
 {
-    if (!item->iconName.isEmpty())
+    QString iconName = item->iconName;
+    if (!iconName.isEmpty())
     {
-        deleteFile(rt->ICON_PATH + item->iconName);
+        deleteFile(rt->ICON_PATH + iconName);
     }
     item->deleteLater();
 }
@@ -171,6 +204,12 @@ void UniversePanel::unselectAll()
     selectedItems.clear();
 }
 
+void UniversePanel::selectItem(PanelItem *item)
+{
+    item->showSelect(true);
+    selectedItems.append(item);
+}
+
 void UniversePanel::triggerItem(PanelItem *item)
 {
     if (!item->link.isEmpty())
@@ -180,6 +219,12 @@ void UniversePanel::triggerItem(PanelItem *item)
             link = "file:///" +link;
         QDesktopServices::openUrl(link);
     }
+}
+
+/// 选中多项，开始拖拽
+void UniversePanel::startDragSelectedItems()
+{
+
 }
 
 QRect UniversePanel::screenGeometry() const
@@ -287,6 +332,23 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
 
         update();
     }
+    else if (event->button() == Qt::RightButton) // 即将显示菜单
+    {
+        if (selectedItems.size() == 1) // 如果选中一项，那么就相当于没选
+            unselectAll();
+        if (!selectedItems.size()) // 没有选中项
+        {
+            // 自动选中鼠标下面的菜单
+            QPoint pos = event->pos();
+            foreach (auto item, items)
+            {
+                if (item->geometry().contains(pos))
+                {
+                    selectItem(item);
+                }
+            }
+        }
+    }
 
     QWidget::mousePressEvent(event);
 }
@@ -328,7 +390,11 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
 
 void UniversePanel::mouseMoveEvent(QMouseEvent *event)
 {
-    if (pressing)
+    if (moving)
+    {
+
+    }
+    else if (pressing)
     {
         draggingPos = event->pos();
         update();
@@ -347,6 +413,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     newFacileMenu;
     currentMenu = menu;
 
+    // 选中一个或者多个
     if (selectedItems.size())
     {
         menu->addAction("打开", [=]{
@@ -366,6 +433,22 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             selectedItems.clear();
             save();
         });
+        menu->split();
+    }
+
+    // 选中一个
+    if (selectedItems.size() == 1)
+    {
+        auto item = selectedItems.first();
+        menu->addAction("重命名", [=]{
+            bool ok = false;
+            QString newName = QInputDialog::getText(this, "修改名字", "请输入新的名字", QLineEdit::Normal, item->text, &ok);
+            if (!ok)
+                return ;
+            item->setText(newName);
+            save();
+        });
+
         menu->split();
     }
 
@@ -488,8 +571,7 @@ void UniversePanel::dropEvent(QDropEvent *event)
         {
             QString path = urls.at(i).toLocalFile();
             QIcon icon = icon_provider.icon(QFileInfo(path));
-            QString iconName = saveIcon(icon);
-            auto item = createItem(pos, iconName, urls.at(i).fileName());
+            auto item = createNewItem(pos, icon, urls.at(i).fileName());
             item->setLink(path);
             pos.rx() += item->width();
         }

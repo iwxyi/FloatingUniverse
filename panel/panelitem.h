@@ -20,9 +20,17 @@ public:
 
 signals:
     void triggered();
+    void pressed();
+    void needSave();
+    void moveItems(QPoint delta);
 
 public slots:
     void showSelect(bool sh);
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 
 public:
     QLabel* iconLabel;
@@ -30,6 +38,9 @@ public:
     QWidget* selectWidget;
 
     const int selectBorder = 2;
+    QPoint pressPos;
+    QPoint pressGlobalPos;
+    bool dragged = false; // 按压下来有没有拖拽过
 
     QString iconName;
     QString text;

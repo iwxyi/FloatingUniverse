@@ -29,9 +29,10 @@ public:
     int panelHeight = 200;
     int panelBangHeight = 1;
     int panelBangWidth = 800;
-    QColor panelBg = QColor(255, 255, 250);
-    QColor panelBangBg = QColor(128, 128, 128);
-    QColor panelSelectBg = QColor(102, 255, 230);
+    QColor panelBg = QColor(240, 248, 255);
+    QColor panelBangBg = QColor(128, 128, 128, 128);
+    QColor panelSelectBg = QColor(230, 230, 250);
+    QColor panelSelectEdge = QColor(0, 71, 125);
     int pannelItemSize = 64;
 
     int fluentRadius = 5;

@@ -1,5 +1,8 @@
 #include <QVBoxLayout>
 #include <QIcon>
+#include <QMouseEvent>
+#include <QApplication>
+#include <QDebug>
 #include "panelitem.h"
 #include "usettings.h"
 #include "runtime.h"
@@ -18,7 +21,9 @@ PanelItem::PanelItem(QWidget *parent) : QWidget(parent)
 
     selectWidget = new QWidget(this);
     selectWidget->hide();
-    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid #FF0000");
+    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + ";");
+
+    setCursor(Qt::PointingHandCursor);
 }
 
 MyJson PanelItem::toJson() const
@@ -34,7 +39,7 @@ MyJson PanelItem::toJson() const
     json.insert("icon", iconName);
     json.insert("text", textLabel->text());
 
-    if (link.isEmpty())
+    if (!link.isEmpty())
         json.insert("link", link);
 
     return json;
@@ -91,5 +96,48 @@ void PanelItem::showSelect(bool sh)
     else
     {
         selectWidget->hide();
+    }
+}
+
+void PanelItem::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        pressPos = event->pos();
+        pressGlobalPos = pressPos + this->pos();
+        dragged = false;
+        event->accept();
+        emit pressed();
+        return ;
+    }
+
+    QWidget::mousePressEvent(event);
+}
+
+void PanelItem::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        if (dragged) // 拖拽移动结束
+        {
+            emit needSave();
+        }
+        else // 点击事件
+        {
+            emit triggered();
+        }
+    }
+}
+
+void PanelItem::mouseMoveEvent(QMouseEvent *event)
+{
+    if (event->buttons() & Qt::LeftButton)
+    {
+        // 拖拽
+        QPoint globalPos = event->pos() + this->pos();
+        QPoint delta = globalPos - pressGlobalPos;
+        dragged = true;
+        emit moveItems(delta);
+        pressGlobalPos = globalPos;
     }
 }
