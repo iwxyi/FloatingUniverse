@@ -82,7 +82,7 @@ PanelItem *UniversePanel::createNewItem(QPoint pos, const QString& iconName, con
     // item->textLabel->setMaximumWidth(us->pannelItemSize);
     item->setIcon(iconName);
     item->setText(text);
-    item->move(pos);
+    item->move(pos - QPoint(item->width() / 2, item->height() / 2));
     items.append(item);
     item->show();
     connectItem(item);
@@ -171,7 +171,7 @@ void UniversePanel::expandPanel()
     ani->setStartValue(pos());
     ani->setEndValue(QPoint(pos().x(), 0));
     ani->setDuration(300);
-    ani->setEasingCurve(QEasingCurve::OutQuad);
+    ani->setEasingCurve(QEasingCurve::OutCubic);
     connect(ani, &QPropertyAnimation::finished, this, [=]{
         ani->deleteLater();
         animating = false;
@@ -192,7 +192,7 @@ void UniversePanel::foldPanel()
     ani->setStartValue(pos());
     ani->setEndValue(QPoint(pos().x(), -height() + us->panelBangHeight));
     ani->setDuration(300);
-    ani->setEasingCurve(QEasingCurve::OutQuad);
+    ani->setEasingCurve(QEasingCurve::InOutCubic);
 
     connect(ani, &QPropertyAnimation::finished, this, [=]{
         ani->deleteLater();
@@ -438,6 +438,14 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
             // 批量选中
             if ((pressPos - draggingPos).manhattanLength() > QApplication::startDragDistance())
             {
+                // 取消hover状态
+                foreach (auto item, items)
+                {
+                    if (!item->isSelected() && item->isHovered())
+                        item->showHover(false);
+                }
+
+                // 选中
                 QRect range(pressPos, draggingPos);
                 foreach (auto item, items)
                 {
@@ -463,14 +471,31 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
 
 void UniversePanel::mouseMoveEvent(QMouseEvent *event)
 {
-    if (moving)
+    if (moving) // 拖着组件移动
     {
 
     }
-    else if (pressing)
+    else if (pressing) // 拖拽出区域
     {
         draggingPos = event->pos();
         update();
+
+        // 显示hover
+        QRect range(pressPos, draggingPos);
+        foreach (auto item, items)
+        {
+            if (item->isSelected())
+                continue;
+
+            if (range.contains(item->geometry().center()))
+            {
+                item->showHover(true);
+            }
+            else
+            {
+                item->showHover(false);
+            }
+        }
     }
 
     QWidget::mouseMoveEvent(event);
@@ -490,7 +515,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     // 选中一个或者多个
     if (selectedItems.size())
     {
-        menu->addAction(QIcon(":/icons/open (&O"), "打开", [=]{
+        menu->addAction(QIcon(":/icons/open"), "打开 (&O)", [=]{
             foreach (auto item, selectedItems)
             {
                 triggerItem(item);
@@ -498,7 +523,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             unselectAll();
         });
 
-        menu->addAction(QIcon(":/icons/delete (&D)"), "删除", [=]{
+        menu->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
             foreach (auto item, selectedItems)
             {
                 items.removeOne(item);
@@ -513,17 +538,16 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     if (selectedItems.size() == 1)
     {
         auto item = selectedItems.toList().first();
-        menu->addAction(QIcon(":/icons/rename"), "重命名", [=]{
+        menu->addAction(QIcon(":/icons/rename"), "重命名 (&N)", [=]{
             bool ok = false;
             QString newName = QInputDialog::getText(this, "修改名字", "请输入新的名字", QLineEdit::Normal, item->text, &ok);
             if (!ok)
                 return ;
             item->setText(newName);
-            item->adjustSize();
             save();
         });
 
-        menu->addAction(QIcon(":/icons/link"), "链接", [=]{
+        menu->addAction(QIcon(":/icons/link"), "链接 (&L)", [=]{
             bool ok = false;
             QString newLink = QInputDialog::getText(this, "修改链接", "可以是文件路径、网址，点击项目后立即打开", QLineEdit::Normal, item->link, &ok);
             if (!ok)
@@ -536,17 +560,17 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     if (selectedItems.size())
         menu->split();
 
-    auto addMenu = menu->addMenu(QIcon(":/icons/add"), "添加");
-    addMenu->addAction("文件", [=]{
+    auto addMenu = menu->addMenu(QIcon(":/icons/add"), "添加 (&A)");
+    addMenu->addAction("文件 (&F)", [=]{
 
     })->disable();
-    addMenu->addAction("文件夹", [=]{
+    addMenu->addAction("文件夹 (&D)", [=]{
 
     })->disable();
-    addMenu->split()->addAction("文件链接", [=]{
+    addMenu->split()->addAction("文件链接 (&K)", [=]{
         menu->close();
         QString prevPath = us->s("recent/selectFile");
-        QString path = QFileDialog::getOpenFileName(this, "添加文件", prevPath);
+        QString path = QFileDialog::getOpenFileName(this, "添加文件快捷方式", prevPath);
         if (path.isEmpty())
             return ;
         us->set("recent/selectFile", path);
@@ -555,10 +579,10 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         item->setLink(path);
         save();
     });
-    addMenu->addAction("文件夹链接", [=]{
+    addMenu->addAction("文件夹链接 (&L)", [=]{
         menu->close();
         QString prevPath = us->s("recent/selectFile");
-        QString path = QFileDialog::getExistingDirectory(this, "添加文件夹", prevPath);
+        QString path = QFileDialog::getExistingDirectory(this, "添加文件夹快捷方式", prevPath);
         if (path.isEmpty())
             return ;
         us->set("recent/selectFile", path);
@@ -567,7 +591,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         item->setLink(path);
         save();
     });
-    addMenu->addAction("网址", [=]{
+    addMenu->addAction("网址 (&U)", [=]{
         menu->close();
         QString url = QInputDialog::getText(this, "添加网址", "请输入URL", QLineEdit::Normal);
         if (url.isEmpty())
@@ -582,11 +606,11 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         save();
     });
 
-    menu->split()->addAction(QIcon(":/icons/fix"), "固定", [=]{
+    menu->split()->addAction(QIcon(":/icons/fix"), "固定 (&F)", [=]{
         fixing = !fixing;
     })->check(fixing);
 
-    menu->addAction(QIcon(":/icons/refresh"), "刷新", [=]{
+    menu->addAction(QIcon(":/icons/refresh"), "刷新 (&R)", [=]{
         readItems();
     });
 

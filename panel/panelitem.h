@@ -18,6 +18,9 @@ public:
     void setText(const QString& text);
     void setLink(const QString& link);
 
+    bool isSelected() const;
+    bool isHovered() const;
+
 signals:
     void triggered();
     void pressed();
@@ -26,6 +29,7 @@ signals:
 
 public slots:
     void showSelect(bool sh);
+    void showHover(bool sh);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -42,6 +46,8 @@ public:
     QPoint pressPos;
     QPoint pressGlobalPos;
     bool dragged = false; // 按压下来有没有拖拽过
+    bool selected = false;
+    bool hovered = false;
 
     QString iconName;
     QString text;

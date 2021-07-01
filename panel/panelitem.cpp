@@ -24,7 +24,6 @@ PanelItem::PanelItem(QWidget *parent) : QWidget(parent)
 
     selectWidget = new QWidget(this);
     selectWidget->hide();
-    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + ";");
 
     setCursor(Qt::PointingHandCursor);
 }
@@ -69,18 +68,33 @@ PanelItem *PanelItem::fromJson(const MyJson &json, QWidget *parent)
 
 void PanelItem::setIcon(const QString &iconName)
 {
-    if (iconName.isEmpty())
-        return ;
     this->iconName = iconName;
+    if (iconName.isEmpty())
+    {
+        iconLabel->hide();
+        return ;
+    }
+    else
+    {
+        iconLabel->show();
+    }
+
     QIcon icon(iconName.startsWith(":") ? iconName : rt->ICON_PATH + iconName);
     if (!icon.isNull())
         iconLabel->setPixmap(icon.pixmap(us->pannelItemSize, us->pannelItemSize));
+    adjustSize();
 }
 
 void PanelItem::setText(const QString &text)
 {
     textLabel->setText(text);
     this->text = text;
+
+    if (text.isEmpty())
+        textLabel->hide();
+    else
+        textLabel->show();
+    adjustSize();
 }
 
 void PanelItem::setLink(const QString &link)
@@ -88,10 +102,21 @@ void PanelItem::setLink(const QString &link)
     this->link = link;
 }
 
+bool PanelItem::isSelected() const
+{
+    return selected;
+}
+
+bool PanelItem::isHovered() const
+{
+    return hovered;
+}
+
 void PanelItem::showSelect(bool sh)
 {
     if (sh)
     {
+        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + ";");
         selectWidget->setGeometry(selectBorder / 2, selectBorder / 2, width() - selectBorder, height() - selectBorder);
         selectWidget->raise();
         selectWidget->show();
@@ -100,6 +125,23 @@ void PanelItem::showSelect(bool sh)
     {
         selectWidget->hide();
     }
+    selected = sh;
+}
+
+void PanelItem::showHover(bool sh)
+{
+    if (sh)
+    {
+        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdge).toString() + ";");
+        selectWidget->setGeometry(selectBorder / 2, selectBorder / 2, width() - selectBorder, height() - selectBorder);
+        selectWidget->raise();
+        selectWidget->show();
+    }
+    else
+    {
+        selectWidget->hide();
+    }
+    hovered = sh;
 }
 
 void PanelItem::mousePressEvent(QMouseEvent *event)
