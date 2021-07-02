@@ -151,6 +151,7 @@ private:
     bool split_in_row = false; // 同一行是否默认添加分割线
     QRect window_rect;
     int window_height = 0; // 窗口高度，每次打开都更新一次
+    QPoint _enter_later_pos = QPoint(-1, -1); // 避免连续两次触发 enterLater 事件
 };
 
 #endif // FACILEMENU_H

@@ -247,6 +247,7 @@ FacileMenu *FacileMenu::addMenu(QIcon icon, QString text, FuncType clicked)
         connect(item, &InteractiveButtonBase::clicked, this, [=]{
             if (_showing_animation)
                 return ;
+
             clicked();
             emit signalActionTriggered(item);
             toHide(items.indexOf(item));
@@ -257,6 +258,7 @@ FacileMenu *FacileMenu::addMenu(QIcon icon, QString text, FuncType clicked)
         connect(item, &InteractiveButtonBase::clicked, this, [=]{
             if (_showing_animation)
                 return ;
+
             // 显示子菜单
             showSubMenu(item);
         });
@@ -271,6 +273,14 @@ FacileMenu *FacileMenu::addMenu(QIcon icon, QString text, FuncType clicked)
         current_index = index;
 
         // 显示子菜单
+        // 可能是需要点击这个菜单项，但是点下去隐藏子菜单，会再次触发 mouseEnterLater 事件
+        // 需要判断位置，屏蔽第二次的 enter 事件，得以点击菜单项
+        // 不过还是需要双击才行，第一次是隐藏子菜单，第二次才是真正点击
+        QPoint showPos = mapFromGlobal(QCursor::pos());
+        if (_enter_later_pos == showPos)
+            return ;
+
+        _enter_later_pos = showPos;
         if (current_index == items.indexOf(item))
             showSubMenu(item);
     });
@@ -287,7 +297,9 @@ FacileMenu *FacileMenu::addMenu(QIcon icon, QString text, FuncType clicked)
         }
 
         // 如果是用户主动隐藏子菜单，那么就隐藏全部菜单
-        if (!menu->hidden_by_another && !linger_on_submenu_clicked)
+        // 有一种情况是需要点击这个菜单项而不是弹出的子菜单，需要避免
+        if (!menu->hidden_by_another && !linger_on_submenu_clicked
+                && !rect().contains(mapFromGlobal(QCursor::pos()))) // 允许鼠标浮在菜单项上，ESC关闭子菜单
         {
             this->hide(); // 隐藏自己，在隐藏事件中继续向上传递隐藏的信号
         }

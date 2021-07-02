@@ -244,6 +244,8 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
         {
             auto m = menu->addMenu(provicer.icon(info), info.fileName(), [=]{
                 QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
+                if (closeAfterClick)
+                    emit hidePanel();
             });
             showFacileDir(info.absoluteFilePath(), m, level+1);
         }
@@ -251,6 +253,8 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
         {
             menu->addAction(provicer.icon(info), info.fileName(), [=]{
                 QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
+                if (closeAfterClick)
+                    emit hidePanel();
             });
         }
     }
