@@ -23,6 +23,7 @@ private:
     QString saveIcon(const QIcon& icon) const;
     QString saveIcon(const QPixmap& pixmap) const;
     void deleteItem(PanelItemBase* item);
+    void keepPanelState(FuncType func);
 
 signals:
 

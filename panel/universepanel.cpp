@@ -205,6 +205,16 @@ void UniversePanel::deleteItem(PanelItemBase *item)
     item->deleteLater();
 }
 
+void UniversePanel::keepPanelState(FuncType func)
+{
+    bool _fixing = fixing;
+    fixing = true;
+
+    func();
+
+    fixing = _fixing;
+}
+
 /// 从收起状态展开面板
 void UniversePanel::expandPanel()
 {
@@ -332,16 +342,19 @@ bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixma
     // 获取网页图标
     QUrl urlObj(url);
     QString host = urlObj.host();
-    QString faviconUrl = url.left(url.indexOf(host)) + host + "/favicon.ico";
-    QByteArray ba = NetUtil::getWebBa(faviconUrl);
-    if (ba.size())
+    if (!host.contains(QRegularExpression("(\\d+\\.){3}\\d+"))) // 内网大概率没有网站图标，算了吧
     {
-         pageIcon = QPixmap(us->pannelItemSize, us->pannelItemSize);
-         pageIcon.loadFromData(ba, nullptr, Qt::AutoColor);
-    }
-    else
-    {
-        qWarning() << "获取网页图标失败：" << faviconUrl;
+        QString faviconUrl = url.left(url.indexOf(host)) + host + "/favicon.ico";
+        QByteArray ba = NetUtil::getWebBa(faviconUrl);
+        if (ba.size())
+        {
+             pageIcon = QPixmap(us->pannelItemSize, us->pannelItemSize);
+             pageIcon.loadFromData(ba, nullptr, Qt::AutoColor);
+        }
+        else
+        {
+            qWarning() << "获取网页图标失败：" << faviconUrl;
+        }
     }
 
     return true;
@@ -782,9 +795,9 @@ void UniversePanel::dropEvent(QDropEvent *event)
     {
         QFileIconProvider icon_provider;
         QList<QUrl> urls = mime->urls();//获取数据并保存到链表中
+        qInfo() << "拖拽 Urls:" << urls;
         for(int i = 0; i < urls.count(); i++)
         {
-            qInfo() << "drop url:" << urls.at(i);
             IconTextItem* item = nullptr;
             if (urls.at(i).isLocalFile()) // 拖拽本地文件
             {
@@ -798,7 +811,20 @@ void UniversePanel::dropEvent(QDropEvent *event)
                 QString path = urls.at(i).url();
                 QString pageName;
                 QPixmap pixmap;
-                getWebPageNameAndIcon(path, pageName, pixmap);
+                keepPanelState([&]{
+                    getWebPageNameAndIcon(path, pageName, pixmap);
+                    if (pageName.isEmpty() && urls.count() == 1) // 空名字，并且获取不到
+                    {
+                        // 手动输入名字
+                        bool ok = false;
+                        this->activateWindow(); // 不激活当前窗口，inputDialog就不会获取焦点
+                        QString text = QInputDialog::getText(this, "快捷方式名字", "请输入URL快捷方式的标题", QLineEdit::Normal, path, &ok);
+                        if (ok)
+                        {
+                            pageName = text;
+                        }
+                    }
+                });
                 item = createNewItem(pos,
                                      pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
                                      pageName.isEmpty() ? path : pageName);
