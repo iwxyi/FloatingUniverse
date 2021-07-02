@@ -14,7 +14,7 @@ public:
 
     void setIcon(const QString& iconName);
     void setText(const QString& text);
-    void setLink(const QString& link, PanelItemType type = DefaultItem);
+    void setLink(const QString& link);
     void setFastOpen(bool fast);
 
     QString getText() const;

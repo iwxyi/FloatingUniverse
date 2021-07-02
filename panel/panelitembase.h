@@ -21,7 +21,7 @@ class PanelItemBase : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PanelItemBase(QWidget *parent = nullptr);
+    explicit PanelItemBase(QWidget *parent);
 
     virtual MyJson toJson() const;
     virtual void fromJson(const MyJson& json);
@@ -53,7 +53,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
-public:
+protected:
     QLabel* iconLabel;
     QLabel* textLabel;
     QWidget* selectWidget;

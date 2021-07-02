@@ -93,21 +93,42 @@ void UniversePanel::readItems()
     }
 }
 
-IconTextItem *UniversePanel::createNewItem(QPoint pos, const QIcon &icon, const QString &text)
+IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QIcon &icon, const QString &text, const QString &link, PanelItemType type)
 {
     QString iconName = saveIcon(icon);
-    return createNewItem(pos, iconName, text);
+    return createLinkItem(pos, iconName, text, link, type);
 }
 
-IconTextItem *UniversePanel::createNewItem(QPoint pos, const QString& iconName, const QString &text)
+IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QString& iconName, const QString &text, const QString &link, PanelItemType type)
 {
     auto item = new IconTextItem(this);
-    // item->textLabel->setMaximumWidth(us->pannelItemSize);
+
     item->setIcon(iconName);
     item->setText(text);
-    item->move(pos - QPoint(item->width() / 2, item->height() / 2));
-    items.append(item);
+
     item->show();
+    item->move(pos - QPoint(item->width() / 2, item->height() / 2));
+
+    items.append(item);
+    connectItem(item);
+
+    item->setLink(link);
+    item->setType(type);
+
+    save();
+    return item;
+}
+
+LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, bool enableHtml)
+{
+    auto item = new LongTextItem(this);
+
+    item->setText(text, enableHtml);
+
+    item->show();
+    item->move(pos - QPoint(item->width() / 2, item->height() / 2));
+
+    items.append(item);
     connectItem(item);
 
     save();
@@ -662,9 +683,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
                 return ;
             us->set("recent/selectFile", path);
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-            auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
-            item->setLink(path, PanelItemType::LocalFile);
-            save();
+            createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
         });
         addMenu->addAction("文件夹链接 (&L)", [=]{
             menu->close();
@@ -674,9 +693,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
                 return ;
             us->set("recent/selectFile", path);
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-            auto item = createNewItem(cursorPos, icon, QFileInfo(path).fileName());
-            item->setLink(path, PanelItemType::LocalFile);
-            save();
+            createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
         });
         addMenu->addAction("网址 (&U)", [=]{
             menu->close();
@@ -686,11 +703,10 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             QString pageName;
             QPixmap pixmap;
             getWebPageNameAndIcon(url, pageName, pixmap);
-            auto item = createNewItem(cursorPos,
-                                      pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
-                                      pageName.isEmpty() ? url : pageName);
-            item->setLink(url, PanelItemType::WebUrl);
-            save();
+            createLinkItem(cursorPos,
+                           pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                           pageName.isEmpty() ? url : pageName,
+                           url, PanelItemType::WebUrl);
         });
 
         menu->split()->addAction(QIcon(":/icons/fix"), "固定 (&F)", [=]{
@@ -795,7 +811,8 @@ void UniversePanel::dropEvent(QDropEvent *event)
     {
         QFileIconProvider icon_provider;
         QList<QUrl> urls = mime->urls();//获取数据并保存到链表中
-        qInfo() << "拖拽 Urls:" << urls;
+        qInfo() << "拖拽 URLs:" << urls;
+
         for(int i = 0; i < urls.count(); i++)
         {
             IconTextItem* item = nullptr;
@@ -803,8 +820,7 @@ void UniversePanel::dropEvent(QDropEvent *event)
             {
                 QString path = urls.at(i).toLocalFile();
                 QIcon icon = icon_provider.icon(QFileInfo(path));
-                item = createNewItem(pos, icon, urls.at(i).fileName());
-                item->setLink(path, PanelItemType::LocalFile);
+                createLinkItem(pos, icon, urls.at(i).fileName(), path, PanelItemType::LocalFile);
             }
             else // 拖拽网络URL
             {
@@ -825,22 +841,27 @@ void UniversePanel::dropEvent(QDropEvent *event)
                         }
                     }
                 });
-                item = createNewItem(pos,
-                                     pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
-                                     pageName.isEmpty() ? path : pageName);
-                item->setLink(path, PanelItemType::WebUrl);
+                createLinkItem(pos,
+                               pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                               pageName.isEmpty() ? path : pageName,
+                               path, PanelItemType::WebUrl);
             }
             pos.rx() += item->width();
         }
-        save();
     }
     else if (mime->hasHtml())
     {
+        QString html = mime->html();
+        qInfo() << "拖拽 HTML" << html.left(200);
 
+        createTextItem(pos, html, true);
     }
     else if (mime->hasText())
     {
         QString text = mime->text();
+        qInfo() << "拖拽 TEXT" << text.left(200);
+
+        // 链接
         if (!text.contains("\n"))
         {
             // 处理网址
@@ -849,8 +870,8 @@ void UniversePanel::dropEvent(QDropEvent *event)
                 QString pageName;
                 QPixmap pixmap;
                 getWebPageNameAndIcon(text, pageName, pixmap);
-                auto item = createNewItem(pos, ":/icons/link", pageName.isEmpty() ? text : pageName);
-                item->setLink(text, PanelItemType::WebUrl);
+                createLinkItem(pos, ":/icons/link", pageName.isEmpty() ? text : pageName, text, PanelItemType::WebUrl);
+                return ;
             }
 
             // 处理本地文件
@@ -859,15 +880,17 @@ void UniversePanel::dropEvent(QDropEvent *event)
                 QFileInfo info(text);
                 QString path = info.absoluteFilePath();
                 QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-                auto item = createNewItem(pos, icon, info.fileName());
-                item->setLink(path, PanelItemType::LocalFile);
+                createLinkItem(pos, icon, info.fileName(), path, PanelItemType::LocalFile);
+                return ;
             }
         }
 
+        // 普通文本
+        createTextItem(pos, text, false);
     }
     else if (mime->hasImage())
     {
-
+        qInfo() << "拖拽 IMG";
     }
     else
     {

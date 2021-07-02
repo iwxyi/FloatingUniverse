@@ -9,9 +9,8 @@ public:
     ResizeableItemBase(QWidget* parent);
 
 protected:
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
 
-private:
+protected:
     int boundaryWidth = 8;
 };
 

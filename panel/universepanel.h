@@ -6,6 +6,7 @@
 #include "facilemenu.h"
 #include "myjson.h"
 #include "icontextitem.h"
+#include "longtextitem.h"
 
 class UniversePanel : public QWidget
 {
@@ -17,8 +18,9 @@ public:
 private:
     void initPanel();
     void readItems();
-    IconTextItem *createNewItem(QPoint pos, const QIcon &icon, const QString& text);
-    IconTextItem *createNewItem(QPoint pos, const QString &iconName, const QString& text);
+    IconTextItem *createLinkItem(QPoint pos, const QIcon &icon, const QString& text, const QString& link, PanelItemType type);
+    IconTextItem *createLinkItem(QPoint pos, const QString &iconName, const QString& text, const QString& link, PanelItemType type);
+    LongTextItem *createTextItem(QPoint pos, const QString& text, bool enableHtml);
     void connectItem(PanelItemBase* item);
     QString saveIcon(const QIcon& icon) const;
     QString saveIcon(const QPixmap& pixmap) const;

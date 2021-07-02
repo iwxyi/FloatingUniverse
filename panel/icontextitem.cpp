@@ -86,12 +86,9 @@ void IconTextItem::setText(const QString &text)
         textLabel->show();
 }
 
-void IconTextItem::setLink(const QString &link, PanelItemType type)
+void IconTextItem::setLink(const QString &link)
 {
     this->link = link;
-    if (type != DefaultItem)
-        setType(type);
-
     setToolTip(link);
 }
 
