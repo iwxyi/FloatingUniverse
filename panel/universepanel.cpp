@@ -421,6 +421,7 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
     {
         pressing = true;
         pressPos = draggingPos = event->pos();
+        scening = false;
 
         // 判断点击位置
         // 此时已经确保不是点在item上了
@@ -446,6 +447,7 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
     {
         pressing = true;
         pressPos = draggingPos = event->pos();
+        scening = false;
 
         // 自动选中鼠标下面的菜单
         QPoint pos = event->pos();
@@ -463,6 +465,58 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
     }
 
     QWidget::mousePressEvent(event);
+}
+
+void UniversePanel::mouseMoveEvent(QMouseEvent *event)
+{
+    if (moving) // 拖着组件移动
+    {
+
+    }
+    else if (pressing) // 拖拽
+    {
+        draggingPos = event->pos();
+        if (event->buttons() & Qt::RightButton || QGuiApplication::keyboardModifiers() & Qt::AltModifier) // 拖拽移动
+        {
+            if (!scening)
+            {
+                if ((draggingPos - pressPos).manhattanLength() > QApplication::startDragDistance())
+                    scening = true;
+            }
+            if (scening)
+            {
+                QPoint delta = draggingPos - pressPos;
+                foreach (auto item, items)
+                {
+                    item->move(item->pos() + delta);
+                }
+                pressPos = draggingPos;
+            }
+        }
+        else if (event->buttons() & Qt::LeftButton) // 拖拽出区域
+        {
+            update();
+
+            // 显示hover
+            QRect range(pressPos, draggingPos);
+            foreach (auto item, items)
+            {
+                if (item->isSelected())
+                    continue;
+
+                if (range.contains(item->geometry().center()))
+                {
+                    item->showHover(true);
+                }
+                else
+                {
+                    item->showHover(false);
+                }
+            }
+        }
+    }
+
+    QWidget::mouseMoveEvent(event);
 }
 
 void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
@@ -526,51 +580,6 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
     }
 
     QWidget::mouseReleaseEvent(event);
-}
-
-void UniversePanel::mouseMoveEvent(QMouseEvent *event)
-{
-    if (moving) // 拖着组件移动
-    {
-
-    }
-    else if (pressing) // 拖拽
-    {
-        draggingPos = event->pos();
-        if (event->buttons() & Qt::RightButton || QGuiApplication::keyboardModifiers() & Qt::AltModifier) // 拖拽移动
-        {
-            scening = true;
-            QPoint delta = draggingPos - pressPos;
-            foreach (auto item, items)
-            {
-                item->move(item->pos() + delta);
-            }
-            pressPos = draggingPos;
-        }
-        else if (event->buttons() & Qt::LeftButton) // 拖拽出区域
-        {
-            update();
-
-            // 显示hover
-            QRect range(pressPos, draggingPos);
-            foreach (auto item, items)
-            {
-                if (item->isSelected())
-                    continue;
-
-                if (range.contains(item->geometry().center()))
-                {
-                    item->showHover(true);
-                }
-                else
-                {
-                    item->showHover(false);
-                }
-            }
-        }
-    }
-
-    QWidget::mouseMoveEvent(event);
 }
 
 void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
