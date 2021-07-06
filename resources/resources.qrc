@@ -16,5 +16,9 @@
         <file alias="fast_open">icons/fast_open.png</file>
         <file alias="open_level">icons/open_level.png</file>
         <file alias="eye">icons/eye.png</file>
+        <file alias="cut">icons/cut.png</file>
+        <file alias="paste">icons/paste.png</file>
+        <file alias="copy">icons/copy.png</file>
+        <file alias="html">icons/html.png</file>
     </qresource>
 </RCC>

@@ -86,7 +86,7 @@ void LongTextItem::showEditMenu()
 
     bool selection = edit->textCursor().hasSelection();
 
-    menu->addAction("复制 (&C)", [=]{
+    menu->addAction(QIcon(":/icons/copy"), "复制 (&C)", [=]{
         if (selection)
         {
             edit->copy();
@@ -106,7 +106,7 @@ void LongTextItem::showEditMenu()
         }
     });
 
-    menu->addAction("剪切 (&X)", [=]{
+    menu->addAction(QIcon(":/icons/cut"), "剪切 (&X)", [=]{
         if (selection)
         {
             edit->cut();
@@ -127,12 +127,12 @@ void LongTextItem::showEditMenu()
         }
     });
 
-    menu->addAction("粘贴 (&V)", [=]{
+    menu->addAction(QIcon(":/icons/paste"), "粘贴 (&V)", [=]{
         edit->paste();
     });
 
     menu->split();
-    menu->addAction("使用HTML (&H)", [=]{
+    menu->addAction(QIcon(":/icons/html"), "使用HTML (&H)", [=]{
         enableHtml = !enableHtml;
         emit modified();
     })->check(enableHtml);

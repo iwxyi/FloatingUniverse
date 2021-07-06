@@ -485,7 +485,8 @@ FacileMenuItem *FacileMenu::addSeparator()
 
 FacileMenu *FacileMenu::split()
 {
-    addSeparator();
+    if (items.size())
+        addSeparator();
     return this;
 }
 
