@@ -72,9 +72,7 @@ private:
     bool expanding = false;
     bool animating = false;
     bool fixing = false;
-
     int boundaryWidth = 8;
-
     bool pressing = false; // 左键按下
     QPoint pressPos;
     bool moving = false; // 正在移动items

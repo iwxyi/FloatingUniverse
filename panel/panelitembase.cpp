@@ -1,8 +1,8 @@
-
 #include <QIcon>
 #include <QMouseEvent>
 #include <QApplication>
 #include <QDebug>
+#include <QLayout>
 #include "panelitembase.h"
 #include "usettings.h"
 #include "runtime.h"
@@ -57,6 +57,12 @@ bool PanelItemBase::isSelected() const
 bool PanelItemBase::isHovered() const
 {
     return hovered;
+}
+
+QRect PanelItemBase::contentsRect() const
+{
+    int border = layout() ? layout()->margin() : selectBorder;
+    return QRect(border, border, width() - border * 2, height() * border * 2);
 }
 
 void PanelItemBase::facileMenuEvent(FacileMenu *menu)

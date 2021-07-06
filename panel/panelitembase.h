@@ -31,6 +31,7 @@ public:
 
     bool isSelected() const;
     bool isHovered() const;
+    QRect contentsRect() const;
 
     virtual void facileMenuEvent(FacileMenu* menu);
     virtual void triggerEvent();

@@ -14,6 +14,7 @@ LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
     layout->addWidget(edit);
 
     layout->setMargin(this->boundaryWidth);
+    edit->setMinimumSize(64, 16);
     edit->setStyleSheet("QTextEdit { background: transparent; border: none; }");
     edit->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -73,6 +74,12 @@ QString LongTextItem::getText() const
 bool LongTextItem::isHtml() const
 {
     return enableHtml;
+}
+
+void LongTextItem::adjustSizeByText()
+{
+    edit->adjustSize();
+    this->adjustSize();
 }
 
 void LongTextItem::editText()

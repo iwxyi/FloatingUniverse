@@ -110,7 +110,6 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QIcon &icon, const
 IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QString& iconName, const QString &text, const QString &link, PanelItemType type)
 {
     auto item = new IconTextItem(this);
-
     item->setIcon(iconName);
     item->setText(text);
 
@@ -130,11 +129,12 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QString& iconName,
 LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, bool enableHtml)
 {
     auto item = new LongTextItem(this);
-
     item->setText(text, enableHtml);
+    item->adjustSizeByText(); // 这个调整大小好像没啥用
 
     item->show();
-    item->move(pos - QPoint(item->width() / 2, item->height() / 2));
+    QFontMetrics fm(item->font());
+    item->move(pos - item->contentsRect().topLeft() - QPoint(2, fm.height() / 2 + 2));
 
     items.append(item);
     connectItem(item);
@@ -680,8 +680,9 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         auto addMenu = menu->addMenu(QIcon(":/icons/add"), "创建 (&A)");
         addMenu->addRow([=]{
             addMenu->addAction(QIcon(":icons/txt"), "文本 (&E)", [=]{
-
-            })->disable();
+                auto item = createTextItem(cursorPos, "", false);
+                item->editText();
+            });
             addMenu->addAction(QIcon(":icons/url"), "网址 (&U)", [=]{
                 menu->close();
                 QString url = QInputDialog::getText(this, "添加网址", "请输入URL", QLineEdit::Normal);

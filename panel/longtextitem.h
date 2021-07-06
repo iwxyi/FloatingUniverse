@@ -10,8 +10,8 @@ class LongTextItem : public ResizeableItemBase
 public:
     LongTextItem(QWidget* parent);
 
-    virtual MyJson toJson() const;
-    virtual void fromJson(const MyJson& json);
+    virtual MyJson toJson() const override;
+    virtual void fromJson(const MyJson& json) override;
 
     void setText(const QString& text);
     void setHtml(const QString& html);
@@ -20,6 +20,7 @@ public:
     QString getText() const;
     bool isHtml() const;
 
+    void adjustSizeByText();
     void editText();
 
 public slots:
