@@ -978,7 +978,18 @@ void UniversePanel::addPastAction(FacileMenu *menu, QPoint pos, bool split)
     if (mime->hasUrls())
         pasteName = "URL";
     else if (mime->hasText())
-        pasteName = "文本";
+    {
+        auto text = mime->text();
+        if (!text.contains("\n"))
+        {
+            if (text.startsWith("http://") || text.startsWith("https://"))
+                pasteName = "网址";
+            else if (QFileInfo(text).exists())
+                pasteName = "文件";
+        }
+        if (pasteName.isEmpty())
+            pasteName = "文本";
+    }
     else if (mime->hasHtml())
         pasteName = "富文本";
     else if (mime->hasImage())
