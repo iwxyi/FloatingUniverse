@@ -3,6 +3,7 @@
 
 #include <QTextEdit>
 #include "resizeableitembase.h"
+#include "customedit.h"
 
 class LongTextItem : public ResizeableItemBase
 {
@@ -31,7 +32,7 @@ protected:
     virtual void showEdgeEvent() override;
 
 private:
-    QTextEdit* edit;
+    CustomEdit* edit;
     bool enableHtml = false;
 };
 

@@ -175,6 +175,14 @@ void UniversePanel::connectItem(PanelItemBase *item)
         }
     });
 
+    connect(item, &PanelItemBase::selectMe, this, [=]{
+        if (!(selectedItems.size() == 1 && selectedItems.contains(item)))
+        {
+            unselectAll();
+            selectItem(item);
+        }
+    });
+
     connect(item, &PanelItemBase::modified, this, [=]{
         save();
     });
@@ -195,10 +203,15 @@ void UniversePanel::connectItem(PanelItemBase *item)
         });
     });
 
-    connect(item, &PanelItemBase::hidePanel, this, [=] {
+    connect(item, &PanelItemBase::hidePanel, this, [=]{
         foldPanel();
     });
 
+    connect(item, &PanelItemBase::useFinished, this, [=]{
+        qDebug() << "use finished";
+//        if (!isItemUsing())
+//            foldPanel();
+    });
 }
 
 QString UniversePanel::saveIcon(const QIcon &icon) const
@@ -232,6 +245,22 @@ void UniversePanel::deleteItem(PanelItemBase *item)
     }
 
     item->deleteLater();
+}
+
+/// 判断item是否正在使用
+/// 有些情况会误判为leaveEvent，可能是：
+/// - 弹出的右键菜单
+/// - 输入法候选框
+bool UniversePanel::isItemUsing() const
+{
+    if (currentMenu && currentMenu->hasFocus())
+        return true;
+
+    bool ct = geometry().contains(QCursor::pos()); // 鼠标是否在面板上
+    foreach (auto item, items)
+        if (item->isUsing() && ct)
+            return true;
+    return false;
 }
 
 void UniversePanel::keepPanelState(FuncType func)
@@ -405,14 +434,8 @@ void UniversePanel::enterEvent(QEvent *event)
 
 void UniversePanel::leaveEvent(QEvent *event)
 {
-    if (currentMenu && currentMenu->hasFocus())
+    if (isItemUsing())
         return ;
-
-    bool ct = geometry().contains(QCursor::pos()); // 鼠标是否在面板上
-
-    foreach (auto item, items)
-        if (item->isUsing() && ct)
-            return ;
 
     QWidget::leaveEvent(event);
 

@@ -24,8 +24,6 @@ MyJson PanelItemBase::toJson() const
     QRect rect(this->geometry());
     json.insert("left", rect.left());
     json.insert("top", rect.top());
-    json.insert("width", rect.width());
-    json.insert("height", rect.height());
     json.insert("type", int(type));
 
     return json;
@@ -34,9 +32,9 @@ MyJson PanelItemBase::toJson() const
 void PanelItemBase::fromJson(const MyJson &json)
 {
     // 位置
-    QRect rect(json.i("left"), json.i("top"), json.i("width"), json.i("height"));
-    move(rect.topLeft());
+    move(QPoint(json.i("left"), json.i("top")));
 
+    // 类型
     this->type = PanelItemType(json.i("type"));
 }
 

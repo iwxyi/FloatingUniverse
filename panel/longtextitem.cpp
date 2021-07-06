@@ -9,7 +9,7 @@ LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
 {
     setType(LongText);
 
-    edit = new QTextEdit(this);
+    edit = new CustomEdit(this);
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(edit);
 
@@ -22,6 +22,14 @@ LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
         emit modified();
     });
     connect(edit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showEditMenu()));
+    connect(edit, &CustomEdit::focusIn, this, [=]{
+        emit selectMe();
+    });
+    connect(edit, &CustomEdit::focusOut, this, [=]{
+        /// 如果是右键菜单，同样会触发 focusOut
+        /// 然后会触发panel的leaveEvent
+        emit useFinished();
+    });
 }
 
 MyJson LongTextItem::toJson() const
@@ -37,10 +45,6 @@ MyJson LongTextItem::toJson() const
 void LongTextItem::fromJson(const MyJson &json)
 {
     ResizeableItemBase::fromJson(json);
-
-    int w = json.i("width", this->width());
-    int h = json.i("height", this->height());
-    resize(w, h);
 
     enableHtml = json.b("enableHtml", enableHtml);
     setText(json.s("text"), enableHtml);

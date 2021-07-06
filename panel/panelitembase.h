@@ -40,10 +40,12 @@ public:
 signals:
     void triggered();
     void pressed();
+    void selectMe();
     void modified();
     void hidePanel();
     void moveItems(QPoint delta);
     void facileMenuUsed(FacileMenu* menu);
+    void useFinished();
 
 public slots:
     void showSelect(bool sh);

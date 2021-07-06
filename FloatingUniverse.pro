@@ -34,8 +34,10 @@ INCLUDEPATH += third_party/color_octree/\
 
 SOURCES += \
     global/usettings.cpp \
+    panel/customedit.cpp \
     panel/icontextitem.cpp \
     panel/longtextitem.cpp \
+    panel/moveablewidget.cpp \
     panel/panelitembase.cpp \
     panel/resizeableitembase.cpp \
     panel/universepanel.cpp \
@@ -56,8 +58,10 @@ HEADERS += \
     global/defines.h \
     global/signaltransfer.h \
     global/usettings.h \
+    panel/customedit.h \
     panel/icontextitem.h \
     panel/longtextitem.h \
+    panel/moveablewidget.h \
     panel/panelitembase.h \
     panel/resizeableitembase.h \
     panel/universepanel.h \
