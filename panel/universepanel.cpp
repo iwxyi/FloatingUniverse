@@ -408,6 +408,12 @@ void UniversePanel::leaveEvent(QEvent *event)
     if (currentMenu && currentMenu->hasFocus())
         return ;
 
+    bool ct = geometry().contains(QCursor::pos()); // 鼠标是否在面板上
+
+    foreach (auto item, items)
+        if (item->isUsing() && ct)
+            return ;
+
     QWidget::leaveEvent(event);
 
     if (expanding)

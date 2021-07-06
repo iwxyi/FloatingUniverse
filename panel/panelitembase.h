@@ -31,6 +31,7 @@ public:
 
     bool isSelected() const;
     bool isHovered() const;
+    virtual bool isUsing() const; // 是否正在使用中，临时屏蔽leaveEvent（比如输入法框）
     QRect contentsRect() const;
 
     virtual void facileMenuEvent(FacileMenu* menu);

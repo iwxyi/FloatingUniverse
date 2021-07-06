@@ -12,6 +12,7 @@ public:
 
     virtual MyJson toJson() const override;
     virtual void fromJson(const MyJson& json) override;
+    virtual bool isUsing() const override;
 
     void setText(const QString& text);
     void setHtml(const QString& html);

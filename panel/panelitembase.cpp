@@ -12,6 +12,7 @@ PanelItemBase::PanelItemBase(QWidget *parent) : QWidget(parent)
     selectWidget = new QWidget(this);
     selectWidget->hide();
 
+    setFocusPolicy(Qt::ClickFocus);
     setCursor(Qt::PointingHandCursor);
     type = PanelItemType::DefaultItem;
 }
@@ -57,6 +58,11 @@ bool PanelItemBase::isSelected() const
 bool PanelItemBase::isHovered() const
 {
     return hovered;
+}
+
+bool PanelItemBase::isUsing() const
+{
+    return false;
 }
 
 QRect PanelItemBase::contentsRect() const

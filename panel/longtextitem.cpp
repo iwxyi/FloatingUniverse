@@ -46,6 +46,13 @@ void LongTextItem::fromJson(const MyJson &json)
     setText(json.s("text"), enableHtml);
 }
 
+bool LongTextItem::isUsing() const
+{
+    if (edit->hasFocus())
+        return true;
+    return ResizeableItemBase::isUsing();
+}
+
 void LongTextItem::setText(const QString &text)
 {
     edit->setPlainText(text);
