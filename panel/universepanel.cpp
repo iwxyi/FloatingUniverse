@@ -11,6 +11,7 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QFileDialog>
+#include <QClipboard>
 #ifdef Q_OS_WIN32
 #include <windows.h>
 #include <windowsx.h>
@@ -371,6 +372,105 @@ void UniversePanel::startDragSelectedItems()
 
 }
 
+void UniversePanel::pasteFromClipboard(QPoint pos)
+{
+    auto mime = QApplication::clipboard()->mimeData();
+    insertMimeData(mime, pos);
+}
+
+void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
+{
+    if(mime->hasUrls())//处理期望数据类型
+    {
+        QFileIconProvider icon_provider;
+        QList<QUrl> urls = mime->urls();//获取数据并保存到链表中
+        qInfo() << "拖拽 URLs:" << urls;
+
+        for(int i = 0; i < urls.count(); i++)
+        {
+            IconTextItem* item = nullptr;
+            if (urls.at(i).isLocalFile()) // 拖拽本地文件
+            {
+                QString path = urls.at(i).toLocalFile();
+                QIcon icon = icon_provider.icon(QFileInfo(path));
+                item = createLinkItem(pos, icon, urls.at(i).fileName(), path, PanelItemType::LocalFile);
+            }
+            else // 拖拽网络URL
+            {
+                QString path = urls.at(i).url();
+                QString pageName;
+                QPixmap pixmap;
+                keepPanelState([&]{
+                    getWebPageNameAndIcon(path, pageName, pixmap);
+                    if (pageName.isEmpty() && urls.count() == 1) // 空名字，并且获取不到
+                    {
+                        // 手动输入名字
+                        bool ok = false;
+                        this->activateWindow(); // 不激活当前窗口，inputDialog就不会获取焦点
+                        QString text = QInputDialog::getText(this, "快捷方式名字", "请输入URL快捷方式的标题", QLineEdit::Normal, path, &ok);
+                        if (ok)
+                        {
+                            pageName = text;
+                        }
+                    }
+                });
+                item = createLinkItem(pos,
+                                      pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                                      pageName.isEmpty() ? path : pageName,
+                                      path, PanelItemType::WebUrl);
+            }
+            pos.rx() += item->width();
+        }
+    }
+    else if (mime->hasHtml())
+    {
+        QString html = mime->html();
+        qInfo() << "拖拽 HTML" << html.left(200);
+
+        createTextItem(pos, html, true);
+    }
+    else if (mime->hasText())
+    {
+        QString text = mime->text();
+        qInfo() << "拖拽 TEXT" << text.left(200);
+
+        // 链接
+        if (!text.contains("\n"))
+        {
+            // 处理网址
+            if (text.startsWith("http://") || text.startsWith("https://"))
+            {
+                QString pageName;
+                QPixmap pixmap;
+                getWebPageNameAndIcon(text, pageName, pixmap);
+                createLinkItem(pos, ":/icons/link", pageName.isEmpty() ? text : pageName, text, PanelItemType::WebUrl);
+                return ;
+            }
+
+            // 处理本地文件
+            else if (QFileInfo(text).exists())
+            {
+                QFileInfo info(text);
+                QString path = info.absoluteFilePath();
+                QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+                createLinkItem(pos, icon, info.fileName(), path, PanelItemType::LocalFile);
+                return ;
+            }
+        }
+
+        // 普通文本
+        createTextItem(pos, text, false);
+    }
+    else if (mime->hasImage())
+    {
+        qInfo() << "TODO: 插入 IMG";
+    }
+    else if (mime->hasColor())
+    {
+        qInfo() << "TODO: 插入 Color";
+    }
+}
+
 QRect UniversePanel::screenGeometry() const
 {
     auto screens = QGuiApplication::screens();
@@ -663,10 +763,15 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
     QWidget::mouseReleaseEvent(event);
 }
 
-void UniversePanel::mouseDoubleClickEvent(QMouseEvent *)
+void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
 {
     newFacileMenu;
+
     showAddMenu(menu);
+
+    Q_UNUSED(event)
+    // addPastAction(menu, event->pos(), true);
+
     currentMenu = menu;
     menu->exec();
     menu->finished([=]{
@@ -685,6 +790,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     }
     newFacileMenu;
     currentMenu = menu;
+    QPoint cursorPos = mapFromGlobal(QCursor::pos());
 
     // 选中多个，使用批量打开（暂且不管是不是选中的item都能打开）
     if (selectedItems.size() > 1)
@@ -722,9 +828,14 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
 
     if (!selectedItems.size())
     {
-        auto addMenu = menu->addMenu(QIcon(":/icons/add"), "创建 (&A)");
+        // 创建新的
+        auto addMenu = menu->addMenu(QIcon(":/icons/add"), "新建 (&A)");
         showAddMenu(addMenu);
 
+        // 剪贴板
+        addPastAction(menu, cursorPos);
+
+        // 面板固定操作
         menu->split()->addAction(QIcon(":/icons/fix"), "固定 (&F)", [=]{
             fixing = !fixing;
         })->check(fixing);
@@ -833,7 +944,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
     });
 
     addMenu->addRow([=]{
-        addMenu->split()->addAction(QIcon(":icons/link"), "文件链接 (&K)", [=]{
+        addMenu->addAction(QIcon(":icons/link"), "文件链接 (&K)", [=]{
             if (currentMenu)
                 currentMenu->close();
             QString prevPath = us->s("recent/selectFile");
@@ -856,6 +967,35 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
             createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
         });
     });
+}
+
+void UniversePanel::addPastAction(FacileMenu *menu, QPoint pos, bool split)
+{
+    auto clipboard = QApplication::clipboard();
+    auto mime = clipboard->mimeData();
+    bool canPaste = true;
+    QString pasteName = "";
+    if (mime->hasUrls())
+        pasteName = "URL";
+    else if (mime->hasText())
+        pasteName = "文本";
+    else if (mime->hasHtml())
+        pasteName = "富文本";
+    else if (mime->hasImage())
+        pasteName = "图像";
+    else if (mime->hasColor())
+        pasteName = "颜色";
+    else
+        canPaste = false;
+
+    if (canPaste)
+    {
+        if (split)
+            menu->split();
+        menu->addAction(QIcon(":/icons/paste"), "粘贴 " + pasteName + " (&A)", [=]{
+            pasteFromClipboard(pos);
+        });
+    }
 }
 
 void UniversePanel::keyPressEvent(QKeyEvent *event)
@@ -939,96 +1079,7 @@ void UniversePanel::dropEvent(QDropEvent *event)
 {
     QPoint pos = event->pos();
     auto mime = event->mimeData();
-    if(mime->hasUrls())//处理期望数据类型
-    {
-        QFileIconProvider icon_provider;
-        QList<QUrl> urls = mime->urls();//获取数据并保存到链表中
-        qInfo() << "拖拽 URLs:" << urls;
-
-        for(int i = 0; i < urls.count(); i++)
-        {
-            IconTextItem* item = nullptr;
-            if (urls.at(i).isLocalFile()) // 拖拽本地文件
-            {
-                QString path = urls.at(i).toLocalFile();
-                QIcon icon = icon_provider.icon(QFileInfo(path));
-                item = createLinkItem(pos, icon, urls.at(i).fileName(), path, PanelItemType::LocalFile);
-            }
-            else // 拖拽网络URL
-            {
-                QString path = urls.at(i).url();
-                QString pageName;
-                QPixmap pixmap;
-                keepPanelState([&]{
-                    getWebPageNameAndIcon(path, pageName, pixmap);
-                    if (pageName.isEmpty() && urls.count() == 1) // 空名字，并且获取不到
-                    {
-                        // 手动输入名字
-                        bool ok = false;
-                        this->activateWindow(); // 不激活当前窗口，inputDialog就不会获取焦点
-                        QString text = QInputDialog::getText(this, "快捷方式名字", "请输入URL快捷方式的标题", QLineEdit::Normal, path, &ok);
-                        if (ok)
-                        {
-                            pageName = text;
-                        }
-                    }
-                });
-                item = createLinkItem(pos,
-                                      pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
-                                      pageName.isEmpty() ? path : pageName,
-                                      path, PanelItemType::WebUrl);
-            }
-            pos.rx() += item->width();
-        }
-    }
-    else if (mime->hasHtml())
-    {
-        QString html = mime->html();
-        qInfo() << "拖拽 HTML" << html.left(200);
-
-        createTextItem(pos, html, true);
-    }
-    else if (mime->hasText())
-    {
-        QString text = mime->text();
-        qInfo() << "拖拽 TEXT" << text.left(200);
-
-        // 链接
-        if (!text.contains("\n"))
-        {
-            // 处理网址
-            if (text.startsWith("http://") || text.startsWith("https://"))
-            {
-                QString pageName;
-                QPixmap pixmap;
-                getWebPageNameAndIcon(text, pageName, pixmap);
-                createLinkItem(pos, ":/icons/link", pageName.isEmpty() ? text : pageName, text, PanelItemType::WebUrl);
-                return ;
-            }
-
-            // 处理本地文件
-            else if (QFileInfo(text).exists())
-            {
-                QFileInfo info(text);
-                QString path = info.absoluteFilePath();
-                QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-                createLinkItem(pos, icon, info.fileName(), path, PanelItemType::LocalFile);
-                return ;
-            }
-        }
-
-        // 普通文本
-        createTextItem(pos, text, false);
-    }
-    else if (mime->hasImage())
-    {
-        qInfo() << "拖拽 IMG";
-    }
-    else
-    {
-        event->ignore();
-        return ;
-    }
+    insertMimeData(mime, pos);
 }
 
 bool UniversePanel::nativeEvent(const QByteArray &eventType, void *message, long *result)

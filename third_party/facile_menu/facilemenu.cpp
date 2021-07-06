@@ -464,11 +464,19 @@ FacileMenu *FacileMenu::setStretchFactor(QLayout *layout, int stretch)
 
 /**
  * 添加水平分割线
+ * 不一定需要
  */
 FacileMenuItem *FacileMenu::addSeparator()
 {
     if (adding_horizone)
+    {
+        if (!row_hlayouts.last()->count())
+            return nullptr;
         return addVSeparator();
+    }
+
+    if (!main_vlayout->count())
+        return nullptr;
 
     FacileMenuItem* item = new FacileMenuItem(this);
     item->setNormalColor(QColor(64, 64, 64, 64));
@@ -485,8 +493,7 @@ FacileMenuItem *FacileMenu::addSeparator()
 
 FacileMenu *FacileMenu::split()
 {
-    if (items.size())
-        addSeparator();
+    addSeparator();
     return this;
 }
 

@@ -42,6 +42,8 @@ public slots:
 
 private slots:
     void startDragSelectedItems();
+    void pasteFromClipboard(QPoint pos);
+    void insertMimeData(const QMimeData *mime, QPoint pos);
 
 public:
     QRect screenGeometry() const;
@@ -58,10 +60,11 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
-    void mouseDoubleClickEvent(QMouseEvent *) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
     void contextMenuEvent(QContextMenuEvent *event) override;
     void showAddMenu(FacileMenu* addMenu);
+    void addPastAction(FacileMenu* menu, QPoint pos, bool split = false);
     void keyPressEvent(QKeyEvent *event) override;
 
     void dragEnterEvent(QDragEnterEvent *event) override;
