@@ -77,6 +77,8 @@ void PanelItemBase::showSelect(bool sh)
         selectWidget->setGeometry(selectBorder / 2, selectBorder / 2, width() - selectBorder, height() - selectBorder);
         selectWidget->raise();
         selectWidget->show();
+
+        showEdgeEvent();
     }
     else
     {
@@ -170,5 +172,10 @@ void PanelItemBase::resizeEvent(QResizeEvent *event)
     {
         showSelect(true);
     }
+}
+
+void PanelItemBase::showEdgeEvent()
+{
+
 }
 

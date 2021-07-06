@@ -6,6 +6,7 @@
 
 class LongTextItem : public ResizeableItemBase
 {
+    Q_OBJECT
 public:
     LongTextItem(QWidget* parent);
 
@@ -20,6 +21,12 @@ public:
     bool isHtml() const;
 
     void editText();
+
+public slots:
+    void showEditMenu();
+
+protected:
+    virtual void showEdgeEvent() override;
 
 private:
     QTextEdit* edit;

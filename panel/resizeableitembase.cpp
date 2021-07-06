@@ -9,4 +9,3 @@ ResizeableItemBase::ResizeableItemBase(QWidget *parent) : PanelItemBase(parent)
 {
 
 }
-

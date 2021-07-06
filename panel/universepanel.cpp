@@ -81,12 +81,20 @@ void UniversePanel::readItems()
         {
             auto item = new IconTextItem(this);
             item->fromJson(json);
-            items.append(item);
             item->show();
+            items.append(item);
             connectItem(item);
             break;
         }
         case LongText:
+        {
+            auto item = new LongTextItem(this);
+            item->fromJson(json);
+            item->show();
+            items.append(item);
+            connectItem(item);
+            break;
+        }
         case ImageView:
             break;
         }
@@ -363,9 +371,10 @@ bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixma
     // 获取网页图标
     QUrl urlObj(url);
     QString host = urlObj.host();
-    if (!host.contains(QRegularExpression("(\\d+\\.){3}\\d+"))) // 内网大概率没有网站图标，算了吧
+    int port = urlObj.port(-1);
+    // if (!host.contains(QRegularExpression("(\\d+\\.){3}\\d+"))) // 内网大概率是测试的，没有网站图标
     {
-        QString faviconUrl = url.left(url.indexOf(host)) + host + "/favicon.ico";
+        QString faviconUrl = url.left(url.indexOf(host)) + host + (port > 0 ? QString(":%1").arg(port) : "") + "/favicon.ico";
         QByteArray ba = NetUtil::getWebBa(faviconUrl);
         if (ba.size())
         {
@@ -820,7 +829,7 @@ void UniversePanel::dropEvent(QDropEvent *event)
             {
                 QString path = urls.at(i).toLocalFile();
                 QIcon icon = icon_provider.icon(QFileInfo(path));
-                createLinkItem(pos, icon, urls.at(i).fileName(), path, PanelItemType::LocalFile);
+                item = createLinkItem(pos, icon, urls.at(i).fileName(), path, PanelItemType::LocalFile);
             }
             else // 拖拽网络URL
             {
@@ -841,10 +850,10 @@ void UniversePanel::dropEvent(QDropEvent *event)
                         }
                     }
                 });
-                createLinkItem(pos,
-                               pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
-                               pageName.isEmpty() ? path : pageName,
-                               path, PanelItemType::WebUrl);
+                item = createLinkItem(pos,
+                                      pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                                      pageName.isEmpty() ? path : pageName,
+                                      path, PanelItemType::WebUrl);
             }
             pos.rx() += item->width();
         }

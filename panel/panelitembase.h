@@ -53,6 +53,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
+    virtual void showEdgeEvent();
+
 protected:
     QLabel* iconLabel;
     QLabel* textLabel;

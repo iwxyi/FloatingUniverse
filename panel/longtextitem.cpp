@@ -1,5 +1,9 @@
 #include <QVBoxLayout>
+#include <QApplication>
+#include <QClipboard>
+#include <QMimeData>
 #include "longtextitem.h"
+#include "facilemenu.h"
 
 LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
 {
@@ -11,10 +15,12 @@ LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
 
     layout->setMargin(this->boundaryWidth);
     edit->setStyleSheet("QTextEdit { background: transparent; border: none; }");
+    edit->setContextMenuPolicy(Qt::CustomContextMenu);
 
     connect(edit, &QTextEdit::textChanged, this, [=]{
         emit modified();
     });
+    connect(edit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showEditMenu()));
 }
 
 MyJson LongTextItem::toJson() const
@@ -72,4 +78,72 @@ bool LongTextItem::isHtml() const
 void LongTextItem::editText()
 {
     edit->setFocus();
+}
+
+void LongTextItem::showEditMenu()
+{
+    newFacileMenu;
+
+    bool selection = edit->textCursor().hasSelection();
+
+    menu->addAction("复制 (&C)", [=]{
+        if (selection)
+        {
+            edit->copy();
+        }
+        else
+        {
+            if (!enableHtml)
+            {
+                QApplication::clipboard()->setText(edit->toPlainText());
+            }
+            else
+            {
+                QMimeData *mime = new QMimeData();
+                mime->setHtml(edit->toHtml());
+                QApplication::clipboard()->setMimeData(mime);
+            }
+        }
+    });
+
+    menu->addAction("剪切 (&X)", [=]{
+        if (selection)
+        {
+            edit->cut();
+        }
+        else
+        {
+            if (!enableHtml)
+            {
+                QApplication::clipboard()->setText(edit->toPlainText());
+            }
+            else
+            {
+                QMimeData *mime = new QMimeData();
+                mime->setHtml(edit->toHtml());
+                QApplication::clipboard()->setMimeData(mime);
+            }
+            edit->clear();
+        }
+    });
+
+    menu->addAction("粘贴 (&V)", [=]{
+        edit->paste();
+    });
+
+    menu->split();
+    menu->addAction("使用HTML (&H)", [=]{
+        enableHtml = !enableHtml;
+        emit modified();
+    })->check(enableHtml);
+
+    menu->exec();
+    emit facileMenuUsed(menu);
+}
+
+void LongTextItem::showEdgeEvent()
+{
+    ResizeableItemBase::showEdgeEvent();
+
+    edit->raise();
 }
