@@ -20,5 +20,12 @@
         <file alias="paste">icons/paste.png</file>
         <file alias="copy">icons/copy.png</file>
         <file alias="html">icons/html.png</file>
+        <file alias="todo">icons/todo.png</file>
+        <file alias="remind">icons/remind.png</file>
+        <file alias="txt">icons/txt.png</file>
+        <file alias="folder">icons/folder.png</file>
+        <file alias="file">icons/file.png</file>
+        <file alias="clock">icons/clock.png</file>
+        <file alias="url">icons/url.png</file>
     </qresource>
 </RCC>
