@@ -767,10 +767,10 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
     });
 
     addMenu->addRow([=]{
-        addMenu->addAction(QIcon(":icons/remind"), "提醒 (&W)", [=]{
+        addMenu->addAction(QIcon(":icons/todo"), "待办 (&T)", [=]{
 
         })->disable();
-        addMenu->addAction(QIcon(":icons/todo"), "待办 (&T)", [=]{
+        addMenu->addAction(QIcon(":icons/remind"), "提醒 (&W)", [=]{
 
         })->disable();
     });

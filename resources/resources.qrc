@@ -27,5 +27,7 @@
         <file alias="file">icons/file.png</file>
         <file alias="clock">icons/clock.png</file>
         <file alias="url">icons/url.png</file>
+        <file alias="update">icons/update.png</file>
+        <file alias="more">icons/more.png</file>
     </qresource>
 </RCC>

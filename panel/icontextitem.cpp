@@ -197,6 +197,16 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
             });
         }
     }
+
+    auto moreMenu = menu->addMenu(QIcon(":/icons/more"), "更多");
+    moreMenu->addAction(QIcon(":/icons/update"), "更新图标", [=]{
+        if (!QFileInfo(link).exists())
+            return ;
+        QIcon icon = QFileIconProvider().icon(QFileInfo(link));
+        auto pixmap = icon.pixmap(us->pannelItemSize, us->pannelItemSize);
+        pixmap.save(rt->ICON_PATH + iconName);
+        iconLabel->setPixmap(pixmap);
+    });
 }
 
 void IconTextItem::triggerEvent()
