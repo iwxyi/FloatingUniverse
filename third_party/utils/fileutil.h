@@ -31,6 +31,7 @@ bool copyFile2(QString old_path, QString new_path); // 复制文件（覆盖）
 bool deleteFile(QString path);
 bool renameFile(QString path, QString new_path/*完整路径*/, bool override = false);
 bool renameDir(QString path, QString new_path, bool override = false);
+bool recycleFile(const QString &filename);
 
 bool isFileExist(QString path);
 bool isDir(QString path);

@@ -1,5 +1,9 @@
 #include "fileutil.h"
 
+#ifdef Q_OS_WIN32
+#include <windows.h>
+#endif
+
 QString readTextFile(QString path)
 {
     return readTextFile(path, QTextCodec::codecForName(QByteArray("utf-8")));
@@ -380,4 +384,41 @@ QString readTextFileIfExist(QString path)
     if (!isFileExist(path))
         return "";
     return readTextFile(path, QTextCodec::codecForName(QByteArray("utf-8")));
+}
+
+/// 移动文件到回收站
+/// 目前仅在windows下有效
+bool recycleFile(const QString &filename)
+{
+#ifdef Q_OS_WIN32
+    bool ret = true;
+    SHFILEOPSTRUCT opRecycle;
+
+    opRecycle.hwnd              = nullptr;
+    opRecycle.wFunc             = FO_DELETE;
+    opRecycle.pFrom             = reinterpret_cast<const wchar_t *>(filename.utf16());//toWCharT(a_filename);
+    opRecycle.pTo               = L"\0\0";
+    opRecycle.fFlags            = FOF_ALLOWUNDO; //此Flag表示送进回收站
+    opRecycle.hNameMappings     = nullptr;
+    opRecycle.lpszProgressTitle = L"Recycling files...";
+
+    if(SHFileOperation(&opRecycle) != 0)
+    {
+        if(SHFileOperation(&opRecycle) != 0)
+        {
+            if(SHFileOperation(&opRecycle) != 0)
+            {
+                ret = false;
+            }
+        }
+    }
+    if(opRecycle.fAnyOperationsAborted)
+    {
+        ret = false;
+        qWarning() << "删除文件到回收站失败：" << filename;
+    }
+    return ret;
+#else
+    return false;
+#endif
 }

@@ -236,10 +236,20 @@ void UniversePanel::deleteItem(PanelItemBase *item)
     if (qobject_cast<IconTextItem*>(item))
     {
         auto it = qobject_cast<IconTextItem*>(item);
+
+        // 删除图标
         QString iconName = it->getIconName();
         if (!iconName.isEmpty())
         {
             deleteFile(rt->ICON_PATH + iconName);
+        }
+
+        // 删除文件
+        QString link = it->getLink();
+        if (link.startsWith(rt->PANEL_FILE_PATH) && isFileExist(link))
+        {
+            qInfo() << "删除文件到回收站：" << link;
+            recycleFile(link);
         }
     }
 
@@ -767,11 +777,59 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
 
     addMenu->split()->addRow([=]{
         addMenu->split()->addAction(QIcon(":icons/file"), "文件 (&F)", [=]{
+            QString name = QInputDialog::getText(this, "创建文件", "请输入文件名");
+            if (name.isEmpty())
+                return ;
 
-        })->disable();
+            // 获取可创建的文件名，去掉特殊符号
+            QString fileName = name;
+            QChar cs[] = {'\\', '/', ':', '*', '?', '"', '<', '>', '|', '\'', '\n', '\t'};
+            for (int i = 0; i < 12; i++)
+                fileName.replace(cs[i], "");
+
+            // 获取合适的文件路径
+            QString suffix;
+            if (fileName.contains("."))
+            {
+                int pos = fileName.lastIndexOf(".");
+                suffix = fileName.right(fileName.length() - pos);
+                fileName = fileName.left(pos);
+                if (fileName.isEmpty())
+                    fileName = QString::number(QDateTime::currentMSecsSinceEpoch());
+            }
+            QString path = getPathWithIndex(rt->PANEL_FILE_PATH, fileName, suffix);
+
+            // 创建item
+            QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+            createLinkItem(cursorPos, icon, name, path, PanelItemType::LocalFile);
+
+            // 创建并打开文件
+            ensureFileExist(path);
+            QDesktopServices::openUrl("file:///" + path);
+        });
         addMenu->addAction(QIcon(":icons/folder"), "文件夹 (&D)", [=]{
+            QString name = QInputDialog::getText(this, "创建文件夹", "请输入文件夹名");
+            if (name.isEmpty())
+                return ;
 
-        })->disable();
+            // 获取可创建的文件名，去掉特殊符号
+            QString fileName = name;
+            QChar cs[] = {'\\', '/', ':', '*', '?', '"', '<', '>', '|', '\'', '\n', '\t'};
+            for (int i = 0; i < 12; i++)
+                fileName.replace(cs[i], "");
+            if (fileName.isEmpty())
+                fileName = QString::number(QDateTime::currentMSecsSinceEpoch());
+
+            QString path = rt->PANEL_FILE_PATH + fileName;
+
+            // 创建item
+            QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+            createLinkItem(cursorPos, icon, name, path, PanelItemType::LocalFile);
+
+            // 创建并打开文件
+            ensureDirExist(path);
+            QDesktopServices::openUrl("file:///" + path);
+        });
     });
 
     addMenu->addRow([=]{
