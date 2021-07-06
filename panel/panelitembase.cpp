@@ -79,7 +79,7 @@ void PanelItemBase::triggerEvent()
 
 }
 
-void PanelItemBase::showSelect(bool sh)
+void PanelItemBase::setSelect(bool sh)
 {
     if (sh)
     {
@@ -88,16 +88,18 @@ void PanelItemBase::showSelect(bool sh)
         selectWidget->raise();
         selectWidget->show();
 
-        showEdgeEvent();
+        selectEvent();
     }
     else
     {
         selectWidget->hide();
+
+        unselectEvent();
     }
     selected = sh;
 }
 
-void PanelItemBase::showHover(bool sh)
+void PanelItemBase::setHover(bool sh)
 {
     if (sh)
     {
@@ -180,11 +182,16 @@ void PanelItemBase::resizeEvent(QResizeEvent *event)
 
     if (!selectWidget->isHidden())
     {
-        showSelect(true);
+        setSelect(true);
     }
 }
 
-void PanelItemBase::showEdgeEvent()
+void PanelItemBase::selectEvent()
+{
+
+}
+
+void PanelItemBase::unselectEvent()
 {
 
 }

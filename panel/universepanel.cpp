@@ -208,9 +208,8 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::useFinished, this, [=]{
-        qDebug() << "use finished";
 //        if (!isItemUsing())
-//            foldPanel();
+//            foldPanel(); // 不能隐藏，否则会出大事！
     });
 }
 
@@ -328,26 +327,26 @@ void UniversePanel::save()
 void UniversePanel::selectAll()
 {
     foreach (auto item, items)
-        item->showSelect(true);
+        item->setSelect(true);
     selectedItems = items.toSet();
 }
 
 void UniversePanel::unselectAll()
 {
     foreach (auto item, selectedItems)
-        item->showSelect(false);
+        item->setSelect(false);
     selectedItems.clear();
 }
 
 void UniversePanel::selectItem(PanelItemBase *item)
 {
-    item->showSelect(true);
+    item->setSelect(true);
     selectedItems.insert(item);
 }
 
 void UniversePanel::unselectItem(PanelItemBase *item)
 {
-    item->showSelect(false);
+    item->setSelect(false);
     selectedItems.remove(item);
 }
 
@@ -578,11 +577,11 @@ void UniversePanel::mouseMoveEvent(QMouseEvent *event)
 
                 if (range.contains(item->geometry().center()))
                 {
-                    item->showHover(true);
+                    item->setHover(true);
                 }
                 else
                 {
-                    item->showHover(false);
+                    item->setHover(false);
                 }
             }
         }
@@ -612,7 +611,7 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
                 foreach (auto item, items)
                 {
                     if (!item->isSelected() && item->isHovered())
-                        item->showHover(false);
+                        item->setHover(false);
                 }
 
                 // 选中
@@ -621,7 +620,7 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
                 {
                     if (range.contains(item->geometry().center()))
                     {
-                        item->showSelect(true);
+                        item->setSelect(true);
                         selectedItems.insert(item);
                     }
                 }
@@ -654,9 +653,17 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
     QWidget::mouseReleaseEvent(event);
 }
 
-void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
+void UniversePanel::mouseDoubleClickEvent(QMouseEvent *)
 {
-    QWidget::mouseDoubleClickEvent(event);
+    newFacileMenu;
+    showAddMenu(menu);
+    currentMenu = menu;
+    menu->exec();
+    menu->finished([=]{
+        currentMenu = nullptr;
+        if (!this->hasFocus())
+            foldPanel();
+    });
 }
 
 void UniversePanel::contextMenuEvent(QContextMenuEvent *)
@@ -668,7 +675,6 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     }
     newFacileMenu;
     currentMenu = menu;
-    QPoint cursorPos = mapFromGlobal(QCursor::pos());
 
     // 选中多个，使用批量打开（暂且不管是不是选中的item都能打开）
     if (selectedItems.size() > 1)
@@ -707,66 +713,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     if (!selectedItems.size())
     {
         auto addMenu = menu->addMenu(QIcon(":/icons/add"), "创建 (&A)");
-        addMenu->addRow([=]{
-            addMenu->addAction(QIcon(":icons/txt"), "文本 (&E)", [=]{
-                auto item = createTextItem(cursorPos, "", false);
-                item->editText();
-            });
-            addMenu->addAction(QIcon(":icons/url"), "网址 (&U)", [=]{
-                menu->close();
-                QString url = QInputDialog::getText(this, "添加网址", "请输入URL", QLineEdit::Normal);
-                if (url.isEmpty())
-                    return ;
-                QString pageName;
-                QPixmap pixmap;
-                getWebPageNameAndIcon(url, pageName, pixmap);
-                createLinkItem(cursorPos,
-                               pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
-                               pageName.isEmpty() ? url : pageName,
-                               url, PanelItemType::WebUrl);
-            });
-        });
-
-        addMenu->addRow([=]{
-            addMenu->addAction(QIcon(":icons/remind"), "提醒 (&W)", [=]{
-
-            })->disable();
-            addMenu->addAction(QIcon(":icons/todo"), "待办 (&T)", [=]{
-
-            })->disable();
-        });
-
-        addMenu->split()->addRow([=]{
-            addMenu->split()->addAction(QIcon(":icons/file"), "文件 (&F)", [=]{
-
-            })->disable();
-            addMenu->addAction(QIcon(":icons/folder"), "文件夹 (&D)", [=]{
-
-            })->disable();
-        });
-
-        addMenu->addRow([=]{
-            addMenu->split()->addAction(QIcon(":icons/link"), "文件链接 (&K)", [=]{
-                menu->close();
-                QString prevPath = us->s("recent/selectFile");
-                QString path = QFileDialog::getOpenFileName(this, "添加文件快捷方式", prevPath);
-                if (path.isEmpty())
-                    return ;
-                us->set("recent/selectFile", path);
-                QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-                createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
-            });
-            addMenu->addAction(QIcon(":icons/link"), "文件夹链接 (&L)", [=]{
-                menu->close();
-                QString prevPath = us->s("recent/selectFile");
-                QString path = QFileDialog::getExistingDirectory(this, "添加文件夹快捷方式", prevPath);
-                if (path.isEmpty())
-                    return ;
-                us->set("recent/selectFile", path);
-                QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-                createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
-            });
-        });
+        showAddMenu(addMenu);
 
         menu->split()->addAction(QIcon(":/icons/fix"), "固定 (&F)", [=]{
             fixing = !fixing;
@@ -782,6 +729,74 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         currentMenu = nullptr;
         if (!this->hasFocus())
             foldPanel();
+    });
+}
+
+void UniversePanel::showAddMenu(FacileMenu *addMenu)
+{
+    QPoint cursorPos = mapFromGlobal(QCursor::pos());
+    addMenu->addRow([=]{
+        addMenu->addAction(QIcon(":icons/txt"), "文本 (&E)", [=]{
+            auto item = createTextItem(cursorPos, "", false);
+            item->editText();
+        });
+        addMenu->addAction(QIcon(":icons/url"), "网址 (&U)", [=]{
+            if (currentMenu)
+                currentMenu->close();
+            QString url = QInputDialog::getText(this, "添加网址", "请输入URL", QLineEdit::Normal);
+            if (url.isEmpty())
+                return ;
+            QString pageName;
+            QPixmap pixmap;
+            getWebPageNameAndIcon(url, pageName, pixmap);
+            createLinkItem(cursorPos,
+                           pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                           pageName.isEmpty() ? url : pageName,
+                           url, PanelItemType::WebUrl);
+        });
+    });
+
+    addMenu->addRow([=]{
+        addMenu->addAction(QIcon(":icons/remind"), "提醒 (&W)", [=]{
+
+        })->disable();
+        addMenu->addAction(QIcon(":icons/todo"), "待办 (&T)", [=]{
+
+        })->disable();
+    });
+
+    addMenu->split()->addRow([=]{
+        addMenu->split()->addAction(QIcon(":icons/file"), "文件 (&F)", [=]{
+
+        })->disable();
+        addMenu->addAction(QIcon(":icons/folder"), "文件夹 (&D)", [=]{
+
+        })->disable();
+    });
+
+    addMenu->addRow([=]{
+        addMenu->split()->addAction(QIcon(":icons/link"), "文件链接 (&K)", [=]{
+            if (currentMenu)
+                currentMenu->close();
+            QString prevPath = us->s("recent/selectFile");
+            QString path = QFileDialog::getOpenFileName(this, "添加文件快捷方式", prevPath);
+            if (path.isEmpty())
+                return ;
+            us->set("recent/selectFile", path);
+            QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+            createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
+        });
+        addMenu->addAction(QIcon(":icons/link"), "文件夹链接 (&L)", [=]{
+            if (currentMenu)
+                currentMenu->close();
+            QString prevPath = us->s("recent/selectFile");
+            QString path = QFileDialog::getExistingDirectory(this, "添加文件夹快捷方式", prevPath);
+            if (path.isEmpty())
+                return ;
+            us->set("recent/selectFile", path);
+            QIcon icon = QFileIconProvider().icon(QFileInfo(path));
+            createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
+        });
     });
 }
 

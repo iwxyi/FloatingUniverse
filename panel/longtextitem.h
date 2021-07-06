@@ -24,12 +24,14 @@ public:
 
     void adjustSizeByText();
     void editText();
+    void cancelEdit();
 
 public slots:
     void showEditMenu();
 
 protected:
-    virtual void showEdgeEvent() override;
+    virtual void selectEvent() override;
+    virtual void unselectEvent() override;
 
 private:
     CustomEdit* edit;

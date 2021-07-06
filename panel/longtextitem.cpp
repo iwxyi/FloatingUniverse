@@ -30,6 +30,10 @@ LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
         /// 然后会触发panel的leaveEvent
         emit useFinished();
     });
+    connect(edit, &CustomEdit::finished, this, [=]{
+        cancelEdit();
+        emit unselectMe();
+    });
 }
 
 MyJson LongTextItem::toJson() const
@@ -90,12 +94,18 @@ bool LongTextItem::isHtml() const
 void LongTextItem::adjustSizeByText()
 {
     edit->adjustSize();
+    edit->resize(edit->sizeHint());
     this->adjustSize();
 }
 
 void LongTextItem::editText()
 {
     edit->setFocus();
+}
+
+void LongTextItem::cancelEdit()
+{
+    // 不知道怎么写，就算了
 }
 
 void LongTextItem::showEditMenu()
@@ -159,9 +169,17 @@ void LongTextItem::showEditMenu()
     emit facileMenuUsed(menu);
 }
 
-void LongTextItem::showEdgeEvent()
+void LongTextItem::selectEvent()
 {
-    ResizeableItemBase::showEdgeEvent();
+    ResizeableItemBase::selectEvent();
 
     edit->raise();
+}
+
+void LongTextItem::unselectEvent()
+{
+    ResizeableItemBase::unselectEvent();
+
+    if (edit->hasFocus())
+        cancelEdit();
 }

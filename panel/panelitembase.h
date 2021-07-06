@@ -40,16 +40,17 @@ public:
 signals:
     void triggered();
     void pressed();
-    void selectMe();
     void modified();
+    void selectMe();
+    void unselectMe();
     void hidePanel();
     void moveItems(QPoint delta);
     void facileMenuUsed(FacileMenu* menu);
     void useFinished();
 
 public slots:
-    void showSelect(bool sh);
-    void showHover(bool sh);
+    void setSelect(bool sh);
+    void setHover(bool sh);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -57,7 +58,8 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
-    virtual void showEdgeEvent();
+    virtual void selectEvent();
+    virtual void unselectEvent();
 
 protected:
     QLabel* iconLabel;

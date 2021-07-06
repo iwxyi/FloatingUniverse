@@ -58,9 +58,10 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *) override;
 
     void contextMenuEvent(QContextMenuEvent *event) override;
+    void showAddMenu(FacileMenu* addMenu);
     void keyPressEvent(QKeyEvent *event) override;
 
     void dragEnterEvent(QDragEnterEvent *event) override;
