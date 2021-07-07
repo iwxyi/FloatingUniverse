@@ -165,6 +165,10 @@ void LongTextItem::showEditMenu()
         emit modified();
     })->check(enableHtml);
 
+    menu->split()->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
+        emit deleteMe();
+    });
+
     menu->exec();
     emit facileMenuUsed(menu);
 }

@@ -212,6 +212,12 @@ void UniversePanel::connectItem(PanelItemBase *item)
 //        if (!isItemUsing())
 //            foldPanel(); // 不能隐藏，否则会出大事！
     });
+
+    connect(item, &PanelItemBase::deleteMe, this, [=]{
+        items.removeOne(item);
+        selectedItems.remove(item);
+        deleteItem(item);
+    });
 }
 
 QString UniversePanel::saveIcon(const QIcon &icon) const

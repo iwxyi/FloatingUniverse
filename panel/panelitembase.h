@@ -50,6 +50,7 @@ signals:
     void moveItems(QPoint delta);
     void facileMenuUsed(FacileMenu* menu);
     void useFinished();
+    void deleteMe();
 
 public slots:
     void setSelect(bool sh, const QPoint& startPos = UNDEFINED_POS);
