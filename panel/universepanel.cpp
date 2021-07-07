@@ -1020,6 +1020,9 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
+        spaceMenu->addAction("网格分布", [=]{
+
+        })->disable();
     }
 
     // 选中一个
@@ -1344,8 +1347,8 @@ bool UniversePanel::nativeEvent(const QByteArray &eventType, void *message, long
             *result = HTTOP;*/
         else if(yPos >= height() - boundaryWidth)                             //下边
         {
-            if (xPos >= (width() - us->panelBangWidth) / 2 && xPos <= (width() + us->panelBangWidth) / 2) // 刘海部分
-                return false;
+            /* if (xPos >= (width() - us->panelBangWidth) / 2 && xPos <= (width() + us->panelBangWidth) / 2) // 刘海部分
+                return false; */
             *result = HTBOTTOM;
         }
         else              //其他部分不做处理，返回false，留给其他事件处理器处理
