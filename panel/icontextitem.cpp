@@ -334,7 +334,7 @@ void IconTextItem::dropEvent(QDropEvent *event)
         emit selectMe();
         setLink(link);
         qInfo() << "setLink:" << link;
-        nod(); // 动画特效
+        shrink();
     };
 
     if (mime->hasUrls())
