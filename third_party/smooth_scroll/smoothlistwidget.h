@@ -1,27 +1,17 @@
-#ifndef CUSTOMEDIT_H
-#define CUSTOMEDIT_H
+#ifndef SMOOTHLISTWIDGET_H
+#define SMOOTHLISTWIDGET_H
 
-#include <QTextEdit>
-#include "third_party/smooth_scroll/smoothscrollbean.h"
+#include <QObject>
+#include <QListWidget>
+#include <QDebug>
+#include "smoothscrollbean.h"
 
-class CustomEdit : public QTextEdit
+class SmoothListWidget : public QListWidget
 {
     Q_OBJECT
 public:
-    CustomEdit(QWidget* parent);
+    SmoothListWidget(QWidget* parent = nullptr);
 
-    // ---------- edit ----------
-signals:
-    void focusIn();
-    void focusOut();
-    void finished();
-
-protected:
-    void focusInEvent(QFocusEvent *e) override;
-    void focusOutEvent(QFocusEvent *e) override;
-    void keyPressEvent(QKeyEvent *e) override;
-
-    // ---------- scroll ----------
     void setSmoothScrollEnabled(bool e);
     void setSmoothScrollSpeed(int speed);
     void setSmoothScrollDuration(int duration);
@@ -52,4 +42,4 @@ private:
     int toBottoming = 0;
 };
 
-#endif // CUSTOMEDIT_H
+#endif // SMOOTHLISTWIDGET_H

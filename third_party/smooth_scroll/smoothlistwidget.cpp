@@ -1,71 +1,33 @@
-#include <QKeyEvent>
-#include "customedit.h"
-#include "third_party/slim_scroll_bar/slimscrollbar.h"
+#include <QScrollBar>
+#include <QWheelEvent>
+#include "smoothlistwidget.h"
 
-CustomEdit::CustomEdit(QWidget *parent) : QTextEdit(parent)
+SmoothListWidget::SmoothListWidget(QWidget *parent) : QListWidget(parent)
 {
-    auto slim = new SlimScrollBar;
-    slim->setRoundCap(false);
-    slim->setFgColors(QColor(0xCC, 0xCC, 0xCC, 64),
-                      QColor(0xCC, 0xCC, 0xCC, 128),
-                      QColor(0xCC, 0xCC, 0xCC, 192));
-    slim->setBgColors(QColor(0xF0, 0xF0, 0xF0, 64),
-                      QColor(0xF0, 0xF0, 0xF0, 128),
-                      QColor(0xF0, 0xF0, 0xF0, 192));
-    setVerticalScrollBar(slim);
+    setVerticalScrollMode(QListWidget::ScrollPerPixel);
 }
 
-// ---------- edit ----------
-
-void CustomEdit::focusInEvent(QFocusEvent *e)
-{
-    QTextEdit::focusInEvent(e);
-
-    emit focusIn();
-}
-
-void CustomEdit::focusOutEvent(QFocusEvent *e)
-{
-    QTextEdit::focusOutEvent(e);
-
-    emit focusOut();
-}
-
-void CustomEdit::keyPressEvent(QKeyEvent *e)
-{
-    auto key = e->key();
-    if (key == Qt::Key_Escape)
-    {
-        emit finished();
-        return ;
-    }
-
-    QTextEdit::keyPressEvent(e);
-}
-
-// ---------- scroll ----------
-
-void CustomEdit::setSmoothScrollEnabled(bool e)
+void SmoothListWidget::setSmoothScrollEnabled(bool e)
 {
     this->enabledSmoothScroll = e;
 }
 
-void CustomEdit::setSmoothScrollSpeed(int speed)
+void SmoothListWidget::setSmoothScrollSpeed(int speed)
 {
     this->smoothScrollSpeed = speed;
 }
 
-void CustomEdit::setSmoothScrollDuration(int duration)
+void SmoothListWidget::setSmoothScrollDuration(int duration)
 {
     this->smoothScrollDuration = duration;
 }
 
-void CustomEdit::scrollToTop()
+void SmoothListWidget::scrollToTop()
 {
     scrollTo(verticalScrollBar()->minimum());
 }
 
-void CustomEdit::scrollTo(int pos)
+void SmoothListWidget::scrollTo(int pos)
 {
     if (!enabledSmoothScroll)
         return verticalScrollBar()->setSliderPosition(pos);
@@ -77,7 +39,7 @@ void CustomEdit::scrollTo(int pos)
     addSmoothScrollThread(delta, smoothScrollDuration);
 }
 
-void CustomEdit::scrollToBottom()
+void SmoothListWidget::scrollToBottom()
 {
     int count = smooth_scrolls.size();
     scrollTo(verticalScrollBar()->maximum());
@@ -92,12 +54,12 @@ void CustomEdit::scrollToBottom()
     });
 }
 
-bool CustomEdit::isToBottoming() const
+bool SmoothListWidget::isToBottoming() const
 {
     return toBottoming;
 }
 
-void CustomEdit::addSmoothScrollThread(int distance, int duration)
+void SmoothListWidget::addSmoothScrollThread(int distance, int duration)
 {
     SmoothScrollBean* bean = new SmoothScrollBean(distance, duration);
     smooth_scrolls.append(bean);
@@ -108,7 +70,7 @@ void CustomEdit::addSmoothScrollThread(int distance, int duration)
     });
 }
 
-void CustomEdit::slotSmoothScrollDistance(SmoothScrollBean *bean, int dis)
+void SmoothListWidget::slotSmoothScrollDistance(SmoothScrollBean *bean, int dis)
 {
     int slide = verticalScrollBar()->sliderPosition();
     slide += dis;
@@ -125,7 +87,7 @@ void CustomEdit::slotSmoothScrollDistance(SmoothScrollBean *bean, int dis)
     verticalScrollBar()->setSliderPosition(slide);
 }
 
-void CustomEdit::wheelEvent(QWheelEvent *event)
+void SmoothListWidget::wheelEvent(QWheelEvent *event)
 {
     if (enabledSmoothScroll)
     {
@@ -145,6 +107,6 @@ void CustomEdit::wheelEvent(QWheelEvent *event)
     }
     else
     {
-        QTextEdit::wheelEvent(event);
+        QListView::wheelEvent(event);
     }
 }

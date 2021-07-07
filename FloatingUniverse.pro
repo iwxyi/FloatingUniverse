@@ -49,6 +49,9 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     global/runtime.cpp \
+    third_party/slim_scroll_bar/slimscrollbar.cpp \
+    third_party/slim_scroll_bar/slimscrollbarpopup.cpp \
+    third_party/smooth_scroll/smoothlistwidget.cpp \
     third_party/utils/fileutil.cpp \
     third_party/utils/stringutil.cpp \
     third_party/utils/textinputdialog.cpp
@@ -66,6 +69,10 @@ HEADERS += \
     panel/resizeableitembase.h \
     panel/universepanel.h \
     resources/resource.rc \
+    third_party/slim_scroll_bar/slimscrollbar.h \
+    third_party/slim_scroll_bar/slimscrollbarpopup.h \
+    third_party/smooth_scroll/smoothlistwidget.h \
+    third_party/smooth_scroll/smoothscrollbean.h \
     third_party/utils/mysettings.h \
     third_party/utils/netimageutil.h \
     third_party/color_octree/coloroctree.h \
