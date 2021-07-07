@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QLabel>
+#include <QMimeData>
 #include "myjson.h"
 
 class FacileMenu;
@@ -58,8 +59,13 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
+    void dragEnterEvent(QDragEnterEvent *event) override;
+    void dragLeaveEvent(QDragLeaveEvent *event) override;
+    void dropEvent(QDropEvent *event) override;
+
     virtual void selectEvent();
     virtual void unselectEvent();
+    virtual bool canDrop(const QMimeData *mime) const;
 
 protected:
     QLabel* iconLabel;

@@ -1003,7 +1003,7 @@ void UniversePanel::addPastAction(FacileMenu *menu, QPoint pos, bool split)
     {
         if (split)
             menu->split();
-        menu->addAction(QIcon(":/icons/paste"), "粘贴 " + pasteName + " (&A)", [=]{
+        menu->addAction(QIcon(":/icons/paste"), "粘贴 " + pasteName + " (&V)", [=]{
             pasteFromClipboard(pos);
         });
     }
@@ -1025,6 +1025,10 @@ void UniversePanel::keyPressEvent(QKeyEvent *event)
 
 void UniversePanel::dragEnterEvent(QDragEnterEvent *event)
 {
+    // 取消选中
+    // 仅drag的对象才显示hover状态
+    unselectAll();
+
     auto mime = event->mimeData();
     if (!expanding)
     {
@@ -1033,19 +1037,19 @@ void UniversePanel::dragEnterEvent(QDragEnterEvent *event)
 
     if(mime->hasUrls())//判断数据类型
     {
-
+        event->setDropAction(Qt::LinkAction);
     }
     else if (mime->hasHtml())
     {
-
+        event->setDropAction(Qt::CopyAction);
     }
     else if (mime->hasText())
     {
-
+        event->setDropAction(Qt::CopyAction);
     }
     else if (mime->hasImage())
     {
-
+        event->setDropAction(Qt::CopyAction);
     }
     else
     {

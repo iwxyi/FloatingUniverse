@@ -117,6 +117,46 @@ bool IconTextItem::isFastOpen() const
     return fastOpen;
 }
 
+void IconTextItem::shake(int range)
+{
+    int nX = this->x();
+    int nY = this->y();
+    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    ani->setEasingCurve(QEasingCurve::InOutSine);
+    ani->setDuration(300);
+    ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
+
+    int nShakeCount = 20; //抖动次数
+    double nStep = 1.0 / nShakeCount;
+    for(int i = 1; i < nShakeCount; i++){
+        range = i & 1 ? -range : range;
+        ani->setKeyValueAt(nStep * i, QRect(QPoint(nX + range, nY), this->size()));
+    }
+
+    ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void IconTextItem::nod(int range)
+{
+    int nX = this->x();
+    int nY = this->y();
+    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    ani->setEasingCurve(QEasingCurve::InOutSine);
+    ani->setDuration(500);
+    ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
+
+    int nShakeCount = 5; //抖动次数
+    double nStep = 1.0 / nShakeCount;
+    for(int i = 1; i < nShakeCount; i++){
+        range = i & 1 ? -range : range;
+        ani->setKeyValueAt(nStep * i, QRect(QPoint(nX, nY + range), this->size()));
+    }
+
+    ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
 void IconTextItem::facileMenuEvent(FacileMenu *menu)
 {
     menu->addAction(QIcon(":/icons/open"), "打开 (&O)", [=]{
@@ -229,6 +269,59 @@ void IconTextItem::triggerEvent()
         QDesktopServices::openUrl(link);
         if (closeAfterClick)
             emit hidePanel();
+    }
+}
+
+bool IconTextItem::canDrop(const QMimeData *mime) const
+{
+    if (mime->hasUrls())
+        return true;
+    if (mime->hasText() && !mime->text().contains("\n"))
+        return true;
+    return false;
+}
+
+void IconTextItem::dropEvent(QDropEvent *event)
+{
+    auto mime = event->mimeData();
+
+    // 设置链接
+    auto setMyLink = [=](QString link) {
+        emit selectMe();
+        setLink(link);
+        qInfo() << "setLink:" << link;
+        nod(); // 动画特效
+    };
+
+    if (mime->hasUrls())
+    {
+        auto urls = mime->urls();
+        if (!urls.size())
+            return PanelItemBase::dropEvent(event);
+        QUrl url = urls.first();
+        if (url.isLocalFile())
+        {
+            setMyLink(url.toLocalFile());
+        }
+        else
+        {
+            setMyLink(url.url());
+        }
+    }
+    else if (mime->hasText())
+    {
+        QString text = mime->text();
+        if (text.contains("\n"))
+        {
+            shake();
+            return PanelItemBase::dropEvent(event);
+        }
+        setMyLink(text);
+    }
+    else
+    {
+        shake();
+        PanelItemBase::dropEvent(event);
     }
 }
 

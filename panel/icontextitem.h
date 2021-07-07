@@ -22,8 +22,14 @@ public:
     QString getLink() const;
     bool isFastOpen() const;
 
+    void shake(int range = 5);
+    void nod(int range = 10);
+
+protected:
     virtual void facileMenuEvent(FacileMenu *menu) override;
     virtual void triggerEvent() override;
+    virtual bool canDrop(const QMimeData *mime) const override;
+    void dropEvent(QDropEvent *event) override;
 
 private:
     void showFacileDir(QString path, FacileMenu *parentMenu, int level);

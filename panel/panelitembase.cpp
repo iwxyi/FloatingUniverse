@@ -14,6 +14,7 @@ PanelItemBase::PanelItemBase(QWidget *parent) : QWidget(parent)
 
     setFocusPolicy(Qt::ClickFocus);
     setCursor(Qt::PointingHandCursor);
+    setAcceptDrops(true);
     type = PanelItemType::DefaultItem;
 }
 
@@ -186,6 +187,26 @@ void PanelItemBase::resizeEvent(QResizeEvent *event)
     }
 }
 
+void PanelItemBase::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (canDrop(event->mimeData()))
+    {
+        setHover(true);
+    }
+    event->accept();
+}
+
+void PanelItemBase::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    setHover(false);
+    event->accept();
+}
+
+void PanelItemBase::dropEvent(QDropEvent *event)
+{
+    QWidget::dropEvent(event);
+}
+
 void PanelItemBase::selectEvent()
 {
 
@@ -194,5 +215,11 @@ void PanelItemBase::selectEvent()
 void PanelItemBase::unselectEvent()
 {
 
+}
+
+bool PanelItemBase::canDrop(const QMimeData *mime) const
+{
+    Q_UNUSED(mime)
+    return false;
 }
 
