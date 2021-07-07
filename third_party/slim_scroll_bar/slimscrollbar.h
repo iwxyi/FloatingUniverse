@@ -91,13 +91,13 @@ private:
     QPixmap pixmap;
     QTimer* event_timer;
 
-    QColor bg_normal_color = QColor(128, 128, 128, 64);
-    QColor bg_hover_color = QColor(128, 128, 128, 0);
-    QColor bg_press_color = QColor(128, 128, 128, 32);
-    QColor fg_normal_color = QColor(66, 103, 124, 64);
-    QColor fg_hover_color = QColor(66, 103, 124, 128);
-    QColor fg_press_color = QColor(66, 103, 124, 192);
-    bool round_cap = true;
+    QColor bg_normal_color = QColor(0xF0, 0xF0, 0xF0, 64);
+    QColor bg_hover_color = QColor(0xF0, 0xF0, 0xF0, 128);
+    QColor bg_press_color = QColor(0xF0, 0xF0, 0xF0, 192);
+    QColor fg_normal_color = QColor(0xCC, 0xCC, 0xCC, 64);
+    QColor fg_hover_color = QColor(0xCC, 0xCC, 0xCC, 128);
+    QColor fg_press_color = QColor(0xCC, 0xCC, 0xCC, 192);
+    bool round_cap = false;
 
     bool enabling = true;
     bool hovering = false;

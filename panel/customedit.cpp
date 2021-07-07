@@ -5,13 +5,6 @@
 CustomEdit::CustomEdit(QWidget *parent) : QTextEdit(parent)
 {
     auto slim = new SlimScrollBar;
-    slim->setRoundCap(false);
-    slim->setFgColors(QColor(0xCC, 0xCC, 0xCC, 64),
-                      QColor(0xCC, 0xCC, 0xCC, 128),
-                      QColor(0xCC, 0xCC, 0xCC, 192));
-    slim->setBgColors(QColor(0xF0, 0xF0, 0xF0, 64),
-                      QColor(0xF0, 0xF0, 0xF0, 128),
-                      QColor(0xF0, 0xF0, 0xF0, 192));
     setVerticalScrollBar(slim);
 }
 

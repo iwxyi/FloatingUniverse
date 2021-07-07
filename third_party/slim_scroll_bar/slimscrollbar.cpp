@@ -251,9 +251,15 @@ void SlimScrollBar::paintPixmap()
         int height = qMax(this->height() * step / range, 16);
         int top = this->height() * (sliderPosition()+minimum()) / range;
 
+        int pen_w = width();
+        if (!round_cap) // 需要微调大小
+        {
+            top += pen_w / 2;
+            height -= pen_w;
+        }
+
 //        QRect fg_rect(0, top, width(), height);
 //        painter.fillRect(fg_rect, fg_normal_color);
-        int pen_w = width();
         QPainterPath bg_path;
         bg_path.moveTo(pen_w/2, top);
         bg_path.lineTo(pen_w/2, top + height);
