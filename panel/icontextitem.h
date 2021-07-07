@@ -22,10 +22,7 @@ public:
     QString getLink() const;
     bool isFastOpen() const;
 
-    void shake(int range = 5);
-    void nod(int range = 5);
-    void jump(int range = 10);
-    void shrink(int range = 10);
+    virtual void jump(int range = 10) override;
 
 protected:
     virtual void facileMenuEvent(FacileMenu *menu) override;
@@ -37,6 +34,9 @@ private:
     void showFacileDir(QString path, FacileMenu *parentMenu, int level);
 
 private:
+    QLabel* iconLabel;
+    QLabel* textLabel;
+
     QString iconName;
     QString text;
     QString link; // 文件或者网址
