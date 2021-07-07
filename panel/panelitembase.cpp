@@ -246,6 +246,8 @@ void PanelItemBase::showSelectEdge(const QPoint& startPos)
 
 void PanelItemBase::hideSelectEdge()
 {
+    if (selectWidget->isHidden())
+        return ;
     QPropertyAnimation* ani = new QPropertyAnimation(selectWidget, "geometry");
     ani->setStartValue(selectWidget->geometry());
     // ani->setEndValue(QRect(this->rect().center(), QSize(1, 1)));

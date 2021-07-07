@@ -105,7 +105,7 @@ void LongTextItem::editText()
 
 void LongTextItem::cancelEdit()
 {
-    // 不知道怎么写，就算了
+    this->parentWidget()->setFocus();
 }
 
 void LongTextItem::showEditMenu()
