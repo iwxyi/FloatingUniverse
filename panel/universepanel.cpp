@@ -867,59 +867,10 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             unselectAll();
         });
-    }
 
-    // 选中一个
-    if (selectedItems.size() == 1)
-    {
-        // 使用这个item的自定义menu
-        auto item = selectedItems.toList().first();
-        item->facileMenuEvent(menu);
-    }
-
-    // 选中一个或者多个
-    if (selectedItems.size())
-    {
         menu->split();
-        auto alignMenu = menu->addMenu("对齐");
-        alignMenu->addAction("左对齐", [=]{
-            auto sItems = selectedItems.toList();
-            // 寻找基准线
-            int minX = sItems.first()->pos().x();
-            foreach (auto item, sItems)
-                if (minX > item->pos().x())
-                {
-                    minX = item->pos().x();
-                }
-
-            // 批量移动
-            foreach (auto item, sItems)
-            {
-                item->move(minX, item->pos().y());
-            }
-            save();
-        });
-        alignMenu->addAction("水平居中对齐", [=]{
-
-        });
-        alignMenu->addAction("右对齐", [=]{
-            auto sItems = selectedItems.toList();
-            // 寻找基准线
-            int maxX = sItems.first()->geometry().right();
-            foreach (auto item, sItems)
-                if (maxX < item->geometry().right())
-                {
-                    maxX = item->geometry().right();
-                }
-
-            // 批量移动
-            foreach (auto item, sItems)
-            {
-                item->move(maxX - item->width(), item->pos().y());
-            }
-            save();
-        });
-        alignMenu->split()->addAction("上对齐", [=]{
+        auto alignMenu = menu->addMenu(QIcon(":/icons/align"), "对齐");
+        alignMenu->addAction("上对齐", [=]{
             auto sItems = selectedItems.toList();
             // 寻找基准线
             int minY = sItems.first()->pos().y();
@@ -936,8 +887,25 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        alignMenu->addAction("垂直居中对齐", [=]{
+        alignMenu->addAction("行中对齐", [=]{
+            auto sItems = selectedItems.toList();
+            // 以最上面的元素为基准线
+            PanelItemBase* tItem = sItems.first();
+            int minLeft = tItem->pos().x();
+            foreach (auto item, sItems)
+                if (minLeft > item->pos().x())
+                {
+                    minLeft = item->pos().x();
+                    tItem = item;
+                }
+            int alignY = tItem->geometry().center().y();
 
+            // 批量移动
+            foreach (auto item, sItems)
+            {
+                item->move(item->pos().x(), alignY - item->height() / 2);
+            }
+            save();
         });
         alignMenu->addAction("下对齐", [=]{
             auto sItems = selectedItems.toList();
@@ -956,15 +924,115 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
+        alignMenu->split()->addAction("左对齐", [=]{
+            auto sItems = selectedItems.toList();
+            // 寻找基准线
+            int minX = sItems.first()->pos().x();
+            foreach (auto item, sItems)
+                if (minX > item->pos().x())
+                {
+                    minX = item->pos().x();
+                }
 
-        auto spaceMenu = menu->addMenu("间距");
+            // 批量移动
+            foreach (auto item, sItems)
+            {
+                item->move(minX, item->pos().y());
+            }
+            save();
+        });
+        alignMenu->addAction("列中对齐", [=]{
+            auto sItems = selectedItems.toList();
+            // 以最上面的元素为基准线
+            PanelItemBase* tItem = sItems.first();
+            int minTop = tItem->pos().y();
+            foreach (auto item, sItems)
+                if (minTop > item->pos().y())
+                {
+                    minTop = item->pos().y();
+                    tItem = item;
+                }
+            int alignX = tItem->geometry().center().x();
+
+            // 批量移动
+            foreach (auto item, sItems)
+            {
+                item->move(alignX - item->width() / 2, item->pos().y());
+            }
+            save();
+        });
+        alignMenu->addAction("右对齐", [=]{
+            auto sItems = selectedItems.toList();
+            // 寻找基准线
+            int maxX = sItems.first()->geometry().right();
+            foreach (auto item, sItems)
+                if (maxX < item->geometry().right())
+                {
+                    maxX = item->geometry().right();
+                }
+
+            // 批量移动
+            foreach (auto item, sItems)
+            {
+                item->move(maxX - item->width(), item->pos().y());
+            }
+            save();
+        });
+
+        auto spaceMenu = menu->addMenu(QIcon(":/icons/spacing"), "间距");
         spaceMenu->addAction("水平等间距", [=]{
+            auto sItems = selectedItems.toList();
+            std::sort(sItems.begin(), sItems.end(), [=](PanelItemBase* item1, PanelItemBase* item2){
+                return item1->x() < item2->x();
+            });
 
+            int barLen = sItems.last()->geometry().right() - sItems.first()->geometry().left();
+            foreach (auto item, sItems)
+                barLen -= item->width();
+            int each = barLen / qMax(1, sItems.count() - 1); // 每两个item之间的间距
+
+            // 批量移动
+            int left = sItems.first()->x();
+            foreach (auto item, sItems)
+            {
+                item->move(left, item->y());
+                left += item->width() + each;
+            }
+            save();
         });
         spaceMenu->addAction("垂直等间距", [=]{
+            auto sItems = selectedItems.toList();
+            std::sort(sItems.begin(), sItems.end(), [=](PanelItemBase* item1, PanelItemBase* item2){
+                return item1->y() < item2->y();
+            });
 
+            int barLen = sItems.last()->geometry().bottom() - sItems.first()->geometry().top();
+            foreach (auto item, sItems)
+                barLen -= item->height();
+            int each = barLen / qMax(1, sItems.count() - 1); // 每两个item之间的间距
+
+            // 批量移动
+            int top = sItems.first()->y();
+            foreach (auto item, sItems)
+            {
+                item->move(item->x(), top);
+                top += item->height() + each;
+            }
+            save();
         });
+    }
 
+    // 选中一个
+    if (selectedItems.size() == 1)
+    {
+        // 使用这个item的自定义menu
+        auto item = selectedItems.toList().first();
+        item->facileMenuEvent(menu);
+    }
+
+    // 选中一个或者多个
+    if (selectedItems.size())
+    {
         menu->split()->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
             foreach (auto item, selectedItems)
             {

@@ -29,5 +29,7 @@
         <file alias="url">icons/url.png</file>
         <file alias="update">icons/update.png</file>
         <file alias="more">icons/more.png</file>
+        <file alias="spacing">icons/spacing.png</file>
+        <file alias="align">icons/align.png</file>
     </qresource>
 </RCC>
