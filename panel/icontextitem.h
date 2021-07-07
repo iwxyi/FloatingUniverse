@@ -23,7 +23,9 @@ public:
     bool isFastOpen() const;
 
     void shake(int range = 5);
-    void nod(int range = 10);
+    void nod(int range = 5);
+    void jump(int range = 10);
+    void shrink(int range = 10);
 
 protected:
     virtual void facileMenuEvent(FacileMenu *menu) override;

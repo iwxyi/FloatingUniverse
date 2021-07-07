@@ -979,7 +979,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             save();
         });
 
-        auto spaceMenu = menu->addMenu(QIcon(":/icons/spacing"), "间距");
+        auto spaceMenu = menu->addMenu(QIcon(":/icons/spacing"), "分布");
         spaceMenu->addAction("水平等间距", [=]{
             auto sItems = selectedItems.toList();
             std::sort(sItems.begin(), sItems.end(), [=](PanelItemBase* item1, PanelItemBase* item2){
@@ -1020,7 +1020,10 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        spaceMenu->addAction("网格分布", [=]{
+        spaceMenu->split()->addAction("自动分布", [=]{
+
+        });
+        spaceMenu->split()->addAction("网格分布", [=]{
 
         })->disable();
     }

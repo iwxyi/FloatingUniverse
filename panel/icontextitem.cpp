@@ -143,10 +143,10 @@ void IconTextItem::nod(int range)
     int nY = this->y();
     QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
     ani->setEasingCurve(QEasingCurve::InOutSine);
-    ani->setDuration(500);
+    ani->setDuration(300);
     ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
 
-    int nShakeCount = 5; //抖动次数
+    int nShakeCount = 3;
     double nStep = 1.0 / nShakeCount;
     for(int i = 1; i < nShakeCount; i++){
         range = i & 1 ? -range : range;
@@ -157,8 +157,50 @@ void IconTextItem::nod(int range)
     ani->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
+void IconTextItem::jump(int range)
+{
+    int nX = this->x();
+    int nY = this->y();
+    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    ani->setEasingCurve(QEasingCurve::InOutSine);
+    ani->setDuration(500);
+    ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
+
+    int nShakeCount = 5;
+    double nStep = 1.0 / nShakeCount;
+    for(int i = 1; i < nShakeCount; i++){
+        range = i & 1 ? -range : range;
+        ani->setKeyValueAt(nStep * i, QRect(QPoint(nX, nY + range), this->size()));
+    }
+
+    ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void IconTextItem::shrink(int range)
+{
+    int nX = this->x();
+    int nY = this->y();
+    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    ani->setEasingCurve(QEasingCurve::InOutSine);
+    ani->setDuration(300);
+    ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
+
+    int nShakeCount = 3;
+    double nStep = 1.0 / nShakeCount;
+    for(int i = 1; i < nShakeCount; i++){
+        range = i & 1 ? -range : range;
+        ani->setKeyValueAt(nStep * i, QRect(nX - range / 2, nY - range / 2, width() + range, height() + range));
+    }
+
+    ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
 void IconTextItem::facileMenuEvent(FacileMenu *menu)
 {
+    nod();
+
     menu->addAction(QIcon(":/icons/open"), "打开 (&O)", [=]{
         triggerEvent();
     });
@@ -267,6 +309,7 @@ void IconTextItem::triggerEvent()
             }
         }
         QDesktopServices::openUrl(link);
+        jump();
         if (closeAfterClick)
             emit hidePanel();
     }
