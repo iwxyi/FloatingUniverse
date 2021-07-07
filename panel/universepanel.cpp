@@ -216,7 +216,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
 
 QString UniversePanel::saveIcon(const QIcon &icon) const
 {
-    QPixmap pixmap = icon.pixmap(us->pannelItemSize, us->pannelItemSize);
+    QPixmap pixmap = icon.pixmap(us->panelItemSize, us->panelItemSize);
     return saveIcon(pixmap);
 }
 
@@ -286,11 +286,53 @@ void UniversePanel::keepPanelState(FuncType func)
 /// 从收起状态展开面板
 void UniversePanel::expandPanel()
 {
+    // 动态背景
+    if (us->panelGrabBlur && this->pos().y() <= -this->height() + 1)
+    {
+        // 截图
+        int radius = us->panelGrabBlurRadius;
+        QScreen* screen = QApplication::screenAt(QCursor::pos());
+        QPixmap bg = screen->grabWindow(0,
+                                        pos().x() - radius,
+                                        0 - radius,
+                                        width() + radius * 2,
+                                        height() + radius * 2);
+
+        // 模糊
+        QT_BEGIN_NAMESPACE
+            extern Q_WIDGETS_EXPORT void qt_blurImage( QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0 );
+        QT_END_NAMESPACE
+
+        QPixmap pixmap = bg;
+        QPainter painter( &pixmap );
+        QImage img = pixmap.toImage(); // img -blur-> painter(pixmap)
+        qt_blurImage( &painter, img, radius, true, false );
+
+        QPixmap blured(pixmap.size());
+        blured.fill(Qt::transparent);
+        QPainter painter2(&blured);
+        painter2.setOpacity(us->panelGrabBlurOpacity / 255.0);
+        painter2.drawPixmap(blured.rect(), pixmap);
+
+        // 裁剪掉边缘（模糊后会有黑边）
+        int c = qMin(bg.width(), bg.height());
+        c = qMin(c/2, radius);
+        panelBlurPixmap = blured.copy(c, c, blured.width()-c*2, blured.height()-c*2);
+    }
+
+    // 展示动画
     QPropertyAnimation* ani = new QPropertyAnimation(this, "pos");
     ani->setStartValue(pos());
     ani->setEndValue(QPoint(pos().x(), 0));
     ani->setDuration(300);
     ani->setEasingCurve(QEasingCurve::OutCubic);
+    if (us->panelGrabBlur)
+    {
+        connect(ani, &QPropertyAnimation::valueChanged, this, [=]{
+//            repaint();
+            update();
+        });
+    }
     connect(ani, &QPropertyAnimation::finished, this, [=]{
         ani->deleteLater();
         animating = false;
@@ -312,7 +354,13 @@ void UniversePanel::foldPanel()
     ani->setEndValue(QPoint(pos().x(), -height() + us->panelBangHeight));
     ani->setDuration(300);
     ani->setEasingCurve(QEasingCurve::InOutCubic);
-
+    if (us->panelGrabBlur)
+    {
+        connect(ani, &QPropertyAnimation::valueChanged, this, [=]{
+//            repaint();
+            update();
+        });
+    }
     connect(ani, &QPropertyAnimation::finished, this, [=]{
         ani->deleteLater();
         animating = false;
@@ -516,7 +564,7 @@ bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixma
         QByteArray ba = NetUtil::getWebBa(faviconUrl);
         if (ba.size())
         {
-             pageIcon = QPixmap(us->pannelItemSize, us->pannelItemSize);
+             pageIcon = QPixmap(us->panelItemSize, us->panelItemSize);
              pageIcon.loadFromData(ba, nullptr, Qt::AutoColor);
         }
         else
@@ -574,12 +622,23 @@ void UniversePanel::paintEvent(QPaintEvent *)
         QPainterPath path;
         path.addRoundedRect(QRect(0, 0, width(), height() - us->panelBangHeight), us->fluentRadius, us->fluentRadius);
         painter.fillPath(path, us->panelBg);
+
+        if (us->panelGrabBlur && !panelBlurPixmap.isNull())
+        {
+            QRect rect = this->rect();
+            rect.moveTop(-this->y());
+            painter.drawPixmap(rect, panelBlurPixmap);
+        }
     }
 
     // 画刘海
+    if (this->pos().y() <= -this->height() + 1)
     {
         QPainterPath path;
-        path.addRect(QRect((width() - us->panelBangWidth) / 2, height() - us->panelBangHeight, us->panelBangWidth, us->panelBangHeight));
+        // int he = this->height();
+        // int w = us->panelBangWidth - us->panelBangWidth * (he + this->pos().y()) / he;
+        int w = us->panelBangWidth;
+        path.addRect(QRect((width() - w) / 2, height() - us->panelBangHeight, w, us->panelBangHeight));
         painter.fillPath(path, us->panelBangBg);
     }
 

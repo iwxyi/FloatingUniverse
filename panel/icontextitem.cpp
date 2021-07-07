@@ -72,7 +72,7 @@ void IconTextItem::setIcon(const QString &iconName)
 
     QIcon icon(iconName.startsWith(":") ? iconName : rt->ICON_PATH + iconName);
     if (!icon.isNull())
-        iconLabel->setPixmap(icon.pixmap(us->pannelItemSize, us->pannelItemSize));
+        iconLabel->setPixmap(icon.pixmap(us->panelItemSize, us->panelItemSize));
 }
 
 void IconTextItem::setText(const QString &text)
@@ -243,7 +243,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         if (!QFileInfo(link).exists())
             return ;
         QIcon icon = QFileIconProvider().icon(QFileInfo(link));
-        auto pixmap = icon.pixmap(us->pannelItemSize, us->pannelItemSize);
+        auto pixmap = icon.pixmap(us->panelItemSize, us->panelItemSize);
         pixmap.save(rt->ICON_PATH + iconName);
         iconLabel->setPixmap(pixmap);
     });

@@ -30,15 +30,18 @@ public:
     int panelBangHeight = 1;
     int panelBangWidth = 800;
     QColor panelBg = QColor(240, 248, 255);
-    QColor panelBangBg = QColor(128, 128, 128, 128);
+    QColor panelBangBg = QColor(128, 128, 128, 1);
     QColor panelSelectBg = QColor(230, 230, 250);
     QColor panelSelectEdge = QColor(179, 153, 255);
     QColor panelHoverEdge = QColor(204, 204, 255);
-    int pannelItemSize = 64;
+    int panelItemSize = 64; // 图标大小
+    bool panelGrabBlur = true;
+    int panelGrabBlurRadius = 32; // 毛玻璃背景模糊半径
+    int panelGrabBlurOpacity = 32; // 毛玻璃透明度
 
     int fluentRadius = 5;
 
-    bool useFacileDirMenu = true;
+    bool useFacileDirMenu = false; // 默认使用快速打开
     int facileDirMenuLevel = 5; // 最多显示3级文件
 };
 

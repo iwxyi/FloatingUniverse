@@ -85,6 +85,7 @@ private:
     QPoint draggingPos;
     FacileMenu* currentMenu = nullptr;
     bool _block_menu = false;
+    QPixmap panelBlurPixmap;
 
     QList<PanelItemBase*> items;
     QSet<PanelItemBase*> selectedItems;
