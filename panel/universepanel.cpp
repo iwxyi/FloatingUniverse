@@ -880,6 +880,91 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     // 选中一个或者多个
     if (selectedItems.size())
     {
+        menu->split();
+        auto alignMenu = menu->addMenu("对齐");
+        alignMenu->addAction("左对齐", [=]{
+            auto sItems = selectedItems.toList();
+            // 寻找基准线
+            int minX = sItems.first()->pos().x();
+            foreach (auto item, sItems)
+                if (minX > item->pos().x())
+                {
+                    minX = item->pos().x();
+                }
+
+            // 批量移动
+            foreach (auto item, sItems)
+            {
+                item->move(minX, item->pos().y());
+            }
+            save();
+        });
+        alignMenu->addAction("水平居中对齐", [=]{
+
+        });
+        alignMenu->addAction("右对齐", [=]{
+            auto sItems = selectedItems.toList();
+            // 寻找基准线
+            int maxX = sItems.first()->geometry().right();
+            foreach (auto item, sItems)
+                if (maxX < item->geometry().right())
+                {
+                    maxX = item->geometry().right();
+                }
+
+            // 批量移动
+            foreach (auto item, sItems)
+            {
+                item->move(maxX - item->width(), item->pos().y());
+            }
+            save();
+        });
+        alignMenu->split()->addAction("上对齐", [=]{
+            auto sItems = selectedItems.toList();
+            // 寻找基准线
+            int minY = sItems.first()->pos().y();
+            foreach (auto item, sItems)
+                if (minY > item->pos().y())
+                {
+                    minY = item->pos().y();
+                }
+
+            // 批量移动
+            foreach (auto item, sItems)
+            {
+                item->move(item->pos().x(), minY);
+            }
+            save();
+        });
+        alignMenu->addAction("垂直居中对齐", [=]{
+
+        });
+        alignMenu->addAction("下对齐", [=]{
+            auto sItems = selectedItems.toList();
+            // 寻找基准线
+            int maxY = sItems.first()->geometry().bottom();
+            foreach (auto item, sItems)
+                if (maxY < item->geometry().bottom())
+                {
+                    maxY = item->geometry().bottom();
+                }
+
+            // 批量移动
+            foreach (auto item, sItems)
+            {
+                item->move(item->pos().x(), maxY - item->height());
+            }
+            save();
+        });
+
+        auto spaceMenu = menu->addMenu("间距");
+        spaceMenu->addAction("水平等间距", [=]{
+
+        });
+        spaceMenu->addAction("垂直等间距", [=]{
+
+        });
+
         menu->split()->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
             foreach (auto item, selectedItems)
             {
