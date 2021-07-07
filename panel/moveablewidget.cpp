@@ -18,6 +18,7 @@ void MoveableWidget::mousePressEvent(QMouseEvent *event)
         pressing = true;
         prevPressPos = event->globalPos();
         moved = false;
+        emit dragPressed();
         return ;
     }
 

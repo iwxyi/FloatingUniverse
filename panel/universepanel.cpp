@@ -150,7 +150,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
         triggerItem(item);
     });
 
-    connect(item, &PanelItemBase::pressed, this, [=]{
+    connect(item, &PanelItemBase::pressed, this, [=](const QPoint& pos){
         if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) // 多选
         {
             QPoint pos = mapFromGlobal(QCursor::pos());
@@ -161,7 +161,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
                     if (selectedItems.contains(item))
                         unselectItem(item);
                     else
-                        selectItem(item);
+                        selectItem(item, pos);
                     break;
                 }
             }
@@ -171,7 +171,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
             if (!selectedItems.contains(item))
             {
                 unselectAll();
-                selectItem(item);
+                selectItem(item, pos);
             }
         }
     });
@@ -397,9 +397,9 @@ void UniversePanel::unselectAll()
     selectedItems.clear();
 }
 
-void UniversePanel::selectItem(PanelItemBase *item)
+void UniversePanel::selectItem(PanelItemBase *item, const QPoint &pos)
 {
-    item->setSelect(true);
+    item->setSelect(true, pos);
     selectedItems.insert(item);
 }
 
@@ -697,7 +697,7 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
             {
                 if (!selectedItems.contains(item))
                     unselectAll();
-                selectItem(item);
+                selectItem(item, item->mapFromParent(pressPos));
                 return ;
             }
         }
@@ -746,7 +746,7 @@ void UniversePanel::mouseMoveEvent(QMouseEvent *event)
 
                 if (range.contains(item->geometry().center()))
                 {
-                    item->setHover(true);
+                    item->setHover(true, item->mapFromParent(draggingPos));
                 }
                 else
                 {

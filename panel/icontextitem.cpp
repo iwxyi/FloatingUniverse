@@ -168,7 +168,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         QFileInfo info(link);
         if (info.exists())
         {
-            menu->addAction(QIcon(":/icons/open"), "打开文件夹", [=]{
+            menu->addAction(QIcon(":/icons/folder"), "打开文件夹", [=]{
                 QDesktopServices::openUrl("file:///" + info.dir().path());
                 if (closeAfterClick)
                     emit hidePanel();

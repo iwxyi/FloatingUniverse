@@ -36,7 +36,7 @@ public slots:
     void save();
     void selectAll();
     void unselectAll();
-    void selectItem(PanelItemBase* item);
+    void selectItem(PanelItemBase* item, const QPoint& pos = UNDEFINED_POS);
     void unselectItem(PanelItemBase* item);
     void triggerItem(PanelItemBase* item);
 

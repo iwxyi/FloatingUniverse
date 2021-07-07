@@ -11,6 +11,9 @@ ResizeableItemBase::ResizeableItemBase(QWidget *parent) : PanelItemBase(parent)
     {
         resizeCorner[i] = new MoveableWidget(this);
         resizeCorner[i]->setFixedSize(boundaryWidth, boundaryWidth);
+        connect(resizeCorner[i], &MoveableWidget::dragPressed, this, [=]{
+            setSelect(true, resizeCorner[i]->geometry().center());
+        });
         connect(resizeCorner[i], &MoveableWidget::dragReleased, this, [=]{
             if (resizeCorner[i]->isMoved())
                 emit modified();

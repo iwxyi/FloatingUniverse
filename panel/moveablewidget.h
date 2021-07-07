@@ -13,6 +13,7 @@ public:
     bool isMoved() const;
 
 signals:
+    void dragPressed();
     void dragMoved(QPoint delta);
     void dragReleased();
 

@@ -18,6 +18,8 @@ enum PanelItemType
     ImageView
 };
 
+#define UNDEFINED_POS QPoint(-1, -1)
+
 class PanelItemBase : public QWidget
 {
     Q_OBJECT
@@ -40,7 +42,7 @@ public:
 
 signals:
     void triggered();
-    void pressed();
+    void pressed(const QPoint& pos);
     void modified();
     void selectMe();
     void unselectMe();
@@ -50,8 +52,8 @@ signals:
     void useFinished();
 
 public slots:
-    void setSelect(bool sh);
-    void setHover(bool sh);
+    void setSelect(bool sh, const QPoint& startPos = UNDEFINED_POS);
+    void setHover(bool sh, const QPoint& startPos = UNDEFINED_POS);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -65,7 +67,13 @@ protected:
 
     virtual void selectEvent();
     virtual void unselectEvent();
+    virtual void showSelectEdge(const QPoint &startPos);
+    virtual void hideSelectEdge();
     virtual bool canDrop(const QMimeData *mime) const;
+
+private:
+    QRect getSelectorBorder() const;
+    QRect getHalfRect(QRect big) const;
 
 protected:
     QLabel* iconLabel;

@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QLayout>
+#include <QPropertyAnimation>
 #include "panelitembase.h"
 #include "usettings.h"
 #include "runtime.h"
@@ -80,12 +81,20 @@ void PanelItemBase::triggerEvent()
 
 }
 
-void PanelItemBase::setSelect(bool sh)
+void PanelItemBase::setSelect(bool sh, const QPoint &startPos)
 {
     if (sh)
     {
+        if ((selectWidget->isHidden() && startPos != UNDEFINED_POS) || !selected)
+        {
+            showSelectEdge(startPos);
+        }
+        else if (selectWidget->isHidden())
+        {
+            selectWidget->setGeometry(getSelectorBorder());
+        }
+
         selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
-        selectWidget->setGeometry(selectBorder / 2, selectBorder / 2, width() - selectBorder, height() - selectBorder);
         selectWidget->raise();
         selectWidget->show();
 
@@ -93,25 +102,33 @@ void PanelItemBase::setSelect(bool sh)
     }
     else
     {
-        selectWidget->hide();
+        hideSelectEdge();
 
         unselectEvent();
     }
     selected = sh;
 }
 
-void PanelItemBase::setHover(bool sh)
+void PanelItemBase::setHover(bool sh, const QPoint &startPos)
 {
     if (sh)
     {
+        if ((selectWidget->isHidden() && startPos != UNDEFINED_POS) || !hovered)
+        {
+            showSelectEdge(startPos);
+        }
+        else if (selectWidget->isHidden())
+        {
+            selectWidget->setGeometry(getSelectorBorder());
+        }
+
         selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
-        selectWidget->setGeometry(selectBorder / 2, selectBorder / 2, width() - selectBorder, height() - selectBorder);
         selectWidget->raise();
         selectWidget->show();
     }
     else
     {
-        selectWidget->hide();
+        hideSelectEdge();
     }
     hovered = sh;
 }
@@ -124,7 +141,7 @@ void PanelItemBase::mousePressEvent(QMouseEvent *event)
         pressGlobalPos = pressPos + this->pos();
         dragged = false;
         event->accept();
-        emit pressed();
+        emit pressed(event->pos());
         return ;
     }
 
@@ -183,7 +200,7 @@ void PanelItemBase::resizeEvent(QResizeEvent *event)
 
     if (!selectWidget->isHidden())
     {
-        setSelect(true);
+        selectWidget->setGeometry(getSelectorBorder());
     }
 }
 
@@ -217,9 +234,50 @@ void PanelItemBase::unselectEvent()
 
 }
 
+void PanelItemBase::showSelectEdge(const QPoint& startPos)
+{
+    QPropertyAnimation* ani = new QPropertyAnimation(selectWidget, "geometry");
+    ani->setStartValue(selectWidget->isHidden() && startPos != UNDEFINED_POS ? QRect(startPos, QSize(1, 1)) : selectWidget->geometry());
+    ani->setEndValue(getSelectorBorder());
+    ani->setDuration(150);
+    ani->setEasingCurve(QEasingCurve::OutCubic);
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void PanelItemBase::hideSelectEdge()
+{
+    QPropertyAnimation* ani = new QPropertyAnimation(selectWidget, "geometry");
+    ani->setStartValue(selectWidget->geometry());
+    // ani->setEndValue(QRect(this->rect().center(), QSize(1, 1)));
+    ani->setEndValue(getHalfRect(selectWidget->geometry()));
+    ani->setDuration(100);
+    ani->setEasingCurve(QEasingCurve::InExpo);
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+    connect(ani, &QPropertyAnimation::finished, this, [=]{
+        selectWidget->hide();
+    });
+}
+
 bool PanelItemBase::canDrop(const QMimeData *mime) const
 {
     Q_UNUSED(mime)
     return false;
+}
+
+QRect PanelItemBase::getSelectorBorder() const
+{
+    return QRect(selectBorder / 2, selectBorder / 2, width() - selectBorder, height() - selectBorder);
+}
+
+QRect PanelItemBase::getHalfRect(QRect big) const
+{
+    double prop = 0.5;
+    QRectF rect(
+                big.left() + big.width() * prop / 2,
+                big.top() + big.height() * prop / 2,
+                big.width() * prop,
+                big.height() * prop
+                );
+    return rect.toRect();
 }
 
