@@ -22,7 +22,10 @@ public:
     QString getLink() const;
     bool isFastOpen() const;
 
-    virtual void jump(int range = 10) override;
+    virtual void shake(int range = 5);
+    virtual void nod(int range = 5);
+    virtual void jump(int range = 10);
+    virtual void shrink(int range = 10);
 
 protected:
     virtual void facileMenuEvent(FacileMenu *menu) override;

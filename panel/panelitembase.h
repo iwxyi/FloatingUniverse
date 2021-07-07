@@ -56,11 +56,6 @@ public slots:
     void setSelect(bool sh, const QPoint& startPos = UNDEFINED_POS);
     void setHover(bool sh, const QPoint& startPos = UNDEFINED_POS);
 
-    virtual void shake(int range = 5);
-    virtual void nod(int range = 5);
-    virtual void jump(int range = 10);
-    virtual void shrink(int range = 10);
-
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;

@@ -117,6 +117,46 @@ bool IconTextItem::isFastOpen() const
     return fastOpen;
 }
 
+void IconTextItem::shake(int range)
+{
+    int nX = this->x();
+    int nY = this->y();
+    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    ani->setEasingCurve(QEasingCurve::InOutSine);
+    ani->setDuration(300);
+    ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
+
+    int nShakeCount = 20; //抖动次数
+    double nStep = 1.0 / nShakeCount;
+    for(int i = 1; i < nShakeCount; i++){
+        range = i & 1 ? -range : range;
+        ani->setKeyValueAt(nStep * i, QRect(QPoint(nX + range, nY), this->size()));
+    }
+
+    ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void IconTextItem::nod(int range)
+{
+    int nX = this->x();
+    int nY = this->y();
+    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    ani->setEasingCurve(QEasingCurve::InOutSine);
+    ani->setDuration(300);
+    ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
+
+    int nShakeCount = 3;
+    double nStep = 1.0 / nShakeCount;
+    for(int i = 1; i < nShakeCount; i++){
+        range = i & 1 ? -range : range;
+        ani->setKeyValueAt(nStep * i, QRect(QPoint(nX, nY + range), this->size()));
+    }
+
+    ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
 void IconTextItem::jump(int range)
 {
     QWidget* w = iconLabel->pixmap() ? (QWidget*)iconLabel : this;
@@ -135,6 +175,26 @@ void IconTextItem::jump(int range)
     }
 
     ani->setEndValue(QRect(QPoint(nX,nY), w->size()));
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void IconTextItem::shrink(int range)
+{
+    int nX = this->x();
+    int nY = this->y();
+    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    ani->setEasingCurve(QEasingCurve::InOutSine);
+    ani->setDuration(300);
+    ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
+
+    int nShakeCount = 3;
+    double nStep = 1.0 / nShakeCount;
+    for(int i = 1; i < nShakeCount; i++){
+        range = i & 1 ? -range : range;
+        ani->setKeyValueAt(nStep * i, QRect(nX - range / 2, nY - range / 2, width() + range, height() + range));
+    }
+
+    ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
     ani->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
