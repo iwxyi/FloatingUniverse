@@ -35,9 +35,9 @@ MyJson IconTextItem::toJson() const
     json.insert("icon", iconName);
     json.insert("text", textLabel->text());
     json.insert("link", link);
-    json.insert("closeAfterClick", closeAfterClick);
-    json.insert("fastOpen", fastOpen);
-    json.insert("openLevel", openLevel);
+    json.insert("hide_after_trigger", hideAfterTrigger);
+    json.insert("fast_open", fastOpen);
+    json.insert("open_level", openLevel);
 
     return json;
 }
@@ -53,9 +53,9 @@ void IconTextItem::fromJson(const MyJson &json)
 
     // 扩展数据
     link = json.s("link");
-    closeAfterClick = json.b("closeAfterClick", closeAfterClick);
-    fastOpen = json.b("fastOpen", fastOpen);
-    openLevel = json.i("openLevel", openLevel);
+    hideAfterTrigger = json.b("hide_after_trigger", hideAfterTrigger);
+    fastOpen = json.b("fast_open", fastOpen);
+    openLevel = json.i("open_level", openLevel);
 }
 
 /// 释放所有的资源
@@ -340,7 +340,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         {
             menu->addAction(QIcon(":/icons/folder"), "打开文件夹", [=]{
                 QDesktopServices::openUrl("file:///" + info.dir().path());
-                if (closeAfterClick)
+                if (hideAfterTrigger)
                     emit hidePanel();
             });
         }
@@ -370,9 +370,9 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
     if (type == LocalFile || type == WebUrl)
     {
         menu->addAction(QIcon(":/icons/eye"), "打开后隐藏", [=]{
-            closeAfterClick = !closeAfterClick;
+            hideAfterTrigger = !hideAfterTrigger;
             emit modified();
-        })->check(closeAfterClick);
+        })->check(hideAfterTrigger);
     }
 
     if (type == LocalFile)
@@ -437,8 +437,9 @@ void IconTextItem::triggerEvent()
             }
         }
         QDesktopServices::openUrl(link);
+
         jump();
-        if (closeAfterClick)
+        if (hideAfterTrigger)
             emit hidePanel();
     }
 }
@@ -528,7 +529,7 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
         {
             auto m = menu->addMenu(provicer.icon(info), info.fileName(), [=]{
                 QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
-                if (closeAfterClick)
+                if (hideAfterTrigger)
                     emit hidePanel();
             });
             showFacileDir(info.absoluteFilePath(), m, level+1);
@@ -537,7 +538,7 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
         {
             menu->addAction(provicer.icon(info), info.fileName(), [=]{
                 QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
-                if (closeAfterClick)
+                if (hideAfterTrigger)
                     emit hidePanel();
             });
         }

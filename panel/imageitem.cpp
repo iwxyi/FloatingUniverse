@@ -28,6 +28,7 @@ MyJson ImageItem::toJson() const
 
     json.insert("image", imageName);
     json.insert("bottom_layer", !autoRaise);
+    json.insert("hide_after_trigger", hideAfterTrigger);
 
     return json;
 }
@@ -40,6 +41,7 @@ void ImageItem::fromJson(const MyJson &json)
     setImage(imageName);
 
     autoRaise = !json.b("bottom_layer");
+    hideAfterTrigger = json.b("hide_after_trigger", hideAfterTrigger);
 }
 
 void ImageItem::releaseResource()
@@ -77,6 +79,20 @@ QString ImageItem::saveImageFile(const QPixmap &pixmap)
     return iconName;
 }
 
+void ImageItem::adjustSizeByImage(QSize maxxSize)
+{
+    QSize size = originPixmap.size();
+    if (size.width() > maxxSize.width() || size.height() > maxxSize.height())
+    {
+        size.scale(maxxSize, Qt::KeepAspectRatio);
+        QSize maxSize = imageLabel->maximumSize();
+        imageLabel->setFixedSize(size);
+        adjustSize();
+        imageLabel->setMinimumSize(QSize(1, 1));
+        imageLabel->setMaximumSize(maxSize);
+    }
+}
+
 void ImageItem::facileMenuEvent(FacileMenu *menu)
 {
     menu->addAction(QIcon(":/icons/open"), "打开 (&O)", [=]{
@@ -91,7 +107,14 @@ void ImageItem::facileMenuEvent(FacileMenu *menu)
 
     menu->split()->addAction(QIcon(":/icons/size_proportion"), "恢复比例 (&A)", [=]{
         QSize iSize = originPixmap.size();
-        QSize lSize = imageLabel->size();
+        iSize.scale(imageLabel->size(), Qt::KeepAspectRatio);
+        QSize maxSize = imageLabel->maximumSize();
+        imageLabel->setFixedSize(iSize);
+        adjustSize();
+        imageLabel->setMinimumSize(QSize(1, 1));
+        imageLabel->setMaximumSize(maxSize);
+
+        /* QSize lSize = imageLabel->size();
         double iProp = iSize.width() / iSize.height();
         double lProp = lSize.width() / lSize.height();
         QSize maxSize = imageLabel->maximumSize();
@@ -105,7 +128,7 @@ void ImageItem::facileMenuEvent(FacileMenu *menu)
         }
         adjustSize();
         imageLabel->setMinimumSize(QSize(1, 1));
-        imageLabel->setMaximumSize(maxSize);
+        imageLabel->setMaximumSize(maxSize); */
         emit modified();
     })->disable(invalid);
 
@@ -122,6 +145,11 @@ void ImageItem::facileMenuEvent(FacileMenu *menu)
         else
             emit modified();
     })->check(!autoRaise);
+
+    menu->addAction(QIcon(":/icons/eye"), "打开后隐藏", [=]{
+        hideAfterTrigger = !hideAfterTrigger;
+        emit modified();
+    })->check(hideAfterTrigger);
 }
 
 void ImageItem::triggerEvent()
@@ -130,5 +158,8 @@ void ImageItem::triggerEvent()
     if (isFileExist(path))
     {
         QDesktopServices::openUrl(QUrl("file:///" + path));
+
+        if (hideAfterTrigger)
+            emit hidePanel();
     }
 }

@@ -16,6 +16,8 @@ public:
 
     static QString saveImageFile(const QPixmap& pixmap);
 
+    void adjustSizeByImage(QSize maxxSize);
+
 protected:
     virtual void facileMenuEvent(FacileMenu* menu) override;
     virtual void triggerEvent() override;
@@ -25,6 +27,8 @@ private:
 
     QString imageName; // 文件名（包括后缀）
     QPixmap originPixmap;
+
+    bool hideAfterTrigger = true;
 };
 
 #endif // IMAGEITEM_H

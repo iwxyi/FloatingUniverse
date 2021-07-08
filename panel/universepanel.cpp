@@ -128,7 +128,7 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
 {
     auto item = new LongTextItem(this);
     item->setText(text, enableHtml);
-    item->adjustSizeByText(this->size() * 0.8);
+    item->adjustSizeByText(ITEM_MAX_SIZE);
 
     item->show();
     QFontMetrics fm(item->font());
@@ -151,6 +151,7 @@ ImageItem *UniversePanel::createImageItem(QPoint pos, const QString &image)
 {
     auto item = new ImageItem(this);
     item->setImage(image);
+    item->adjustSizeByImage(ITEM_MAX_SIZE);
 
     item->show();
     item->move(pos - QPoint(item->width() / 2, item->height() / 2));

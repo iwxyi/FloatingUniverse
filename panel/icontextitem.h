@@ -50,7 +50,7 @@ private:
     QString text; // 显示的标题
     QString link; // 文件或者网址
 
-    bool closeAfterClick = true;
+    bool hideAfterTrigger = true;
     bool fastOpen = false; // 左键快速打开
     int openLevel = 3; // 打开的级别，文件多的时候越大越慢
 
