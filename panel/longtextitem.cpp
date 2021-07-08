@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QMimeData>
+#include <QScrollBar>
 #include "longtextitem.h"
 #include "facilemenu.h"
 
@@ -91,11 +92,36 @@ bool LongTextItem::isHtml() const
     return enableHtml;
 }
 
-void LongTextItem::adjustSizeByText()
+void LongTextItem::adjustSizeByText(QSize maxxSize)
 {
-    edit->adjustSize();
-    edit->resize(edit->sizeHint());
+    auto maxSize = edit->maximumSize();
+
+    // 获取合适的大小
+    edit->document()->adjustSize();
+    auto size = edit->document()->size().toSize();// + QSize(4, 4);
+
+    bool shrink = false;
+    if (size.width() > maxxSize.width())
+    {
+        size.setWidth(maxxSize.width());
+        shrink = true;
+    }
+    if (size.height() > maxxSize.height())
+    {
+        size.setHeight(maxxSize.height());
+        shrink = true;
+    }
+    // if (shrink) // 有缩起
+    {
+        // 需要加上滚动条的宽度
+        size += QSize(edit->verticalScrollBar()->width(), 0);
+    }
+
+    // 调整大小
+    edit->setFixedSize(size);
     this->adjustSize();
+    edit->setMinimumSize(ITEM_MIN_SIZE);
+    edit->setMaximumSize(maxSize);
 }
 
 void LongTextItem::editText()

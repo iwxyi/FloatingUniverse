@@ -17,6 +17,8 @@ PanelItemBase::PanelItemBase(QWidget *parent) : QWidget(parent)
     setCursor(Qt::PointingHandCursor);
     setAcceptDrops(true);
     type = PanelItemType::DefaultItem;
+
+    setMinimumSize(ITEM_MIN_SIZE);
 }
 
 MyJson PanelItemBase::toJson() const

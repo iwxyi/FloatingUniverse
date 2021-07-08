@@ -22,7 +22,7 @@ public:
     QString getText() const;
     bool isHtml() const;
 
-    void adjustSizeByText();
+    void adjustSizeByText(QSize maxxSize);
     void editText();
     void cancelEdit();
 

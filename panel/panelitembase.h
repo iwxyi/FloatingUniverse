@@ -19,6 +19,7 @@ enum PanelItemType
 };
 
 #define UNDEFINED_POS QPoint(-1, -1)
+#define ITEM_MIN_SIZE QSize(8, 8)
 
 class PanelItemBase : public QWidget
 {

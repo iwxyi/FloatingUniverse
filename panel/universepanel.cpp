@@ -128,7 +128,7 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
 {
     auto item = new LongTextItem(this);
     item->setText(text, enableHtml);
-    item->adjustSizeByText(); // 这个调整大小好像没啥用
+    item->adjustSizeByText(this->size() * 0.8);
 
     item->show();
     QFontMetrics fm(item->font());

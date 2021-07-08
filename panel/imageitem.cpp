@@ -19,7 +19,7 @@ ImageItem::ImageItem(QWidget *parent) : ResizeableItemBase(parent)
     layout->setMargin(selectBorder);
 
     setType(PanelItemType::ImageView);
-    setMinimumSize(8, 8);
+    setMinimumSize(ITEM_MIN_SIZE);
 }
 
 MyJson ImageItem::toJson() const
