@@ -117,11 +117,16 @@ bool IconTextItem::isFastOpen() const
     return fastOpen;
 }
 
+/// 左右震动
+/// 拒绝 drop
 void IconTextItem::shake(int range)
 {
+    if (_shaking)
+        return ;
+
     int nX = this->x();
     int nY = this->y();
-    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    QPropertyAnimation *ani = new QPropertyAnimation(this, "geometry");
     ani->setEasingCurve(QEasingCurve::InOutSine);
     ani->setDuration(300);
     ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
@@ -135,13 +140,23 @@ void IconTextItem::shake(int range)
 
     ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
     ani->start(QAbstractAnimation::DeleteWhenStopped);
+
+    _shaking = true;
+    connect(ani, &QPropertyAnimation::stateChanged, this, [=](QAbstractAnimation::State state){
+        if (state == QPropertyAnimation::State::Stopped)
+        {
+            _shaking = false;
+        }
+    });
 }
 
+/// 整体点头
+/// 单个 menu
 void IconTextItem::nod(int range)
 {
     int nX = this->x();
     int nY = this->y();
-    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    QPropertyAnimation *ani = new QPropertyAnimation(this, "geometry");
     ani->setEasingCurve(QEasingCurve::InOutSine);
     ani->setDuration(300);
     ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
@@ -155,14 +170,24 @@ void IconTextItem::nod(int range)
 
     ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
     ani->start(QAbstractAnimation::DeleteWhenStopped);
+
+    _nodding = true;
+    connect(ani, &QPropertyAnimation::stateChanged, this, [=](QAbstractAnimation::State state){
+        if (state == QPropertyAnimation::State::Stopped)
+        {
+            _nodding = false;
+        }
+    });
 }
 
+/// 图标跳跃
+/// trigger
 void IconTextItem::jump(int range)
 {
-    QWidget* w = iconLabel->pixmap() ? (QWidget*)iconLabel : this;
+    QWidget* w = iconLabel->pixmap() ? static_cast<QWidget*>(iconLabel) : this;
     int nX = w->x();
     int nY = w->y();
-    QPropertyAnimation *ani = new QPropertyAnimation(w,"geometry");
+    QPropertyAnimation *ani = new QPropertyAnimation(w, "geometry");
     ani->setEasingCurve(QEasingCurve::InOutSine);
     ani->setDuration(500);
     ani->setStartValue(QRect(QPoint(nX,nY), w->size()));
@@ -176,13 +201,23 @@ void IconTextItem::jump(int range)
 
     ani->setEndValue(QRect(QPoint(nX,nY), w->size()));
     ani->start(QAbstractAnimation::DeleteWhenStopped);
+
+    _jumping = true;
+    connect(ani, &QPropertyAnimation::stateChanged, this, [=](QAbstractAnimation::State state){
+        if (state == QPropertyAnimation::State::Stopped)
+        {
+            _jumping = false;
+        }
+    });
 }
 
+/// 整体缩放
+/// drop 修改属性
 void IconTextItem::shrink(int range)
 {
     int nX = this->x();
     int nY = this->y();
-    QPropertyAnimation *ani = new QPropertyAnimation(this,"geometry");
+    QPropertyAnimation *ani = new QPropertyAnimation(this, "geometry");
     ani->setEasingCurve(QEasingCurve::InOutSine);
     ani->setDuration(300);
     ani->setStartValue(QRect(QPoint(nX,nY), this->size()));
@@ -196,6 +231,62 @@ void IconTextItem::shrink(int range)
 
     ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
     ani->start(QAbstractAnimation::DeleteWhenStopped);
+
+    _shrinking = true;
+    connect(ani, &QPropertyAnimation::stateChanged, this, [=](QAbstractAnimation::State state){
+        if (state == QPropertyAnimation::State::Stopped)
+        {
+            _shrinking = false;
+        }
+    });
+}
+
+/// 图标抖动
+/// hover
+/// @param startPos 相对于本控件的鼠标位置，图标向反方向移动
+void IconTextItem::jitter(QPoint startPos, int range)
+{
+    if (_jittering)
+        return ;
+    if (startPos == UNDEFINED_POS)
+        return ;
+    if (iconLabel->pixmap()->isNull())
+        return ;
+
+    QWidget* w = iconLabel;
+    int nX = w->x();
+    int nY = w->y();
+    QPoint effectPos = startPos - rect().center();
+    if (effectPos == QPoint(0, 0))
+        return ;
+    double xie = sqrt(effectPos.x() * effectPos.x() + effectPos.y() * effectPos.y());
+    double dx = effectPos.x() / xie; // 最长边为1的直角三角形的x
+    double dy = effectPos.y() / xie; // 同上的y
+
+    QPropertyAnimation *ani = new QPropertyAnimation(iconLabel, "geometry");
+    ani->setEasingCurve(QEasingCurve::InOutSine);
+    ani->setDuration(300);
+    ani->setStartValue(QRect(QPoint(nX,nY), w->size()));
+
+    int nShakeCount = 3;
+    double nStep = 1.0 / nShakeCount;
+    for(int i = 1; i < nShakeCount; i++){
+        range = i & 1 ? -range : range;
+        ani->setKeyValueAt(nStep * i, QRect(nX - dx * range, nY - dy * range, w->width(), w->height()));
+    }
+    ani->setEndValue(QRect(QPoint(nX,nY), w->size()));
+    ani->start(QAbstractAnimation::DeleteWhenStopped);
+
+    // 避免重复动画
+    _jittering = true;
+    this->layout()->setEnabled(false);
+    connect(ani, &QPropertyAnimation::stateChanged, this, [=](QAbstractAnimation::State state){
+        if (state == QPropertyAnimation::State::Stopped)
+        {
+            _jittering = false;
+            this->layout()->setEnabled(true);
+        }
+    });
 }
 
 void IconTextItem::facileMenuEvent(FacileMenu *menu)
@@ -316,12 +407,15 @@ void IconTextItem::triggerEvent()
     }
 }
 
-bool IconTextItem::canDrop(const QMimeData *mime) const
+bool IconTextItem::canDropEvent(const QMimeData *mime)
 {
-    if (mime->hasUrls())
+    if (mime->hasUrls()
+            || (mime->hasText() && !mime->text().contains("\n")))
+    {
+        jitter(mapFromGlobal(QCursor::pos()), -10);
         return true;
-    if (mime->hasText() && !mime->text().contains("\n"))
-        return true;
+    }
+    shake();
     return false;
 }
 
@@ -366,6 +460,16 @@ void IconTextItem::dropEvent(QDropEvent *event)
     {
         shake();
         PanelItemBase::dropEvent(event);
+    }
+}
+
+void IconTextItem::hoverEvent(const QPoint &startPos)
+{
+    PanelItemBase::hoverEvent(startPos);
+
+    if (!hovered)
+    {
+        jitter(startPos);
     }
 }
 

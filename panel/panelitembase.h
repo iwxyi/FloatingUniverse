@@ -66,11 +66,13 @@ protected:
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 
-    virtual void selectEvent();
+    virtual void selectEvent(const QPoint& startPos);
     virtual void unselectEvent();
+    virtual void hoverEvent(const QPoint& startPos);
+    virtual void unhoverEvent();
     virtual void showSelectEdge(const QPoint &startPos);
     virtual void hideSelectEdge();
-    virtual bool canDrop(const QMimeData *mime) const;
+    virtual bool canDropEvent(const QMimeData *mime);
 
 private:
     QRect getSelectorBorder() const;

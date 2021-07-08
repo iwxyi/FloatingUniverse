@@ -66,7 +66,7 @@ void UniversePanel::readItems()
     selectedItems.clear();
 
     // 读取设置
-    MyJson json(readTextFile(rt->PANEL_PATH).toUtf8());
+    MyJson json(readTextFileIfExist(rt->PANEL_PATH).toUtf8());
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
     {
@@ -1022,8 +1022,8 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         });
         spaceMenu->split()->addAction("自动分布", [=]{
 
-        });
-        spaceMenu->split()->addAction("网格分布", [=]{
+        })->disable();
+        spaceMenu->addAction("网格分布", [=]{
 
         })->disable();
     }

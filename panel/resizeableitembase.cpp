@@ -77,9 +77,9 @@ void ResizeableItemBase::resizeEvent(QResizeEvent *event)
     adjustCornerPos();
 }
 
-void ResizeableItemBase::selectEvent()
+void ResizeableItemBase::selectEvent(const QPoint& startPos)
 {
-    PanelItemBase::selectEvent();
+    PanelItemBase::selectEvent(startPos);
 
     for (int i = 0; i < 4; i++)
     {

@@ -26,12 +26,14 @@ public:
     virtual void nod(int range = 5);
     virtual void jump(int range = 10);
     virtual void shrink(int range = 10);
+    virtual void jitter(QPoint startPos, int range = 10);
 
 protected:
     virtual void facileMenuEvent(FacileMenu *menu) override;
     virtual void triggerEvent() override;
-    virtual bool canDrop(const QMimeData *mime) const override;
+    virtual bool canDropEvent(const QMimeData *mime) override;
     void dropEvent(QDropEvent *event) override;
+    virtual void hoverEvent(const QPoint &startPos) override;
 
 private:
     void showFacileDir(QString path, FacileMenu *parentMenu, int level);
@@ -47,6 +49,12 @@ private:
     bool closeAfterClick = true;
     bool fastOpen = false; // 左键快速打开
     int openLevel = 3; // 打开的级别，文件多的时候越大越慢
+
+    bool _shaking = false;
+    bool _nodding = false;
+    bool _jumping = false;
+    bool _shrinking = false;
+    bool _jittering = false;
 };
 
 #endif // ICONTEXTITEM_H

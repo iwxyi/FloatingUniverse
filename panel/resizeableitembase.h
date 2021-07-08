@@ -17,7 +17,7 @@ protected:
     void fromJson(const MyJson &json) override;
 
     void resizeEvent(QResizeEvent *event) override;
-    void selectEvent() override;
+    void selectEvent(const QPoint& startPos) override;
 
 protected:
     int boundaryWidth = 8;

@@ -30,7 +30,7 @@ public slots:
     void showEditMenu();
 
 protected:
-    virtual void selectEvent() override;
+    virtual void selectEvent(const QPoint& startPos) override;
     virtual void unselectEvent() override;
 
 private:

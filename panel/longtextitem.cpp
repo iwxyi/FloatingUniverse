@@ -173,9 +173,9 @@ void LongTextItem::showEditMenu()
     emit facileMenuUsed(menu);
 }
 
-void LongTextItem::selectEvent()
+void LongTextItem::selectEvent(const QPoint &startPos)
 {
-    ResizeableItemBase::selectEvent();
+    ResizeableItemBase::selectEvent(startPos);
 
     edit->raise();
 }

@@ -85,25 +85,10 @@ void PanelItemBase::setSelect(bool sh, const QPoint &startPos)
 {
     if (sh)
     {
-        if ((selectWidget->isHidden() && startPos != UNDEFINED_POS) || !selected)
-        {
-            showSelectEdge(startPos);
-        }
-        else if (selectWidget->isHidden())
-        {
-            selectWidget->setGeometry(getSelectorBorder());
-        }
-
-        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
-        selectWidget->raise();
-        selectWidget->show();
-
-        selectEvent();
+        selectEvent(startPos);
     }
     else
     {
-        hideSelectEdge();
-
         unselectEvent();
     }
     selected = sh;
@@ -113,22 +98,11 @@ void PanelItemBase::setHover(bool sh, const QPoint &startPos)
 {
     if (sh)
     {
-        if ((selectWidget->isHidden() && startPos != UNDEFINED_POS) || !hovered)
-        {
-            showSelectEdge(startPos);
-        }
-        else if (selectWidget->isHidden())
-        {
-            selectWidget->setGeometry(getSelectorBorder());
-        }
-
-        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
-        selectWidget->raise();
-        selectWidget->show();
+        hoverEvent(startPos);
     }
     else
     {
-        hideSelectEdge();
+        unhoverEvent();
     }
     hovered = sh;
 }
@@ -206,7 +180,7 @@ void PanelItemBase::resizeEvent(QResizeEvent *event)
 
 void PanelItemBase::dragEnterEvent(QDragEnterEvent *event)
 {
-    if (canDrop(event->mimeData()))
+    if (canDropEvent(event->mimeData()))
     {
         setHover(true);
     }
@@ -224,14 +198,46 @@ void PanelItemBase::dropEvent(QDropEvent *event)
     QWidget::dropEvent(event);
 }
 
-void PanelItemBase::selectEvent()
+void PanelItemBase::selectEvent(const QPoint &startPos)
 {
+    if ((selectWidget->isHidden() && startPos != UNDEFINED_POS) || !selected)
+    {
+        showSelectEdge(startPos);
+    }
+    else if (selectWidget->isHidden())
+    {
+        selectWidget->setGeometry(getSelectorBorder());
+    }
 
+    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
+    selectWidget->raise();
+    selectWidget->show();
 }
 
 void PanelItemBase::unselectEvent()
 {
+    hideSelectEdge();
+}
 
+void PanelItemBase::hoverEvent(const QPoint &startPos)
+{
+    if ((selectWidget->isHidden() && startPos != UNDEFINED_POS) || !hovered)
+    {
+        showSelectEdge(startPos);
+    }
+    else if (selectWidget->isHidden())
+    {
+        selectWidget->setGeometry(getSelectorBorder());
+    }
+
+    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
+    selectWidget->raise();
+    selectWidget->show();
+}
+
+void PanelItemBase::unhoverEvent()
+{
+    hideSelectEdge();
 }
 
 void PanelItemBase::showSelectEdge(const QPoint& startPos)
@@ -260,7 +266,7 @@ void PanelItemBase::hideSelectEdge()
     });
 }
 
-bool PanelItemBase::canDrop(const QMimeData *mime) const
+bool PanelItemBase::canDropEvent(const QMimeData *mime)
 {
     Q_UNUSED(mime)
     return false;
