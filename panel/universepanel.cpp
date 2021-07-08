@@ -72,6 +72,8 @@ void UniversePanel::readItems()
     {
         MyJson json = ar.toObject();
         PanelItemType type = PanelItemType(json.i("type"));
+
+        PanelItemBase* item = nullptr;
         switch (type)
         {
         case DefaultItem:
@@ -79,25 +81,22 @@ void UniversePanel::readItems()
         case IconText:
         case LocalFile:
         case WebUrl:
-        {
-            auto item = new IconTextItem(this);
-            item->fromJson(json);
-            item->show();
-            items.append(item);
-            connectItem(item);
+            item = new IconTextItem(this);
             break;
-        }
         case LongText:
+            item = new LongTextItem(this);
+            break;
+        case ImageView:
+            item = new ImageItem(this);
+            break;
+        }
+
+        if (item)
         {
-            auto item = new LongTextItem(this);
             item->fromJson(json);
             item->show();
             items.append(item);
             connectItem(item);
-            break;
-        }
-        case ImageView:
-            break;
         }
     }
 }
@@ -113,16 +112,14 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QString& iconName,
     auto item = new IconTextItem(this);
     item->setIcon(iconName);
     item->setText(text);
+    item->setLink(link);
+    item->setType(type);
 
     item->show();
     item->move(pos - QPoint(item->width() / 2, item->height() / 2));
 
     items.append(item);
     connectItem(item);
-
-    item->setLink(link);
-    item->setType(type);
-
     save();
     return item;
 }
@@ -144,6 +141,26 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
     return item;
 }
 
+ImageItem *UniversePanel::createImageItem(QPoint pos, const QPixmap &pixmap)
+{
+    QString imageName = ImageItem::saveImageFile(pixmap);
+    return createImageItem(pos, imageName);
+}
+
+ImageItem *UniversePanel::createImageItem(QPoint pos, const QString &image)
+{
+    auto item = new ImageItem(this);
+    item->setImage(image);
+
+    item->show();
+    item->move(pos - QPoint(item->width() / 2, item->height() / 2));
+
+    items.append(item);
+    connectItem(item);
+    save();
+    return item;
+}
+
 void UniversePanel::connectItem(PanelItemBase *item)
 {
     connect(item, &PanelItemBase::triggered, this, [=]{
@@ -151,6 +168,8 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::pressed, this, [=](const QPoint& pos){
+        raiseItem(item);
+
         if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) // 多选
         {
             QPoint pos = mapFromGlobal(QCursor::pos());
@@ -193,6 +212,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
         {
             item->move(item->pos() + delta);
         }
+        save();
     });
 
     connect(item, &PanelItemBase::facileMenuUsed, this, [=](FacileMenu* menu) {
@@ -217,6 +237,17 @@ void UniversePanel::connectItem(PanelItemBase *item)
         items.removeOne(item);
         selectedItems.remove(item);
         deleteItem(item);
+        save();
+    });
+
+    connect(item, &PanelItemBase::raiseMe, this, [=]{
+        raiseItem(item);
+        save();
+    });
+
+    connect(item, &PanelItemBase::lowerMe, this, [=]{
+        lowerItem(item);
+        save();
     });
 }
 
@@ -383,6 +414,20 @@ void UniversePanel::triggerItem(PanelItemBase *item)
     item->triggerEvent();
 }
 
+void UniversePanel::raiseItem(PanelItemBase *item)
+{
+    item->raise();
+    items.removeOne(item);
+    items.append(item);
+}
+
+void UniversePanel::lowerItem(PanelItemBase *item)
+{
+    item->lower();
+    items.removeOne(item);
+    items.insert(0, item);
+}
+
 /// 选中多项，开始拖拽
 void UniversePanel::startDragSelectedItems()
 {
@@ -480,7 +525,9 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
     }
     else if (mime->hasImage())
     {
-        qInfo() << "TODO: 插入 IMG";
+        QImage image = qvariant_cast<QImage>(mime->imageData());
+        QPixmap pixmap(image.size());
+        createImageItem(pos, pixmap.fromImage(image));
     }
     else if (mime->hasColor())
     {

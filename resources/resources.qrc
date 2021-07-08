@@ -31,5 +31,9 @@
         <file alias="more">icons/more.png</file>
         <file alias="spacing">icons/spacing.png</file>
         <file alias="align">icons/align.png</file>
+        <file alias="size_proportion">icons/size_proportion.png</file>
+        <file alias="origin_size">icons/origin_size.png</file>
+        <file alias="top_layer">icons/top_layer.png</file>
+        <file alias="bottom_layer">icons/bottom_layer.png</file>
     </qresource>
 </RCC>

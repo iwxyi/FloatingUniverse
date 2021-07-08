@@ -7,6 +7,7 @@
 #include "myjson.h"
 #include "icontextitem.h"
 #include "longtextitem.h"
+#include "imageitem.h"
 
 class UniversePanel : public QWidget
 {
@@ -18,9 +19,11 @@ public:
 private:
     void initPanel();
     void readItems();
-    IconTextItem *createLinkItem(QPoint pos, const QIcon &icon, const QString& text, const QString& link, PanelItemType type);
-    IconTextItem *createLinkItem(QPoint pos, const QString &iconName, const QString& text, const QString& link, PanelItemType type);
+    IconTextItem *createLinkItem(QPoint pos, const QIcon& icon, const QString& text, const QString& link, PanelItemType type);
+    IconTextItem *createLinkItem(QPoint pos, const QString& iconName, const QString& text, const QString& link, PanelItemType type);
     LongTextItem *createTextItem(QPoint pos, const QString& text, bool enableHtml);
+    ImageItem *createImageItem(QPoint pos, const QPixmap& pixmap);
+    ImageItem *createImageItem(QPoint pos, const QString& image);
     void connectItem(PanelItemBase* item);
     void deleteItem(PanelItemBase* item);
     bool hasItemUsing() const;
@@ -37,6 +40,8 @@ public slots:
     void selectItem(PanelItemBase* item, const QPoint& pos = UNDEFINED_POS);
     void unselectItem(PanelItemBase* item);
     void triggerItem(PanelItemBase* item);
+    void raiseItem(PanelItemBase* item);
+    void lowerItem(PanelItemBase* item);
 
 private slots:
     void startDragSelectedItems();

@@ -46,8 +46,8 @@ private:
     QLabel* iconLabel;
     QLabel* textLabel;
 
-    QString iconName;
-    QString text;
+    QString iconName; // 图标文件名（包括后缀）
+    QString text; // 显示的标题
     QString link; // 文件或者网址
 
     bool closeAfterClick = true;

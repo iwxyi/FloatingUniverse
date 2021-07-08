@@ -53,6 +53,8 @@ signals:
     void facileMenuUsed(FacileMenu* menu);
     void useFinished();
     void deleteMe();
+    void raiseMe();
+    void lowerMe();
 
 public slots:
     void setSelect(bool sh, const QPoint& startPos = UNDEFINED_POS);
