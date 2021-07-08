@@ -27,6 +27,7 @@ MyJson ImageItem::toJson() const
     MyJson json = ResizeableItemBase::toJson();
 
     json.insert("image", imageName);
+    json.insert("bottom_layer", !autoRaise);
 
     return json;
 }
@@ -37,6 +38,8 @@ void ImageItem::fromJson(const MyJson &json)
 
     QString imageName = json.s("image");
     setImage(imageName);
+
+    autoRaise = !json.b("bottom_layer");
 }
 
 void ImageItem::releaseResource()
@@ -113,8 +116,12 @@ void ImageItem::facileMenuEvent(FacileMenu *menu)
     })->disable(invalid);
 
     menu->split()->addAction(QIcon(":/icons/bottom_layer"), " 置于底层", [=]{
-        emit lowerMe();
-    });
+        autoRaise = !autoRaise;
+        if (!autoRaise)
+            emit lowerMe();
+        else
+            emit modified();
+    })->check(!autoRaise);
 }
 
 void ImageItem::triggerEvent()

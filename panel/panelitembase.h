@@ -36,6 +36,7 @@ public:
     bool isHovered() const;
     virtual bool isUsing() const; // 是否正在使用中，临时屏蔽leaveEvent（比如输入法框）
     QRect contentsRect() const;
+    bool isAutoRaise() const;
 
     virtual void facileMenuEvent(FacileMenu* menu);
     virtual void triggerEvent();
@@ -93,6 +94,7 @@ protected:
     bool hovered = false;
 
     PanelItemType type;
+    bool autoRaise = true;
 };
 
 #endif // PANELITEM_H

@@ -71,6 +71,11 @@ QRect PanelItemBase::contentsRect() const
     return QRect(border, border, width() - border * 2, height() * border * 2);
 }
 
+bool PanelItemBase::isAutoRaise() const
+{
+    return autoRaise;
+}
+
 void PanelItemBase::facileMenuEvent(FacileMenu *menu)
 {
     Q_UNUSED(menu)

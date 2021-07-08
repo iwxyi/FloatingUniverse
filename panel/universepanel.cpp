@@ -168,7 +168,8 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::pressed, this, [=](const QPoint& pos){
-        raiseItem(item);
+        if (item->isAutoRaise())
+            raiseItem(item);
 
         if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) // 多选
         {
@@ -234,8 +235,6 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::deleteMe, this, [=]{
-        items.removeOne(item);
-        selectedItems.remove(item);
         deleteItem(item);
         save();
     });
@@ -253,6 +252,8 @@ void UniversePanel::connectItem(PanelItemBase *item)
 
 void UniversePanel::deleteItem(PanelItemBase *item)
 {
+    items.removeOne(item);
+    selectedItems.remove(item);
     item->releaseResource();
     item->deleteLater();
 }
@@ -1064,10 +1065,8 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         menu->split()->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
             foreach (auto item, selectedItems)
             {
-                items.removeOne(item);
                 deleteItem(item);
             }
-            selectedItems.clear();
             save();
         });
     }
