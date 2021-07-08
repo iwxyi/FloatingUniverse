@@ -10,6 +10,7 @@
 #include "runtime.h"
 #include "usettings.h"
 #include "facilemenu.h"
+#include "fileutil.h"
 
 IconTextItem::IconTextItem(QWidget *parent) : PanelItemBase(parent)
 {
@@ -55,6 +56,24 @@ void IconTextItem::fromJson(const MyJson &json)
     closeAfterClick = json.b("closeAfterClick", closeAfterClick);
     fastOpen = json.b("fastOpen", fastOpen);
     openLevel = json.i("openLevel", openLevel);
+}
+
+/// 释放所有的资源
+/// 删除item的时候必须执行，否则变为垃圾文件
+void IconTextItem::releaseResource()
+{
+    PanelItemBase::releaseResource();
+
+    if (!iconName.isEmpty())
+    {
+        deleteFile(rt->ICON_PATH + iconName);
+    }
+
+    if (link.startsWith(rt->PANEL_FILE_PATH) && isFileExist(link))
+    {
+        qInfo() << "删除文件到回收站：" << link;
+        recycleFile(link);
+    }
 }
 
 void IconTextItem::setIcon(const QString &iconName)

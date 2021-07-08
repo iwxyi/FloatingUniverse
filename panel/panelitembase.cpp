@@ -81,6 +81,11 @@ void PanelItemBase::triggerEvent()
 
 }
 
+void PanelItemBase::releaseResource()
+{
+
+}
+
 void PanelItemBase::setSelect(bool sh, const QPoint &startPos)
 {
     if (selected == sh)

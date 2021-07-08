@@ -40,6 +40,8 @@ public:
     virtual void facileMenuEvent(FacileMenu* menu);
     virtual void triggerEvent();
 
+    virtual void releaseResource();
+
 signals:
     void triggered();
     void pressed(const QPoint& pos);

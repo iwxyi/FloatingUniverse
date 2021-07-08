@@ -240,26 +240,7 @@ QString UniversePanel::saveIcon(const QPixmap &pixmap) const
 
 void UniversePanel::deleteItem(PanelItemBase *item)
 {
-    if (qobject_cast<IconTextItem*>(item))
-    {
-        auto it = qobject_cast<IconTextItem*>(item);
-
-        // 删除图标
-        QString iconName = it->getIconName();
-        if (!iconName.isEmpty())
-        {
-            deleteFile(rt->ICON_PATH + iconName);
-        }
-
-        // 删除文件
-        QString link = it->getLink();
-        if (link.startsWith(rt->PANEL_FILE_PATH) && isFileExist(link))
-        {
-            qInfo() << "删除文件到回收站：" << link;
-            recycleFile(link);
-        }
-    }
-
+    item->releaseResource();
     item->deleteLater();
 }
 
