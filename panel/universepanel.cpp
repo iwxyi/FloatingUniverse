@@ -104,7 +104,7 @@ void UniversePanel::readItems()
 
 IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QIcon &icon, const QString &text, const QString &link, PanelItemType type)
 {
-    QString iconName = saveIcon(icon);
+    QString iconName = IconTextItem::saveIconFile(icon);
     return createLinkItem(pos, iconName, text, link, type);
 }
 
@@ -220,24 +220,6 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 }
 
-QString UniversePanel::saveIcon(const QIcon &icon) const
-{
-    QPixmap pixmap = icon.pixmap(us->panelItemSize, us->panelItemSize);
-    return saveIcon(pixmap);
-}
-
-QString UniversePanel::saveIcon(const QPixmap &pixmap) const
-{
-    // 保存到本地
-    int val = 1;
-    while (QFileInfo(rt->ICON_PATH + QString::number(val) + ".png").exists())
-        val++;
-    QString iconName = QString::number(val) + ".png";
-
-    pixmap.save(rt->ICON_PATH + iconName);
-    return iconName;
-}
-
 void UniversePanel::deleteItem(PanelItemBase *item)
 {
     item->releaseResource();
@@ -248,7 +230,7 @@ void UniversePanel::deleteItem(PanelItemBase *item)
 /// 有些情况会误判为leaveEvent，可能是：
 /// - 弹出的右键菜单
 /// - 输入法候选框
-bool UniversePanel::isItemUsing() const
+bool UniversePanel::hasItemUsing() const
 {
     if (currentMenu && currentMenu->hasFocus())
         return true;
@@ -450,7 +432,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                     }
                 });
                 item = createLinkItem(pos,
-                                      pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                                      pixmap.isNull() ? ":/icons/link" : IconTextItem::saveIconFile(pixmap),
                                       pageName.isEmpty() ? path : pageName,
                                       path, PanelItemType::WebUrl);
             }
@@ -586,7 +568,7 @@ void UniversePanel::leaveEvent(QEvent *event)
     }
 
     // 是否有item正在使用
-    if (isItemUsing())
+    if (hasItemUsing())
         return ;
 
     QWidget::leaveEvent(event);
@@ -1088,7 +1070,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
             QPixmap pixmap;
             getWebPageNameAndIcon(url, pageName, pixmap);
             createLinkItem(cursorPos,
-                           pixmap.isNull() ? ":/icons/link" : saveIcon(pixmap),
+                           pixmap.isNull() ? ":/icons/link" : IconTextItem::saveIconFile(pixmap),
                            pageName.isEmpty() ? url : pageName,
                            url, PanelItemType::WebUrl);
         });

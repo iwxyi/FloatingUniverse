@@ -23,6 +23,9 @@ public:
     QString getLink() const;
     bool isFastOpen() const;
 
+    static QString saveIconFile(const QIcon& icon);
+    static QString saveIconFile(const QPixmap& pixmap);
+
     virtual void shake(int range = 5);
     virtual void nod(int range = 5);
     virtual void jump(int range = 10);

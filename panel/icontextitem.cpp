@@ -136,6 +136,23 @@ bool IconTextItem::isFastOpen() const
     return fastOpen;
 }
 
+QString IconTextItem::saveIconFile(const QIcon &icon)
+{
+    return saveIconFile(icon.pixmap(us->panelItemSize, us->panelItemSize));
+}
+
+QString IconTextItem::saveIconFile(const QPixmap &pixmap)
+{
+    // 保存到本地
+    int val = 1;
+    while (QFileInfo(rt->ICON_PATH + QString::number(val) + ".png").exists())
+        val++;
+    QString iconName = QString::number(val) + ".png";
+
+    pixmap.save(rt->ICON_PATH + iconName);
+    return iconName;
+}
+
 /// 左右震动
 /// 拒绝 drop
 void IconTextItem::shake(int range)

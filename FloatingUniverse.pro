@@ -36,6 +36,7 @@ SOURCES += \
     global/usettings.cpp \
     panel/customedit.cpp \
     panel/icontextitem.cpp \
+    panel/imageitem.cpp \
     panel/longtextitem.cpp \
     panel/moveablewidget.cpp \
     panel/panelitembase.cpp \
@@ -63,6 +64,7 @@ HEADERS += \
     global/usettings.h \
     panel/customedit.h \
     panel/icontextitem.h \
+    panel/imageitem.h \
     panel/longtextitem.h \
     panel/moveablewidget.h \
     panel/panelitembase.h \

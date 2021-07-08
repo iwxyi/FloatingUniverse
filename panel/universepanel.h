@@ -22,10 +22,8 @@ private:
     IconTextItem *createLinkItem(QPoint pos, const QString &iconName, const QString& text, const QString& link, PanelItemType type);
     LongTextItem *createTextItem(QPoint pos, const QString& text, bool enableHtml);
     void connectItem(PanelItemBase* item);
-    QString saveIcon(const QIcon& icon) const;
-    QString saveIcon(const QPixmap& pixmap) const;
     void deleteItem(PanelItemBase* item);
-    bool isItemUsing() const;
+    bool hasItemUsing() const;
     void keepPanelState(FuncType func);
 
 signals:
