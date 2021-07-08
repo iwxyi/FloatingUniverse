@@ -869,8 +869,8 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         });
 
         menu->split();
-        auto alignMenu = menu->addMenu(QIcon(":/icons/align"), "对齐");
-        alignMenu->addAction("上对齐", [=]{
+        auto alignMenu = menu->addMenu(QIcon(":/icons/align"), "对齐 (&Q)");
+        alignMenu->addAction("上对齐 (&T)", [=]{
             auto sItems = selectedItems.toList();
             // 寻找基准线
             int minY = sItems.first()->pos().y();
@@ -887,7 +887,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        alignMenu->addAction("行中对齐", [=]{
+        alignMenu->addAction("行中对齐 (&H)", [=]{
             auto sItems = selectedItems.toList();
             // 以最上面的元素为基准线
             PanelItemBase* tItem = sItems.first();
@@ -907,7 +907,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        alignMenu->addAction("下对齐", [=]{
+        alignMenu->addAction("下对齐 (&B)", [=]{
             auto sItems = selectedItems.toList();
             // 寻找基准线
             int maxY = sItems.first()->geometry().bottom();
@@ -924,7 +924,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        alignMenu->split()->addAction("左对齐", [=]{
+        alignMenu->split()->addAction("左对齐 (&L)", [=]{
             auto sItems = selectedItems.toList();
             // 寻找基准线
             int minX = sItems.first()->pos().x();
@@ -941,7 +941,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        alignMenu->addAction("列中对齐", [=]{
+        alignMenu->addAction("列中对齐 (&V)", [=]{
             auto sItems = selectedItems.toList();
             // 以最上面的元素为基准线
             PanelItemBase* tItem = sItems.first();
@@ -961,7 +961,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        alignMenu->addAction("右对齐", [=]{
+        alignMenu->addAction("右对齐 (&R)", [=]{
             auto sItems = selectedItems.toList();
             // 寻找基准线
             int maxX = sItems.first()->geometry().right();
@@ -979,8 +979,8 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             save();
         });
 
-        auto spaceMenu = menu->addMenu(QIcon(":/icons/spacing"), "分布");
-        spaceMenu->addAction("水平等间距", [=]{
+        auto spaceMenu = menu->addMenu(QIcon(":/icons/spacing"), "分布 (&F)");
+        spaceMenu->addAction("水平等间距 (&H)", [=]{
             auto sItems = selectedItems.toList();
             std::sort(sItems.begin(), sItems.end(), [=](PanelItemBase* item1, PanelItemBase* item2){
                 return item1->x() < item2->x();
@@ -1000,7 +1000,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        spaceMenu->addAction("垂直等间距", [=]{
+        spaceMenu->addAction("垂直等间距 (&V)", [=]{
             auto sItems = selectedItems.toList();
             std::sort(sItems.begin(), sItems.end(), [=](PanelItemBase* item1, PanelItemBase* item2){
                 return item1->y() < item2->y();
@@ -1020,10 +1020,10 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             }
             save();
         });
-        spaceMenu->split()->addAction("自动分布", [=]{
+        spaceMenu->split()->addAction("自动分布 (&A)", [=]{
 
         })->disable();
-        spaceMenu->addAction("网格分布", [=]{
+        spaceMenu->addAction("网格分布 (&G)", [=]{
 
         })->disable();
     }

@@ -83,6 +83,9 @@ void PanelItemBase::triggerEvent()
 
 void PanelItemBase::setSelect(bool sh, const QPoint &startPos)
 {
+    if (selected == sh)
+        return ;
+
     if (sh)
     {
         selectEvent(startPos);
@@ -96,6 +99,9 @@ void PanelItemBase::setSelect(bool sh, const QPoint &startPos)
 
 void PanelItemBase::setHover(bool sh, const QPoint &startPos)
 {
+    if (hovered == sh)
+        return ;
+
     if (sh)
     {
         hoverEvent(startPos);

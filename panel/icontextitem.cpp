@@ -409,7 +409,7 @@ void IconTextItem::triggerEvent()
 
 bool IconTextItem::canDropEvent(const QMimeData *mime)
 {
-    if (mime->hasUrls()
+    if ((mime->hasUrls() && mime->urls().size() == 1)
             || (mime->hasText() && !mime->text().contains("\n")))
     {
         jitter(mapFromGlobal(QCursor::pos()), -10);
