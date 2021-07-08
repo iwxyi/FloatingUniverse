@@ -36,7 +36,7 @@ public:
     QColor panelHoverEdge = QColor(204, 204, 255);
     int panelItemSize = 64; // 图标大小
     bool panelGrabBlur = true;
-    int panelGrabBlurRadius = 32; // 毛玻璃背景模糊半径
+    int panelGrabBlurRadius = 64; // 毛玻璃背景模糊半径
     int panelGrabBlurOpacity = 32; // 毛玻璃透明度
 
     int fluentRadius = 5;

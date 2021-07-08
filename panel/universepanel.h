@@ -85,6 +85,7 @@ private:
     QPoint draggingPos;
     FacileMenu* currentMenu = nullptr;
     bool _block_menu = false;
+    bool _release_outter = false; // 鼠标松开的时候，是不是在外面
     QPixmap panelBlurPixmap;
 
     QList<PanelItemBase*> items;

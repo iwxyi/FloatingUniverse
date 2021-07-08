@@ -597,6 +597,14 @@ void UniversePanel::enterEvent(QEvent *event)
 
 void UniversePanel::leaveEvent(QEvent *event)
 {
+    // 是否是拖拽的时候不小心移到了外面去了
+    if (_release_outter)
+    {
+        _release_outter = false;
+        return ;
+    }
+
+    // 是否有item正在使用
     if (isItemUsing())
         return ;
 
@@ -824,6 +832,10 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
             return ;
         }
     }
+
+    // 拖拽到外面，必定会触发 leaveEvent
+    if (!this->geometry().contains(QCursor::pos()))
+        _release_outter = true;
 
     QWidget::mouseReleaseEvent(event);
 }
