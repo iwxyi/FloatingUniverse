@@ -138,7 +138,7 @@ void ImageItem::facileMenuEvent(FacileMenu *menu)
         emit modified();
     })->disable(invalid);
 
-    menu->split()->addAction(QIcon(":/icons/bottom_layer"), " 置于底层", [=]{
+    menu->split()->addAction(QIcon(":/icons/bottom_layer"), "置于底层", [=]{
         autoRaise = !autoRaise;
         if (!autoRaise)
             emit lowerMe();

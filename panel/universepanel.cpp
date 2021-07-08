@@ -609,6 +609,13 @@ void UniversePanel::enterEvent(QEvent *event)
 
 void UniversePanel::leaveEvent(QEvent *event)
 {
+    // 拖拽到外面的时候，左边没事leave在release之后
+    // 右边就在release之前leave了
+    // 所以直接判断pressing状态
+    if (pressing)
+    {
+        return ;
+    }
     // 是否是拖拽的时候不小心移到了外面去了
     if (_release_outter)
     {
