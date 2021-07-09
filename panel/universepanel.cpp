@@ -386,7 +386,6 @@ void UniversePanel::expandPanel()
     if (us->panelGrabBlur)
     {
         connect(ani, &QPropertyAnimation::valueChanged, this, [=]{
-//            repaint();
             update();
         });
     }
@@ -501,6 +500,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
 {
     // 要选中添加的item，就先取消其他所有的
     unselectAll();
+
     // 处理期望数据类型
     if(mime->hasUrls())
     {
@@ -1409,6 +1409,9 @@ void UniversePanel::dragEnterEvent(QDragEnterEvent *event)
     else if (mime->hasImage())
     {
         event->setDropAction(Qt::CopyAction);
+    }
+    else if (mime->hasColor())
+    {
     }
     else
     {

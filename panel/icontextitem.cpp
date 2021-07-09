@@ -542,10 +542,12 @@ void IconTextItem::dropEvent(QDropEvent *event)
         if (url.isLocalFile())
         {
             setMyLink(url.toLocalFile());
+            setType(PanelItemType::LocalFile);
         }
         else
         {
             setMyLink(url.url());
+            setType(PanelItemType::WebUrl);
         }
     }
     else if (mime->hasText())
@@ -557,12 +559,17 @@ void IconTextItem::dropEvent(QDropEvent *event)
             return PanelItemBase::dropEvent(event);
         }
         setMyLink(text);
+        if (isFileExist(text))
+            setType(PanelItemType::LocalFile);
+        else
+            setType(PanelItemType::WebUrl);
     }
     else
     {
         shake();
-        PanelItemBase::dropEvent(event);
+        return PanelItemBase::dropEvent(event);
     }
+    emit modified();
 }
 
 void IconTextItem::hoverEvent(const QPoint &startPos)

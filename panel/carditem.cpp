@@ -104,5 +104,5 @@ void CardItem::facileMenuEvent(FacileMenu *menu)
         setAttribute(Qt::WA_TransparentForMouseEvents, ignoreSelect);
         if (isSelected())
             emit unselectMe();
-    })->check(ignoreSelect)->tooltip("屏蔽鼠标左键点击或者框选；仅支持右键操作");
+    })->check(ignoreSelect)->tooltip("屏蔽鼠标左键点击或者框选；不影响显示右键菜单");
 }
