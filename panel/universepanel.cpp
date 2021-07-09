@@ -139,6 +139,7 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QString& iconName,
     items.append(item);
     connectItem(item);
     save();
+    selectItem(item);
     return item;
 }
 
@@ -146,7 +147,8 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
 {
     auto item = new LongTextItem(this);
     item->setText(text, enableHtml);
-    item->adjustSizeByText(ITEM_MAX_SIZE);
+    if (!text.isEmpty())
+        item->adjustSizeByText(ITEM_MAX_SIZE);
 
     item->show();
     QFontMetrics fm(item->font());
@@ -156,6 +158,7 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
     connectItem(item);
 
     save();
+    selectItem(item);
     return item;
 }
 
@@ -177,6 +180,7 @@ ImageItem *UniversePanel::createImageItem(QPoint pos, const QString &image)
     items.append(item);
     connectItem(item);
     save();
+    selectItem(item);
     return item;
 }
 
@@ -197,6 +201,7 @@ CardItem *UniversePanel::createCardItem(QPoint pos)
     items.append(item);
     connectItem(item);
     save();
+    selectItem(item);
     return item;
 }
 
@@ -494,7 +499,10 @@ void UniversePanel::pasteFromClipboard(QPoint pos)
 
 void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
 {
-    if(mime->hasUrls())//处理期望数据类型
+    // 要选中添加的item，就先取消其他所有的
+    unselectAll();
+    // 处理期望数据类型
+    if(mime->hasUrls())
     {
         QFileIconProvider icon_provider;
         QList<QUrl> urls = mime->urls();//获取数据并保存到链表中
