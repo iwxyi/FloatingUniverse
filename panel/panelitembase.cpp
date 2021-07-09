@@ -78,6 +78,11 @@ bool PanelItemBase::isAutoRaise() const
     return autoRaise;
 }
 
+bool PanelItemBase::isIgnoreSelect() const
+{
+    return ignoreSelect;
+}
+
 void PanelItemBase::facileMenuEvent(FacileMenu *menu)
 {
     Q_UNUSED(menu)
@@ -129,6 +134,9 @@ void PanelItemBase::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
     {
+        // 不被选中，跳过单击选择
+        //if (ignoreSelect) return ; // 不用管，transparentMouse自动跳过了
+
         pressPos = event->pos();
         pressGlobalPos = pressPos + this->pos();
         dragged = false;
@@ -153,6 +161,8 @@ void PanelItemBase::mouseReleaseEvent(QMouseEvent *event)
         }
         else // 点击事件
         {
+            if (!isSelected()) // 鼠标按下，但是ESC键取消了
+                return ;
             emit triggered();
         }
         return ;

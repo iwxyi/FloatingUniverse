@@ -39,6 +39,7 @@ public:
     virtual bool isUsing() const; // 是否正在使用中，临时屏蔽leaveEvent（比如输入法框）
     QRect contentsRect() const;
     bool isAutoRaise() const;
+    bool isIgnoreSelect() const;
 
     virtual void facileMenuEvent(FacileMenu* menu);
     virtual void triggerEvent();
@@ -98,7 +99,8 @@ protected:
     bool hovered = false;
 
     PanelItemType type;
-    bool autoRaise = true;
+    bool autoRaise = true; // press自动置顶
+    bool ignoreSelect = false; // 作为背景，不允许左键点击打开、拖拽选中，只能右键选择
 };
 
 #endif // PANELITEM_H

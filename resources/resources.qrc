@@ -37,5 +37,7 @@
         <file alias="bottom_layer">icons/bottom_layer.png</file>
         <file alias="config">icons/config.png</file>
         <file alias="happy">icons/happy.png</file>
+        <file alias="image">icons/image.png</file>
+        <file alias="ignore_select">icons/ignore_select.png</file>
     </qresource>
 </RCC>

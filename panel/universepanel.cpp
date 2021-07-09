@@ -806,7 +806,7 @@ void UniversePanel::mouseMoveEvent(QMouseEvent *event)
             QRect range(pressPos, draggingPos);
             foreach (auto item, items)
             {
-                if (item->isSelected())
+                if (item->isSelected() || item->isIgnoreSelect())
                     continue;
 
                 if (range.contains(item->geometry().center()))
@@ -852,6 +852,8 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
                 QRect range(pressPos, draggingPos);
                 foreach (auto item, items)
                 {
+                    if (item->isIgnoreSelect())
+                        continue;
                     if (range.contains(item->geometry().center()))
                     {
                         item->setSelect(true);
@@ -861,7 +863,8 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
             }
             else // 单击
             {
-                // 什么都不做
+                // item自己的trigger事件
+                // 自己什么都不做
             }
         }
 
@@ -1172,9 +1175,19 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
         addMenu->addAction(QIcon(":icons/todo"), "待办 (&T)", [=]{
 
         })->disable();
-        addMenu->addAction(QIcon(":icons/remind"), "提醒 (&W)", [=]{
+        addMenu->addAction(QIcon(":icons/image"), "图像 (&P)", [=]{
+            if (currentMenu)
+                currentMenu->close();
+            QString prevPath = us->s("recent/selectFile");
+            QString path = QFileDialog::getOpenFileName(this, "选择图片文件", prevPath, tr("Images (*.png *.xpm *.jpg *.jpeg *.gif)"));
+            if (path.isEmpty())
+                return ;
+            us->set("recent/selectFile", path);
 
-        })->disable();
+            // 插入图像
+            QPixmap pixmap(path);
+            createImageItem(cursorPos, pixmap);
+        });
     });
 
     addMenu->split()->addRow([=]{
