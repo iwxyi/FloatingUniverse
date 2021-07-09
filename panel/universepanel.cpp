@@ -1169,8 +1169,18 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     menu->exec();
     menu->finished([=]{
         currentMenu = nullptr;
-        if (!this->hasFocus())
+        if (!geometry().contains(QCursor::pos()) // 应该使用的，但实测这句加不加问题不大
+                && !menu->rect().contains(menu->mapFromGlobal(QCursor::pos()))
+                && !this->hasFocus()) // 这个判断并没有任何用处，就意思一下
+        {
+            // 鼠标外面隐藏菜单，隐藏面板
             foldPanel();
+        }
+
+        // 获取焦点后，鼠标外面操作菜单后，点击外面区域会触发 leaveEvent
+        // this->setFocus();
+//        if (!this->hasFocus())
+//            foldPanel();
     });
 }
 
