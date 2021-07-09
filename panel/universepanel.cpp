@@ -784,8 +784,7 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
 
         // 自动选中鼠标下面的菜单
         QPoint pos = event->pos();
-        foreach (auto item, items)
-        {
+        eachitem( // 越显示在前面的优先判断
             if (item->geometry().contains(pos))
             {
                 if (!selectedItems.contains(item))
@@ -793,7 +792,7 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
                 selectItem(item, item->mapFromParent(pressPos));
                 return ;
             }
-        }
+        )
         // 没有选中的，可能是移动画面，或者空白菜单
     }
 

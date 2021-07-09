@@ -10,6 +10,12 @@
 #include "imageitem.h"
 #include "carditem.h"
 
+#define eachitem(x) for (int i = items.size() - 1; i >= 0; i--)\
+{\
+    auto item = items.at(i);\
+    x\
+}
+
 class UniversePanel : public QWidget
 {
     Q_OBJECT
