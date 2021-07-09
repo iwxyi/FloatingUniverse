@@ -367,7 +367,8 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
                 QString fileName = info.isDir() ? info.fileName() : info.baseName();
                 if (fileName == oldName && canBeFileName(newName))
                 {
-                    if (QMessageBox::question(this, "重命名", "是否同步修改文件名", "修改", "取消", nullptr, 0) == 0)
+                    int recentRename = us->i("recent/renameFileSync", 0);
+                    if ((recentRename = QMessageBox::question(this, "重命名", "是否同步修改文件名", "修改", "取消", nullptr, recentRename)) == 0)
                     {
                         QString newLink;
                         if (info.isDir())
@@ -387,6 +388,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
                         }
                         setLink(newLink);
                     }
+                    us->set("recent/renameFileSync", recentRename);
                 }
             }
         }
