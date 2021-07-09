@@ -58,6 +58,8 @@ signals:
     void deleteMe();
     void raiseMe();
     void lowerMe();
+    void keepPanelFixing();
+    void restorePanelFixing();
 
 public slots:
     void setSelect(bool sh, const QPoint& startPos = UNDEFINED_POS);

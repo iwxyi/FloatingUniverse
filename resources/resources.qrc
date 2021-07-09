@@ -35,5 +35,7 @@
         <file alias="origin_size">icons/origin_size.png</file>
         <file alias="top_layer">icons/top_layer.png</file>
         <file alias="bottom_layer">icons/bottom_layer.png</file>
+        <file alias="config">icons/config.png</file>
+        <file alias="happy">icons/happy.png</file>
     </qresource>
 </RCC>

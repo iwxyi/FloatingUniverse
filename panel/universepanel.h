@@ -30,6 +30,7 @@ private:
     void keepPanelState(FuncType func);
 
 signals:
+    void openSettings();
 
 public slots:
     void expandPanel();
@@ -89,6 +90,7 @@ private:
     FacileMenu* currentMenu = nullptr;
     bool _block_menu = false;
     bool _release_outter = false; // 鼠标松开的时候，是不是在外面
+    bool _prev_fixing = false;
     QPixmap panelBlurPixmap;
 
     QList<PanelItemBase*> items;

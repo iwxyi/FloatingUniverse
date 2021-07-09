@@ -52,6 +52,20 @@ void UniversePanel::initPanel()
     move((screen.width() - width()) / 2 + us->panelCenterOffset, -height() + us->panelBangHeight); //
 
     readItems();
+
+    // 没有项目，展示一下这里有东西
+    QTimer::singleShot(1000, [=]{
+        if (!items.size())
+        {
+            // 自动展开，吸引用户
+            expandPanel();
+            QTimer::singleShot(1000, [=]{
+                // 如果用户没有管它，则1秒后自动隐藏
+                if (!this->geometry().contains(QCursor::pos()))
+                    foldPanel();
+            });
+        }
+    });
 }
 
 /// 读取设置
@@ -248,6 +262,15 @@ void UniversePanel::connectItem(PanelItemBase *item)
     connect(item, &PanelItemBase::lowerMe, this, [=]{
         lowerItem(item);
         save();
+    });
+
+    connect(item, &PanelItemBase::keepPanelFixing, this, [=]{
+        _prev_fixing = fixing;
+        fixing = true;
+    });
+
+    connect(item, &PanelItemBase::restorePanelFixing, this, [=]{
+        fixing = _prev_fixing;
     });
 }
 
@@ -457,7 +480,8 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
             {
                 QString path = urls.at(i).toLocalFile();
                 QIcon icon = icon_provider.icon(QFileInfo(path));
-                item = createLinkItem(pos, icon, urls.at(i).fileName(), path, PanelItemType::LocalFile);
+                QFileInfo info(path);
+                item = createLinkItem(pos, icon, info.baseName(), path, PanelItemType::LocalFile);
             }
             else // 拖拽网络URL
             {
@@ -468,10 +492,18 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                     getWebPageNameAndIcon(path, pageName, pixmap);
                     if (pageName.isEmpty() && urls.count() == 1) // 空名字，并且获取不到
                     {
-                        // 手动输入名字
+                        // 智能获取名字
+                        QString defaultName = path;
+                        if (defaultName.contains("?")) // 去掉URL参数
+                            defaultName = defaultName.left(defaultName.indexOf("?"));
+                        if (defaultName.contains("/")) // 获取action
+                            defaultName = defaultName.right(defaultName.length() - defaultName.lastIndexOf("/") - 1);
+                        if (defaultName.contains(".")) // 去掉文件后缀
+                            defaultName = defaultName.left(defaultName.indexOf("."));
+                        // 输入名字
                         bool ok = false;
                         this->activateWindow(); // 不激活当前窗口，inputDialog就不会获取焦点
-                        QString text = QInputDialog::getText(this, "快捷方式名字", "请输入URL快捷方式的标题", QLineEdit::Normal, path, &ok);
+                        QString text = QInputDialog::getText(this, "书签标题", "无法自动获取标题，请手动输入", QLineEdit::Normal, defaultName, &ok);
                         if (ok)
                         {
                             pageName = text;
@@ -479,7 +511,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                     }
                 });
                 item = createLinkItem(pos,
-                                      pixmap.isNull() ? ":/icons/link" : IconTextItem::saveIconFile(pixmap),
+                                      IconTextItem::saveIconFile(pixmap.isNull() ? QPixmap(":/icons/link") : pixmap),
                                       pageName.isEmpty() ? path : pageName,
                                       path, PanelItemType::WebUrl);
             }
@@ -507,7 +539,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QString pageName;
                 QPixmap pixmap;
                 getWebPageNameAndIcon(text, pageName, pixmap);
-                createLinkItem(pos, ":/icons/link", pageName.isEmpty() ? text : pageName, text, PanelItemType::WebUrl);
+                createLinkItem(pos, QPixmap(":/icons/link"), pageName.isEmpty() ? text : pageName, text, PanelItemType::WebUrl);
                 return ;
             }
 
@@ -582,7 +614,7 @@ bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixma
         QByteArray ba = NetUtil::getWebBa(faviconUrl);
         if (ba.size())
         {
-             pageIcon = QPixmap(us->panelItemSize, us->panelItemSize);
+             pageIcon = QPixmap(us->panelIconSize, us->panelIconSize);
              pageIcon.loadFromData(ba, nullptr, Qt::AutoColor);
         }
         else
@@ -1093,9 +1125,15 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             fixing = !fixing;
         })->check(fixing);
 
-        menu->addAction(QIcon(":/icons/refresh"), "刷新 (&R)", [=]{
-            readItems();
+        menu->addAction(QIcon(":/icons/config"), "设置 (&S)", [=]{
+            emit openSettings();
         });
+
+        menu->addAction(QIcon(":/icons/refresh"), "刷新 (&R)", [=]{
+            // 其实刷新并没有任何用处
+            // 但会让人觉得高大上起来
+            readItems();
+        })->hide();
     }
 
     menu->exec();
@@ -1124,7 +1162,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
             QPixmap pixmap;
             getWebPageNameAndIcon(url, pageName, pixmap);
             createLinkItem(cursorPos,
-                           pixmap.isNull() ? ":/icons/link" : IconTextItem::saveIconFile(pixmap),
+                           IconTextItem::saveIconFile(pixmap.isNull() ? QPixmap(":/icons/link") : pixmap),
                            pageName.isEmpty() ? url : pageName,
                            url, PanelItemType::WebUrl);
         });

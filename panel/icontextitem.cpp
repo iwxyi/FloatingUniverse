@@ -91,7 +91,7 @@ void IconTextItem::setIcon(const QString &iconName)
 
     QIcon icon(iconName.startsWith(":") ? iconName : rt->ICON_PATH + iconName);
     if (!icon.isNull())
-        iconLabel->setPixmap(icon.pixmap(us->panelItemSize, us->panelItemSize));
+        iconLabel->setPixmap(icon.pixmap(us->panelIconSize, us->panelIconSize));
 }
 
 void IconTextItem::setText(const QString &text)
@@ -138,7 +138,7 @@ bool IconTextItem::isFastOpen() const
 
 QString IconTextItem::saveIconFile(const QIcon &icon)
 {
-    return saveIconFile(icon.pixmap(us->panelItemSize, us->panelItemSize));
+    return saveIconFile(icon.pixmap(us->panelIconSize, us->panelIconSize));
 }
 
 QString IconTextItem::saveIconFile(const QPixmap &pixmap)
@@ -409,11 +409,36 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
     }
 
     auto moreMenu = menu->addMenu(QIcon(":/icons/more"), "更多");
-    moreMenu->addAction(QIcon(":/icons/update"), "更新图标", [=]{
+
+    moreMenu->addAction(QIcon(":/icons/happy"), "更换图标", [=]{
+        menu->close();
+        emit keepPanelFixing();
+        QString prevPath = us->s("recent/iconPath");
+        QString path = QFileDialog::getOpenFileName(this, "更换图标", prevPath, tr("Images (*.png *.xpm *.jpg *.jpeg *.gif *.ico)"));
+        QTimer::singleShot(0, [=]{
+            // 先等待leave，所以要延迟一会儿
+            emit restorePanelFixing();
+        });
+        if (path.isEmpty())
+            return ;
+        us->set("recent/iconPath", path);
+
+        // 读取图标并保存
+        QPixmap pixmap(path);
+        if (pixmap.width() > us->panelIconSize || pixmap.height() > us->panelIconSize)
+            pixmap = pixmap.scaled(us->panelIconSize, us->panelIconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        if (!pixmap.save(rt->ICON_PATH + this->iconName))
+            qWarning() << "保存新图标失败" << path << "  ->  " << (rt->ICON_PATH + this->iconName);
+        iconLabel->setPixmap(pixmap);
+        this->adjustSize();
+        jump();
+    });
+
+    moreMenu->addAction(QIcon(":/icons/update"), "刷新图标", [=]{
         if (!QFileInfo(link).exists())
             return ;
         QIcon icon = QFileIconProvider().icon(QFileInfo(link));
-        auto pixmap = icon.pixmap(us->panelItemSize, us->panelItemSize);
+        auto pixmap = icon.pixmap(us->panelIconSize, us->panelIconSize);
         pixmap.save(rt->ICON_PATH + iconName);
         iconLabel->setPixmap(pixmap);
     });

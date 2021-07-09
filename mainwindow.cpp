@@ -185,6 +185,7 @@ void MainWindow::initKey()
 void MainWindow::initPanel()
 {
     panel = new UniversePanel(nullptr);
+    connect(panel, SIGNAL(openSettings()), this, SLOT(show()));
     panel->show();
 }
 
