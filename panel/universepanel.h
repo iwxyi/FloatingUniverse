@@ -8,6 +8,7 @@
 #include "icontextitem.h"
 #include "longtextitem.h"
 #include "imageitem.h"
+#include "carditem.h"
 
 class UniversePanel : public QWidget
 {
@@ -24,6 +25,7 @@ private:
     LongTextItem *createTextItem(QPoint pos, const QString& text, bool enableHtml);
     ImageItem *createImageItem(QPoint pos, const QPixmap& pixmap);
     ImageItem *createImageItem(QPoint pos, const QString& image);
+    CardItem *createCardItem(QPoint pos);
     void connectItem(PanelItemBase* item);
     void deleteItem(PanelItemBase* item);
     bool hasItemUsing() const;

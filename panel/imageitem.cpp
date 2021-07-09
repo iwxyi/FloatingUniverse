@@ -28,8 +28,8 @@ MyJson ImageItem::toJson() const
 
     json.insert("image", imageName);
     json.insert("bottom_layer", !autoRaise);
-    json.insert("hide_after_trigger", hideAfterTrigger);
     json.insert("ignore_select", ignoreSelect);
+    json.insert("hide_after_trigger", hideAfterTrigger);
 
     return json;
 }
@@ -42,8 +42,8 @@ void ImageItem::fromJson(const MyJson &json)
     setImage(imageName);
 
     autoRaise = !json.b("bottom_layer");
-    hideAfterTrigger = json.b("hide_after_trigger", hideAfterTrigger);
     ignoreSelect = json.b("ignore_select", ignoreSelect);
+    hideAfterTrigger = json.b("hide_after_trigger", hideAfterTrigger);
     if (ignoreSelect)
     {
         setAttribute(Qt::WA_TransparentForMouseEvents, true);
@@ -161,7 +161,7 @@ void ImageItem::facileMenuEvent(FacileMenu *menu)
     menu->addAction(QIcon(":/icons/eye"), "打开后隐藏", [=]{
         hideAfterTrigger = !hideAfterTrigger;
         emit modified();
-    })->check(hideAfterTrigger);
+    })->check(hideAfterTrigger)->disable(ignoreSelect);
 }
 
 void ImageItem::triggerEvent()

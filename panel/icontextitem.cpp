@@ -415,10 +415,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         emit keepPanelFixing();
         QString prevPath = us->s("recent/iconPath");
         QString path = QFileDialog::getOpenFileName(this, "更换图标", prevPath, tr("Images (*.png *.xpm *.jpg *.jpeg *.gif *.ico)"));
-        QTimer::singleShot(0, [=]{
-            // 先等待leave，所以要延迟一会儿
-            emit restorePanelFixing();
-        });
+        emit restorePanelFixing();
         if (path.isEmpty())
             return ;
         us->set("recent/iconPath", path);

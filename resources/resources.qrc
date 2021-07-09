@@ -39,5 +39,8 @@
         <file alias="happy">icons/happy.png</file>
         <file alias="image">icons/image.png</file>
         <file alias="ignore_select">icons/ignore_select.png</file>
+        <file alias="select_color">icons/select_color.png</file>
+        <file alias="rounded_rect">icons/rounded_rect.png</file>
+        <file alias="round_corner">icons/round_corner.png</file>
     </qresource>
 </RCC>

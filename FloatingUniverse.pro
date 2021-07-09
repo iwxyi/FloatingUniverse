@@ -34,6 +34,7 @@ INCLUDEPATH += third_party/color_octree/\
 
 SOURCES += \
     global/usettings.cpp \
+    panel/carditem.cpp \
     panel/customedit.cpp \
     panel/icontextitem.cpp \
     panel/imageitem.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     global/defines.h \
     global/signaltransfer.h \
     global/usettings.h \
+    panel/carditem.h \
     panel/customedit.h \
     panel/icontextitem.h \
     panel/imageitem.h \

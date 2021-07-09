@@ -24,6 +24,7 @@
 #include "fileutil.h"
 #include "netutil.h"
 #include "icontextitem.h"
+#include "carditem.h"
 
 UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 {
@@ -103,6 +104,9 @@ void UniversePanel::readItems()
         case ImageView:
             item = new ImageItem(this);
             break;
+        case CardView:
+            item = new CardItem(this);
+            break;
         }
 
         if (item)
@@ -169,6 +173,26 @@ ImageItem *UniversePanel::createImageItem(QPoint pos, const QString &image)
 
     item->show();
     item->move(pos - QPoint(item->width() / 2, item->height() / 2));
+
+    items.append(item);
+    connectItem(item);
+    save();
+    return item;
+}
+
+CardItem *UniversePanel::createCardItem(QPoint pos)
+{
+    auto item = new CardItem(this);
+    if (us->contains("recent/cardRadius"))
+        item->setRadius(us->i("recent/cardRadius"));
+    else
+        item->setRadius(us->fluentRadius);
+    if (us->contains("recent/cardColor"))
+        item->setColor(us->value("recent/cardColor").toString());
+    item->resize(us->panelItemSize * 3, us->panelItemSize * 2);
+
+    item->show();
+    item->move(pos);
 
     items.append(item);
     connectItem(item);
@@ -270,7 +294,9 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::restorePanelFixing, this, [=]{
-        fixing = _prev_fixing;
+        QTimer::singleShot(0, [=]{
+            fixing = _prev_fixing;
+        });
     });
 }
 
@@ -733,6 +759,8 @@ void UniversePanel::mousePressEvent(QMouseEvent *event)
         bool inSelectItem = false; // 点在选中图形上
         foreach (auto item, selectedItems)
         {
+            if (item->isIgnoreSelect())
+                continue;
             if (item->geometry().contains(pressPos))
             {
                 inSelectItem = true;
@@ -1175,19 +1203,9 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
         addMenu->addAction(QIcon(":icons/todo"), "待办 (&T)", [=]{
 
         })->disable();
-        addMenu->addAction(QIcon(":icons/image"), "图像 (&P)", [=]{
-            if (currentMenu)
-                currentMenu->close();
-            QString prevPath = us->s("recent/selectFile");
-            QString path = QFileDialog::getOpenFileName(this, "选择图片文件", prevPath, tr("Images (*.png *.xpm *.jpg *.jpeg *.gif)"));
-            if (path.isEmpty())
-                return ;
-            us->set("recent/selectFile", path);
+        addMenu->addAction(QIcon(":icons/remind"), "提醒 (&R)", [=]{
 
-            // 插入图像
-            QPixmap pixmap(path);
-            createImageItem(cursorPos, pixmap);
-        });
+        })->disable();
     });
 
     addMenu->split()->addRow([=]{
@@ -1269,6 +1287,25 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
             us->set("recent/selectFile", path);
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
             createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
+        });
+    });
+
+    addMenu->split()->addRow([=]{
+        addMenu->addAction(QIcon(":icons/image"), "图像 (&P)", [=]{
+            if (currentMenu)
+                currentMenu->close();
+            QString prevPath = us->s("recent/selectFile");
+            QString path = QFileDialog::getOpenFileName(this, "选择图片文件", prevPath, tr("Images (*.png *.xpm *.jpg *.jpeg *.gif)"));
+            if (path.isEmpty())
+                return ;
+            us->set("recent/selectFile", path);
+
+            // 插入图像
+            QPixmap pixmap(path);
+            createImageItem(cursorPos, pixmap);
+        });
+        addMenu->addAction(QIcon(":icons/rounded_rect"), "矩形 (&B)", [=]{
+            createCardItem(cursorPos);
         });
     });
 }
