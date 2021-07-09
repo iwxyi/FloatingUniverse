@@ -106,6 +106,7 @@ void PanelItemBase::setSelect(bool sh, const QPoint &startPos)
     if (sh)
     {
         selectEvent(startPos);
+        hovered = false; // 强制关闭hover状态
     }
     else
     {

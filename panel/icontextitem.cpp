@@ -268,10 +268,12 @@ void IconTextItem::shrink(int range)
     ani->setEndValue(QRect(QPoint(nX,nY), this->size()));
     ani->start(QAbstractAnimation::DeleteWhenStopped);
 
+    layout()->setEnabled(false);
     _shrinking = true;
     connect(ani, &QPropertyAnimation::stateChanged, this, [=](QAbstractAnimation::State state){
         if (state == QPropertyAnimation::State::Stopped)
         {
+            layout()->setEnabled(true);
             _shrinking = false;
         }
     });
