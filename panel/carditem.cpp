@@ -96,11 +96,13 @@ void CardItem::facileMenuEvent(FacileMenu *menu)
             emit lowerMe();
         else
             emit modified();
-    })->check(!autoRaise);
+    })->check(!autoRaise)->tooltip("放到所有项目的最底下");
 
     menu->addAction(QIcon(":/icons/ignore_select"), "不被选中", [=]{
         ignoreSelect = !ignoreSelect;
         emit modified();
         setAttribute(Qt::WA_TransparentForMouseEvents, ignoreSelect);
-    })->check(ignoreSelect);
+        if (isSelected())
+            emit unselectMe();
+    })->check(ignoreSelect)->tooltip("屏蔽鼠标左键点击或者框选；仅支持右键操作");
 }

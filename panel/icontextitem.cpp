@@ -347,18 +347,59 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
     }
 
     menu->split()->addAction(QIcon(":/icons/rename"), "重命名 (&N)", [=]{
+        menu->close();
         bool ok = false;
+        QString oldName = text;
+        emit keepPanelFixing();
         QString newName = QInputDialog::getText(this, "修改名字", "请输入新的名字", QLineEdit::Normal, text, &ok);
+        emit restorePanelFixing();
         if (!ok)
             return ;
         this->setText(newName);
         adjustSize();
+
+        // 询问是否修改文件名
+        if (isFileExist(link))
+        {
+            QFileInfo info(link);
+            if (info.exists())
+            {
+                QString fileName = info.isDir() ? info.fileName() : info.baseName();
+                if (fileName == oldName && canBeFileName(newName))
+                {
+                    if (QMessageBox::question(this, "重命名", "是否同步修改文件名", "修改", "取消", nullptr, 0) == 0)
+                    {
+                        QString newLink;
+                        if (info.isDir())
+                        {
+                            QDir dir(link);
+                            dir.cdUp();
+                            newLink = dir.absoluteFilePath(newName);
+                            if (!renameDir(link, newLink))
+                                qWarning() << "重命名失败：" << link << "  ->  " <<newLink;
+                        }
+                        else
+                        {
+                            QDir dir(info.absoluteDir());
+                            newLink = dir.absoluteFilePath(newName) + (info.suffix().isEmpty() ? "" : "." + info.suffix());
+                            if (!renameFile(link, newLink))
+                                qWarning() << "重命名失败：" << link << "  ->  " <<newLink;
+                        }
+                        setLink(newLink);
+                    }
+                }
+            }
+        }
+
         emit modified();
     });
 
     menu->addAction(QIcon(":/icons/link"), "链接 (&L)", [=]{
+        menu->close();
         bool ok = false;
+        emit keepPanelFixing();
         QString newLink = QInputDialog::getText(this, "修改链接", "可以是文件路径、网址，点击项目后立即打开", QLineEdit::Normal, link, &ok);
+        emit restorePanelFixing();
         if (!ok)
             return ;
         setLink(newLink);
@@ -372,7 +413,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         menu->addAction(QIcon(":/icons/eye"), "打开后隐藏", [=]{
             hideAfterTrigger = !hideAfterTrigger;
             emit modified();
-        })->check(hideAfterTrigger);
+        })->check(hideAfterTrigger)->tooltip("打开此项目后，自动隐藏悬浮面板");
     }
 
     if (type == LocalFile)

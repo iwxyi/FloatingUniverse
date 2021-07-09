@@ -294,8 +294,9 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::restorePanelFixing, this, [=]{
+        auto f = _prev_fixing;
         QTimer::singleShot(0, [=]{
-            fixing = _prev_fixing;
+            fixing = f;
         });
     });
 }
@@ -507,7 +508,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QString path = urls.at(i).toLocalFile();
                 QIcon icon = icon_provider.icon(QFileInfo(path));
                 QFileInfo info(path);
-                item = createLinkItem(pos, icon, info.baseName(), path, PanelItemType::LocalFile);
+                item = createLinkItem(pos, icon, info.isDir() ? info.fileName() : info.baseName(), path, PanelItemType::LocalFile);
             }
             else // 拖拽网络URL
             {

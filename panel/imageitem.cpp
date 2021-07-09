@@ -156,12 +156,14 @@ void ImageItem::facileMenuEvent(FacileMenu *menu)
         ignoreSelect = !ignoreSelect;
         emit modified();
         setAttribute(Qt::WA_TransparentForMouseEvents, ignoreSelect);
-    })->check(ignoreSelect);
+        if (isSelected())
+            emit unselectMe();
+    })->check(ignoreSelect)->tooltip("屏蔽鼠标左键点击或者框选；仅支持右键操作");
 
     menu->addAction(QIcon(":/icons/eye"), "打开后隐藏", [=]{
         hideAfterTrigger = !hideAfterTrigger;
         emit modified();
-    })->check(hideAfterTrigger)->disable(ignoreSelect);
+    })->check(hideAfterTrigger)->disable(ignoreSelect)->tooltip("打开此项目后，自动隐藏悬浮面板");
 }
 
 void ImageItem::triggerEvent()
