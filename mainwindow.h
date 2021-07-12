@@ -33,6 +33,7 @@ private:
     void initTray();
     void initKey();
     void initPanel();
+    void adjustSettingsGroupSize();
 
     QRect screenGeometry() const;
 
@@ -56,5 +57,8 @@ private:
 #endif
     UniversePanel* panel = nullptr;
     WaterCircleButton *confirmButton = nullptr;
+
+    QList<QLabel*> groupLabels;
+    QList<QWidget*> groupBoxes;
 };
 #endif // MAINWINDOW_H

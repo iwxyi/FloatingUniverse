@@ -57,7 +57,8 @@ SOURCES += \
     third_party/smooth_scroll/smoothlistwidget.cpp \
     third_party/utils/fileutil.cpp \
     third_party/utils/stringutil.cpp \
-    third_party/utils/textinputdialog.cpp
+    third_party/utils/textinputdialog.cpp \
+    widgets/panelsettingswidget.cpp
 
 HEADERS += \
     global/accountinfo.h \
@@ -97,11 +98,13 @@ HEADERS += \
     third_party/utils/textinputdialog.h \
     widgets/clicklabel.h \
     widgets/customtabstyle.h \
-    widgets/lefttabwidget.h
+    widgets/lefttabwidget.h \
+    widgets/panelsettingswidget.h
 
 FORMS += \
     mainwindow.ui \
-    third_party/utils/textinputdialog.ui
+    third_party/utils/textinputdialog.ui \
+    widgets/panelsettingswidget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -95,6 +95,22 @@ void MainWindow::initView()
     addGroupItem(QPixmap(":/icons/about"), "关于程序");
 
     // body
+    auto addSettingsGroupWidget = [=](QWidget* w, QString name){
+        QLabel* label = new QLabel(name, ui->scrollAreaWidgetContents);
+        label->setStyleSheet("color: gray;");
+        w->setObjectName("SettingsGroup");
+        w->setStyleSheet("#SettingsGroup{ background: white; border: none; border-radius: 5px; }");
+
+        groupLabels.append(label);
+        groupBoxes.append(w);
+        setShadow(w, 0, 8);
+    };
+
+    addSettingsGroupWidget(new QWidget(ui->scrollAreaWidgetContents), "测试");
+
+    // 调整body的大小
+    adjustSettingsGroupSize();
+
 }
 
 QRect MainWindow::screenGeometry() const
@@ -187,6 +203,34 @@ void MainWindow::initPanel()
     panel->show();
 }
 
+void MainWindow::adjustSettingsGroupSize()
+{
+    int margin = 12;
+    const int fixedWidth = qMin(qMax(ui->scrollAreaWidgetContents->width() - margin * 2, 300), 680);
+    const int groupSpacing = 12;
+    const int labelSpacing = 9;
+    const int left = qMax(margin, (ui->scrollAreaWidgetContents->width() - fixedWidth) / 2);
+    int top = 9;
+    for (int i = 0; i < groupLabels.size(); i++)
+    {
+        auto label = groupLabels.at(i);
+        auto box = groupBoxes.at(i);
+        label->setFixedWidth(fixedWidth);
+        box->setFixedWidth(fixedWidth);
+        label->adjustSize();
+        box->adjustSize();
+        box->setMinimumHeight(32);
+
+        label->move(left, top);
+        top += label->height() + labelSpacing;
+
+        box->move(left, top);
+        top += box->height() + groupSpacing;
+    }
+
+    ui->scrollAreaWidgetContents->setFixedHeight(top);
+}
+
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     us->setValue("mainwindow/geometry", this->saveGeometry());
@@ -215,6 +259,7 @@ void MainWindow::resizeEvent(QResizeEvent *e)
 {
     QMainWindow::resizeEvent(e);
 
+    adjustSettingsGroupSize();
     if (confirmButton)
         confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.3, confirmButton->width()*1.3));
 }
