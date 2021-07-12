@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 
     QFont font(a.font());
     font.setFamily("微软雅黑");
+    font.setPointSize(qMax(10, font.pointSize()));
     a.setFont(font);
 
     // 初始化全局配置

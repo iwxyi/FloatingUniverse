@@ -41,13 +41,13 @@ void MainWindow::initView()
         w->setGraphicsEffect(shadow_effect);
     };
 
-
     auto setButton = [=](WaterCircleButton* btn) {
         btn->setHoverColor(QColor(0xff, 0xff, 0xff, 0x32));
         btn->setPressColor(QColor(0xff, 0xff, 0xff, 0x64));
         btn->setFixedForePos();
         btn->setFixedForeSize();
         btn->setIconPaddingProper(0.25);
+        btn->setCursor(Qt::PointingHandCursor);
     };
 
     // AppBar
@@ -63,8 +63,38 @@ void MainWindow::initView()
     confirmButton->setFixedSize(us->widgetSize * 1.5, us->widgetSize * 1.5);
     confirmButton->setIcon(QIcon(":/icons/apply"));
     setButton(confirmButton);
-    confirmButton->setCursor(Qt::PointingHandCursor);
     setShadow(confirmButton, 0, 5);
+
+    // sidebar
+    auto addGroupItem = [=](QPixmap pixmap, QString groupName) {
+        InteractiveButtonBase* w = new InteractiveButtonBase(ui->sidebarList);
+        QLabel* pixmapLabel = new QLabel(w);
+        QLabel* titleLabel = new QLabel(w);
+        QHBoxLayout* layout = new QHBoxLayout(w);
+        layout->addWidget(pixmapLabel);
+        layout->addWidget(titleLabel);
+        pixmapLabel->setPixmap(pixmap);
+        pixmapLabel->setScaledContents(true);
+        titleLabel->setText(groupName);
+        titleLabel->adjustSize();
+        int sz = titleLabel->height();
+        pixmapLabel->setFixedSize(sz, sz);
+        layout->setMargin(layout->margin() * 1.3);
+
+        auto item = new QListWidgetItem(ui->sidebarList);
+        ui->sidebarList->setItemWidget(item, w);
+        w->adjustSize();
+        w->setCursor(Qt::PointingHandCursor);
+        item->setSizeHint(QSize(0, sz + layout->margin() * 2));
+    };
+    addGroupItem(QPixmap(":/icons/panel"), "悬浮面板");
+    addGroupItem(QPixmap(":/icons/universe2"), "宇宙传送");
+    addGroupItem(QPixmap(":/icons/interaction"), "交互优化");
+    addGroupItem(QPixmap(":/icons/auto_fill"), "自动填充");
+    addGroupItem(QPixmap(":/icons/used_data"), "使用数据");
+    addGroupItem(QPixmap(":/icons/about"), "关于程序");
+
+    // body
 }
 
 QRect MainWindow::screenGeometry() const
@@ -186,7 +216,7 @@ void MainWindow::resizeEvent(QResizeEvent *e)
     QMainWindow::resizeEvent(e);
 
     if (confirmButton)
-        confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.1, confirmButton->height() + confirmButton->width()*0.1));
+        confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.3, confirmButton->width()*1.3));
 }
 
 void MainWindow::returnToPrevWindow()

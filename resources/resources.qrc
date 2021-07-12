@@ -45,5 +45,11 @@
         <file alias="point_menu">icons/point_menu.png</file>
         <file alias="drawer_menu">icons/drawer_menu.png</file>
         <file alias="apply">icons/apply.png</file>
+        <file alias="about">icons/about.png</file>
+        <file alias="used_data">icons/used_data.png</file>
+        <file alias="interaction">icons/interaction.png</file>
+        <file alias="universe2">icons/universe2.png</file>
+        <file alias="panel">icons/panel.png</file>
+        <file alias="auto_fill">icons/auto_fill.png</file>
     </qresource>
 </RCC>
