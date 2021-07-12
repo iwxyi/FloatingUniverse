@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QGraphicsDropShadowEffect>
 #include "facilemenu.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -32,71 +33,38 @@ MainWindow::~MainWindow()
 
 void MainWindow::initView()
 {
-    ui->settingsTabWidget->setAttribute(Qt::WA_StyledBackground);
-    ui->settingsTabWidget->setTabPosition(QTabWidget::West);
-    ui->settingsTabWidget->tabBar()->setStyle(new CustomTabStyle);
-    ui->settingsTabWidget->setCurrentIndex(us->i("mainwindow/settingsTabIndex"));
-
-    ui->auxiliaryTabWidget->setAttribute(Qt::WA_StyledBackground);
-    ui->auxiliaryTabWidget->setTabPosition(QTabWidget::West);
-    ui->auxiliaryTabWidget->tabBar()->setStyle(new CustomTabStyle);
-    ui->auxiliaryTabWidget->setCurrentIndex(us->i("mainwindow/settingsTabIndex"));
-
-    ui->dataTabWidget->setAttribute(Qt::WA_StyledBackground);
-    ui->dataTabWidget->setTabPosition(QTabWidget::West);
-    ui->dataTabWidget->tabBar()->setStyle(new CustomTabStyle);
-    ui->dataTabWidget->setCurrentIndex(us->i("mainwindow/settingsTabIndex"));
+    auto setShadow = [=](QWidget* w, int x, int y){
+        QGraphicsDropShadowEffect *shadow_effect = new QGraphicsDropShadowEffect(w);
+        shadow_effect->setOffset(x, y);
+        shadow_effect->setColor(Qt::gray);
+        shadow_effect->setBlurRadius(32);
+        w->setGraphicsEffect(shadow_effect);
+    };
 
 
-    ui->settingsTabWidget->clear();
-    ui->settingsTabWidget->addTab(new QWidget(this), QIcon("://icons/tab1.png"), "Tab1");
+    auto setButton = [=](WaterCircleButton* btn) {
+        btn->setHoverColor(QColor(0xff, 0xff, 0xff, 0x32));
+        btn->setPressColor(QColor(0xff, 0xff, 0xff, 0x64));
+        btn->setFixedForePos();
+        btn->setFixedForeSize();
+        btn->setIconPaddingProper(0.25);
+    };
 
-    ui->auxiliaryTabWidget->clear();
-    ui->auxiliaryTabWidget->addTab(new QWidget(this), QIcon("://icons/tab2.png"), "Tab2");
-
-    ui->dataTabWidget->clear();
-    ui->dataTabWidget->addTab(new QWidget(this), QIcon("://icons/tab3.png"), "Tab3");
-
-    ui->sideButtons->setCurrentRow(qMin(us->i("mainwindow/sideIndex"), ui->sideButtons->count() - 1));
-    ui->settingsTabWidget->setCurrentIndex(qMin(us->i("mainwindow/settingsTabIndex"), ui->settingsTabWidget->count() - 1));
-    ui->auxiliaryTabWidget->setCurrentIndex(qMin(us->i("mainwindow/auxiliaryTabIndex"), ui->auxiliaryTabWidget->count() - 1));
-    ui->dataTabWidget->setCurrentIndex(qMin(us->i("mainwindow/dataTabIndex"), ui->dataTabWidget->count() - 1));
-
-    connect(ui->settingsTabWidget, &QTabWidget::currentChanged, this, [=](int index) {
-        us->set("mainwindow/settingsTabIndex", index);
-    });
-    connect(ui->auxiliaryTabWidget, &QTabWidget::currentChanged, this, [=](int index) {
-        us->set("mainwindow/auxiliaryTabIndex", index);
-    });
-    connect(ui->dataTabWidget, &QTabWidget::currentChanged, this, [=](int index) {
-        us->set("mainwindow/dataTabIndex", index);
-    });
+    // AppBar
+    ui->drawerButton->setFixedSize(us->widgetSize, us->widgetSize);
+    ui->menuButton->setFixedSize(us->widgetSize, us->widgetSize);
+    setButton(ui->drawerButton);
+    setButton(ui->menuButton);
+    setShadow(ui->appbarWidget, 0, 3);
 
     // 应用更改按钮
-    confirmButton = new InteractiveButtonBase("应用更改", this);
-    confirmButton->setBorderColor(Qt::gray);
-    confirmButton->setFixedForeSize();
+    confirmButton = new WaterCircleButton(this);
+    confirmButton->setBgColor(us->themeMainColor);
+    confirmButton->setFixedSize(us->widgetSize * 1.5, us->widgetSize * 1.5);
+    confirmButton->setIcon(QIcon(":/icons/apply"));
+    setButton(confirmButton);
     confirmButton->setCursor(Qt::PointingHandCursor);
-    confirmButton->setFixedForePos();
-    confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.1, confirmButton->height() + confirmButton->width()*0.1));
-    confirmButton->setFocusPolicy(Qt::StrongFocus);
-    if (ui->sideButtons->currentRow() == 2)
-        confirmButton->hide();
-}
-
-void MainWindow::on_sideButtons_currentRowChanged(int currentRow)
-{
-    ui->stackedWidget->setCurrentIndex(currentRow);
-    us->set("mainwindow/sideIndex", currentRow);
-
-    // 只有设置才显示应用更改
-    if (confirmButton)
-    {
-        if (currentRow == 0 || currentRow == 1)
-            this->confirmButton->show();
-        else
-            this->confirmButton->hide();
-    }
+    setShadow(confirmButton, 0, 5);
 }
 
 QRect MainWindow::screenGeometry() const

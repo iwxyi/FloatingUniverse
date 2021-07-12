@@ -42,5 +42,8 @@
         <file alias="select_color">icons/select_color.png</file>
         <file alias="rounded_rect">icons/rounded_rect.png</file>
         <file alias="round_corner">icons/round_corner.png</file>
+        <file alias="point_menu">icons/point_menu.png</file>
+        <file alias="drawer_menu">icons/drawer_menu.png</file>
+        <file alias="apply">icons/apply.png</file>
     </qresource>
 </RCC>

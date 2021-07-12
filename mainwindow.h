@@ -7,12 +7,14 @@
 #if defined(ENABLE_SHORTCUT)
 #include "qxtglobalshortcut.h"
 #endif
-#include "interactivebuttonbase.h"
+#include "watercirclebutton.h"
 #include "panel/universepanel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+
 
 class QListWidgetItem;
 
@@ -25,7 +27,6 @@ public:
 
 private slots:
     void trayAction(QSystemTrayIcon::ActivationReason reason);
-    void on_sideButtons_currentRowChanged(int currentRow);
 
 private:
     void initView();
@@ -54,6 +55,6 @@ private:
     HWND prevWindow = nullptr;
 #endif
     UniversePanel* panel = nullptr;
-    InteractiveButtonBase *confirmButton = nullptr;
+    WaterCircleButton *confirmButton = nullptr;
 };
 #endif // MAINWINDOW_H

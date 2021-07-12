@@ -10,7 +10,6 @@
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QScreen>
-#include <QGraphicsDropShadowEffect>
 #include <QMenu>
 #include <QAction>
 #include "facilemenuitem.h"

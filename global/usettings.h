@@ -40,10 +40,12 @@ public:
     int panelGrabBlurRadius = 64; // 毛玻璃背景模糊半径
     int panelGrabBlurOpacity = 32; // 毛玻璃透明度
 
+    int widgetSize = 32;
     int fluentRadius = 5;
 
     bool useFacileDirMenu = false; // 默认使用快速打开
     int facileDirMenuLevel = 5; // 最多显示3级文件
+    QColor themeMainColor = QColor(51, 103, 214); // #3367D6
 };
 
 extern USettings* us;

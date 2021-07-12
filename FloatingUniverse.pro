@@ -51,6 +51,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     global/runtime.cpp \
+    third_party/interactive_buttons/watercirclebutton.cpp \
     third_party/slim_scroll_bar/slimscrollbar.cpp \
     third_party/slim_scroll_bar/slimscrollbarpopup.cpp \
     third_party/smooth_scroll/smoothlistwidget.cpp \
@@ -73,6 +74,7 @@ HEADERS += \
     panel/resizeableitembase.h \
     panel/universepanel.h \
     resources/resource.rc \
+    third_party/interactive_buttons/watercirclebutton.h \
     third_party/slim_scroll_bar/slimscrollbar.h \
     third_party/slim_scroll_bar/slimscrollbarpopup.h \
     third_party/smooth_scroll/smoothlistwidget.h \
