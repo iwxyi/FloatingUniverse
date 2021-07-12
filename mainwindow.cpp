@@ -52,9 +52,7 @@ void MainWindow::initView()
 
     // AppBar
     ui->drawerButton->setFixedSize(us->widgetSize, us->widgetSize);
-    ui->menuButton->setFixedSize(us->widgetSize, us->widgetSize);
     setButton(ui->drawerButton);
-    setButton(ui->menuButton);
     setShadow(ui->appbarWidget, 0, 3);
 
     // 应用更改按钮
@@ -103,14 +101,18 @@ void MainWindow::initView()
 
         groupLabels.append(label);
         groupBoxes.append(w);
-        setShadow(w, 0, 8);
+
+        QGraphicsDropShadowEffect *shadow_effect = new QGraphicsDropShadowEffect(w);
+        shadow_effect->setOffset(0, 1);
+        shadow_effect->setColor(Qt::lightGray);
+        shadow_effect->setBlurRadius(8);
+        w->setGraphicsEffect(shadow_effect);
     };
 
     addSettingsGroupWidget(new QWidget(ui->scrollAreaWidgetContents), "测试");
 
     // 调整body的大小
     adjustSettingsGroupSize();
-
 }
 
 QRect MainWindow::screenGeometry() const
@@ -210,7 +212,7 @@ void MainWindow::adjustSettingsGroupSize()
     const int groupSpacing = 12;
     const int labelSpacing = 9;
     const int left = qMax(margin, (ui->scrollAreaWidgetContents->width() - fixedWidth) / 2);
-    int top = 9;
+    int top = 18;
     for (int i = 0; i < groupLabels.size(); i++)
     {
         auto label = groupLabels.at(i);
@@ -219,7 +221,7 @@ void MainWindow::adjustSettingsGroupSize()
         box->setFixedWidth(fixedWidth);
         label->adjustSize();
         box->adjustSize();
-        box->setMinimumHeight(32);
+        box->setMinimumHeight(64);
 
         label->move(left, top);
         top += label->height() + labelSpacing;
@@ -228,7 +230,9 @@ void MainWindow::adjustSettingsGroupSize()
         top += box->height() + groupSpacing;
     }
 
-    ui->scrollAreaWidgetContents->setFixedHeight(top);
+    ui->scrollAreaWidgetContents->setFixedHeight(top + labelSpacing);
+    ui->searchBox->setMaximumWidth(fixedWidth);
+    ui->spacerWidget->setFixedWidth(ui->scrollArea->x() + left - ui->spacerWidget->x());
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

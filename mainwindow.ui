@@ -54,18 +54,21 @@
 	background: #3367d6;
 }</string>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,1,0">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
-        <number>9</number>
+        <number>6</number>
        </property>
        <property name="topMargin">
-        <number>9</number>
+        <number>6</number>
        </property>
        <property name="rightMargin">
-        <number>9</number>
+        <number>6</number>
        </property>
        <property name="bottomMargin">
-        <number>9</number>
+        <number>6</number>
        </property>
        <item>
         <widget class="WaterCircleButton" name="drawerButton">
@@ -79,28 +82,82 @@
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer">
+        <widget class="QWidget" name="spacerWidget" native="true"/>
+       </item>
+       <item>
+        <widget class="QWidget" name="searchBox" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>300</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">#searchBox
+{
+	background: #2850a7
+}</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+           <number>3</number>
+          </property>
+          <property name="leftMargin">
+           <number>3</number>
+          </property>
+          <property name="topMargin">
+           <number>3</number>
+          </property>
+          <property name="rightMargin">
+           <number>3</number>
+          </property>
+          <property name="bottomMargin">
+           <number>3</number>
+          </property>
+          <item>
+           <widget class="WaterCircleButton" name="pushButton">
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resources/resources.qrc">
+              <normaloff>:/icons/search</normaloff>:/icons/search</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="searchEdit">
+            <property name="styleSheet">
+             <string notr="true">#searchEdit
+{
+	background: transparent;
+	border: none;
+	color: white;
+}</string>
+            </property>
+            <property name="placeholderText">
+             <string>在设置中搜索</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>40</width>
+           <width>0</width>
            <height>20</height>
           </size>
          </property>
         </spacer>
-       </item>
-       <item>
-        <widget class="WaterCircleButton" name="menuButton">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="resources/resources.qrc">
-           <normaloff>:/icons/point_menu</normaloff>:/icons/point_menu</iconset>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -135,6 +192,7 @@
 {
 	background: transparent;
 	border: none;
+	padding-top: 6px;
 }</string>
         </property>
         <property name="selectionMode">

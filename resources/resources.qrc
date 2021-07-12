@@ -51,5 +51,6 @@
         <file alias="universe2">icons/universe2.png</file>
         <file alias="panel">icons/panel.png</file>
         <file alias="auto_fill">icons/auto_fill.png</file>
+        <file alias="search">icons/search.png</file>
     </qresource>
 </RCC>
