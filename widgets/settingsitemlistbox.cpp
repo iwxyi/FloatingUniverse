@@ -3,6 +3,9 @@
 #include <QStyleOption>
 #include "settingsitemlistbox.h"
 #include "usettings.h"
+#include "third_party/sapid_switch/boundaryswitchbase.h"
+#include "third_party/sapid_switch/lovelyheartswitch.h"
+#include "third_party/sapid_switch/normalswitch.h"
 
 SettingsItemListBox::SettingsItemListBox(QWidget *parent) : QWidget(parent)
 {
@@ -14,7 +17,19 @@ SettingsItemListBox::SettingsItemListBox(QWidget *parent) : QWidget(parent)
 void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, bool *val)
 {
     auto btn = createBg(pixmap, text, desc);
+    auto layout = static_cast<QHBoxLayout*>(btn->layout());
+    auto swtch = new NormalSwitch(*val, btn);
+    swtch->setSuitableHeight(4);
+    layout->addWidget(swtch);
 
+    auto changed = [=](bool v){
+        *val = v;
+    };
+    connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
+        changed(!*val);
+        swtch->setState(*val);
+    });
+    connect(swtch, &SapidSwitchBase::stateChanged, btn, [=](bool v){ changed(v); });
 }
 
 void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, int *val)
@@ -40,7 +55,6 @@ void SettingsItemListBox::addOpen(QPixmap pixmap, QString text, QString desc)
 InteractiveButtonBase *SettingsItemListBox::createBg(QPixmap pixmap, QString text, QString desc)
 {
     InteractiveButtonBase* btn = new InteractiveButtonBase(this);
-    items.append(btn);
 
     btn->setCursor(Qt::PointingHandCursor);
 
@@ -77,7 +91,18 @@ InteractiveButtonBase *SettingsItemListBox::createBg(QPixmap pixmap, QString tex
     }
     hlayout->addLayout(vlayout);
     btn->setFixedHeight(hintHeight += hlayout->margin() * 2);
+
+    if (items.size())
+    {
+        // 添加分割线
+        QWidget* w = new QWidget(this);
+        w->setFixedHeight(1);
+        w->setStyleSheet("background-color: #20888888");
+        mainLayout->addWidget(w);
+        w->setCursor(Qt::PointingHandCursor);
+    }
     mainLayout->addWidget(btn);
+    items.append(btn);
     return btn;
 }
 

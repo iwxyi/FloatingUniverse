@@ -52,6 +52,10 @@ SOURCES += \
     mainwindow.cpp \
     global/runtime.cpp \
     third_party/interactive_buttons/watercirclebutton.cpp \
+    third_party/sapid_switch/boundaryswitchbase.cpp \
+    third_party/sapid_switch/lovelyheartswitch.cpp \
+    third_party/sapid_switch/normalswitch.cpp \
+    third_party/sapid_switch/sapidswitchbase.cpp \
     third_party/slim_scroll_bar/slimscrollbar.cpp \
     third_party/slim_scroll_bar/slimscrollbarpopup.cpp \
     third_party/smooth_scroll/smoothlistwidget.cpp \
@@ -77,6 +81,10 @@ HEADERS += \
     panel/universepanel.h \
     resources/resource.rc \
     third_party/interactive_buttons/watercirclebutton.h \
+    third_party/sapid_switch/boundaryswitchbase.h \
+    third_party/sapid_switch/lovelyheartswitch.h \
+    third_party/sapid_switch/normalswitch.h \
+    third_party/sapid_switch/sapidswitchbase.h \
     third_party/slim_scroll_bar/slimscrollbar.h \
     third_party/slim_scroll_bar/slimscrollbarpopup.h \
     third_party/smooth_scroll/smoothlistwidget.h \
