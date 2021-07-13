@@ -26,4 +26,9 @@ void USettings::restoreSettings()
     assign(fastOpenDir, "fastOpenDir");
     assign(fastOpenDirLevel, "fastOpenDirLevel");
     endGroup();
+
+    beginGroup("usage");
+    assign(bootCount, "bootCount");
+    assign(linkOpenCount, "linkOpenCount");
+    endGroup();
 }

@@ -65,5 +65,8 @@
         <file>st/TODO.png</file>
         <file>st/fastOpenDirLevel.png</file>
         <file>st/fastOpenDir.png</file>
+        <file>st/bootCount.png</file>
+        <file>st/linkOpenCount.png</file>
+        <file alias="space_transmission">icons/space_transmission.png</file>
     </qresource>
 </RCC>

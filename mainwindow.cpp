@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
     initView();
     initTray();
     initPanel();
+
+    us->set("usage/bootCount", ++us->bootCount);
 }
 
 MainWindow::~MainWindow()
@@ -98,9 +100,9 @@ void MainWindow::initView()
         });
     };
     addGroupItem(QPixmap(":/icons/panel"), "悬浮面板");
-    addGroupItem(QPixmap(":/icons/universe2"), "宇宙之星");
-    addGroupItem(QPixmap(":/icons/interaction"), "空间传送");
-    addGroupItem(QPixmap(":/icons/auto_fill"), "自动填充");
+    addGroupItem(QPixmap(":/icons/universe2"), "宇宙荧光");
+    addGroupItem(QPixmap(":/icons/space_transmission"), "空间传送");
+    addGroupItem(QPixmap(":/icons/interaction"), "交互优化");
     addGroupItem(QPixmap(":/icons/used_data"), "使用数据");
     addGroupItem(QPixmap(":/icons/about"), "关于程序");
 

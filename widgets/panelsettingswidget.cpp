@@ -31,7 +31,7 @@ void PanelSettingsWidget::initItems()
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/iconSize"), "图标大小", "最大尺寸(非强制,可能更小)，新图标生效", "panel/iconSize", &us->panelIconSize, 16, 255, 16);
-    addGroup(w, "宇宙之星");
+    addGroup(w, "宇宙荧光");
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/TODO"), "待添加", "");
@@ -44,7 +44,10 @@ void PanelSettingsWidget::initItems()
     addGroup(w, "交互优化");
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
-    w->add(QPixmap(":/icons/st/TODO"), "待添加", "");
+    w->add(QPixmap(":/icons/st/bootCount"), "程序启动次数", "", "panel/bootCount", &us->bootCount, 0, 0, 1);
+    w->lastItem()->setEnabled(false);
+    w->add(QPixmap(":/icons/st/linkOpenCount"), "打开链接次数", "", "panel/linkOpenCount", &us->linkOpenCount, 0, 0, 1);
+    w->lastItem()->setEnabled(false);
     addGroup(w, "使用数据");
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);

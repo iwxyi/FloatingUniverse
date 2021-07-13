@@ -505,6 +505,7 @@ void IconTextItem::triggerEvent()
             }
         }
         QDesktopServices::openUrl(link);
+        us->set("usage/linkOpenCount", ++us->linkOpenCount);
 
         jump();
         if (hideAfterTrigger)
