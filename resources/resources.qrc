@@ -52,5 +52,18 @@
         <file alias="panel">icons/panel.png</file>
         <file alias="auto_fill">icons/auto_fill.png</file>
         <file alias="search">icons/search.png</file>
+        <file>st/open_url.png</file>
+        <file>st/bgColor.png</file>
+        <file>st/blurRadius.png</file>
+        <file>st/hoverEdgeColor.png</file>
+        <file>st/selectBgColor.png</file>
+        <file>st/selectEdgeColor.png</file>
+        <file>st/blurOpacity.png</file>
+        <file>st/fileName.png</file>
+        <file>st/iconSize.png</file>
+        <file>st/GitHub.png</file>
+        <file>st/TODO.png</file>
+        <file>st/fastOpenDirLevel.png</file>
+        <file>st/fastOpenDir.png</file>
     </qresource>
 </RCC>

@@ -12,11 +12,15 @@ class SettingsItemListBox : public QWidget
 public:
     explicit SettingsItemListBox(QWidget *parent = nullptr);
 
+    void add(QPixmap pixmap, QString text, QString desc);
     void add(QPixmap pixmap, QString text, QString desc, QString key, bool* val);
-    void add(QPixmap pixmap, QString text, QString desc, QString key, int* val, int min = 0, int max = 99999, int step = 1);
+    void add(QPixmap pixmap, QString text, QString desc, QString key, int* val, int min, int max, int step);
     void add(QPixmap pixmap, QString text, QString desc, QString key, QString* val);
     void add(QPixmap pixmap, QString text, QString desc, QString key, QColor* val);
     void addOpen(QPixmap pixmap, QString text, QString desc, QString payload);
+    void addOpen(QPixmap pixmap, QString text, QString desc, QUrl url);
+
+    InteractiveButtonBase* lastItem() const;
 
 private:
     InteractiveButtonBase* createBg(QPixmap pixmap, QString text, QString desc);
@@ -33,6 +37,7 @@ protected:
 private:
     QVBoxLayout* mainLayout;
     QList<InteractiveButtonBase*> items;
+    InteractiveButtonBase* _lastItem = nullptr;
 };
 
 #endif // SETTINGSITEMLISTBOX_H

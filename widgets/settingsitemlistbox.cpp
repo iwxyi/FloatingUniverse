@@ -3,6 +3,7 @@
 #include <QStyleOption>
 #include <QInputDialog>
 #include <QColorDialog>
+#include <QDesktopServices>
 #include "settingsitemlistbox.h"
 #include "usettings.h"
 #include "sapid_switch/boundaryswitchbase.h"
@@ -16,6 +17,11 @@ SettingsItemListBox::SettingsItemListBox(QWidget *parent) : QWidget(parent)
     mainLayout = new QVBoxLayout(this);
     mainLayout->setMargin(0);
     mainLayout->setSpacing(0);
+}
+
+void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc)
+{
+    createBg(pixmap, text, desc);
 }
 
 void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString key, bool *val)
@@ -107,10 +113,31 @@ void SettingsItemListBox::addOpen(QPixmap pixmap, QString text, QString desc, QS
     auto layout = static_cast<QHBoxLayout*>(btn->layout());
     auto label = new QLabel(btn);
     label->setPixmap(QPixmap(":/icons/sub_menu_arrow"));
+    label->setScaledContents(true);
+    label->setFixedSize(20, 20);
     layout->addWidget(label);
     connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
         emit openPage(payload);
     });
+}
+
+void SettingsItemListBox::addOpen(QPixmap pixmap, QString text, QString desc, QUrl url)
+{
+    auto btn = createBg(pixmap, text, desc);
+    auto layout = static_cast<QHBoxLayout*>(btn->layout());
+    auto label = new QLabel(btn);
+    label->setPixmap(QPixmap(":/icons/st/open_url.png"));
+    label->setScaledContents(true);
+    label->setFixedSize(20, 20);
+    layout->addWidget(label);
+    connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
+        QDesktopServices::openUrl(url);
+    });
+}
+
+InteractiveButtonBase *SettingsItemListBox::lastItem() const
+{
+    return _lastItem;
 }
 
 InteractiveButtonBase *SettingsItemListBox::createBg(QPixmap pixmap, QString text, QString desc)
@@ -165,6 +192,7 @@ InteractiveButtonBase *SettingsItemListBox::createBg(QPixmap pixmap, QString tex
     }
     mainLayout->addWidget(btn);
     items.append(btn);
+    _lastItem = btn;
     return btn;
 }
 

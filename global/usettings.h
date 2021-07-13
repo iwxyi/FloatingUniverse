@@ -41,9 +41,11 @@ public:
     int widgetSize = 32;
     int fluentRadius = 5;
 
-    bool useFacileDirMenu = false; // 默认使用快速打开
-    int facileDirMenuLevel = 5; // 最多显示3级文件
+    bool fastOpenDir = false; // 默认使用快速打开
+    int fastOpenDirLevel = 5; // 最多显示3级文件
     QColor themeMainColor = QColor(51, 103, 214); // #3367D6
+
+    bool modifyFileNameSync = true; // 询问同步修改文件名
 };
 
 extern USettings* us;

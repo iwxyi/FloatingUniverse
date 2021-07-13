@@ -20,4 +20,10 @@ void USettings::restoreSettings()
     assign(panelBlurOpacity, "blurOpacity");
     assign(panelIconSize, "iconSize");
     endGroup();
+
+    beginGroup("interactive");
+    assign(modifyFileNameSync, "modifyFileNameSync");
+    assign(fastOpenDir, "fastOpenDir");
+    assign(fastOpenDirLevel, "fastOpenDirLevel");
+    endGroup();
 }

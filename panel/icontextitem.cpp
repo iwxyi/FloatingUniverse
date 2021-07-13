@@ -361,7 +361,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         adjustSize();
 
         // 询问是否修改文件名
-        if (isFileExist(link))
+        if (us->modifyFileNameSync && isFileExist(link))
         {
             QFileInfo info(link);
             if (info.exists())
@@ -370,6 +370,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
                 if (fileName == oldName && canBeFileName(newName))
                 {
                     int recentRename = us->i("recent/renameFileSync", 0);
+                    recentRename = 0; // 强制默认修改，而不是上一次的选项
                     if ((recentRename = QMessageBox::question(this, "重命名", "是否同步修改文件名", "修改", "取消", nullptr, recentRename)) == 0)
                     {
                         QString newLink;
