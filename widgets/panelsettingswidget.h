@@ -28,12 +28,6 @@ signals:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
-    /* void addBool(QIcon icon, QString text, QString desc, bool* val);
-    void addInt(QIcon icon, QString text, QString desc, int* val);
-    void addString(QIcon icon, QString text, QString desc, QString* val);
-    void addColor(QIcon icon, QString text, QString desc, QColor* val);
-    void addOpen(QIcon icon, QString text, QString desc); */
-
 private:
     QList<QLabel*> labels;
     QList<QWidget*> boxes;

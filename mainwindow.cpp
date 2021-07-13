@@ -65,11 +65,16 @@ void MainWindow::initView()
 
     // sidebar
     auto addGroupItem = [=](QPixmap pixmap, QString groupName) {
+        const int margin = 12;
+        const int spacingAdd = 6;
+
         InteractiveButtonBase* w = new InteractiveButtonBase(ui->sidebarList);
         QLabel* pixmapLabel = new QLabel(w);
         QLabel* titleLabel = new QLabel(w);
         QHBoxLayout* layout = new QHBoxLayout(w);
+        layout->addSpacing(spacingAdd);
         layout->addWidget(pixmapLabel);
+        layout->addSpacing(spacingAdd);
         layout->addWidget(titleLabel);
         pixmapLabel->setPixmap(pixmap);
         pixmapLabel->setScaledContents(true);
@@ -77,7 +82,9 @@ void MainWindow::initView()
         titleLabel->adjustSize();
         int sz = titleLabel->height();
         pixmapLabel->setFixedSize(sz, sz);
-        layout->setMargin(layout->margin() * 1.3);
+
+        layout->setMargin(margin);
+        layout->setSpacing(margin);
 
         auto item = new QListWidgetItem(ui->sidebarList);
         ui->sidebarList->setItemWidget(item, w);
@@ -158,9 +165,14 @@ void MainWindow::trayAction(QSystemTrayIcon::ActivationReason reason)
     {
         FacileMenu* menu = new FacileMenu;
 
+        menu->addAction(QIcon("://icons/hide.png"), "隐藏", [=]{
+            if (panel->isHidden())
+                panel->show();
+            else
+                panel->hide();
+        })->check(panel->isHidden());
 
-
-        menu->split()->addAction(QIcon("://icons/quit.png"), "退出", [=] {
+        menu->split()->addAction(QIcon("://icons/quit.png"), "退出", [=]{
             qApp->quit();
         });
 

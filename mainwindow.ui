@@ -130,6 +130,12 @@
           </item>
           <item>
            <widget class="QLineEdit" name="searchEdit">
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="styleSheet">
              <string notr="true">#searchEdit
 {
@@ -180,7 +186,7 @@
        <widget class="QListWidget" name="sidebarList">
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>180</width>
           <height>16777215</height>
          </size>
         </property>
@@ -199,7 +205,7 @@
          <enum>QAbstractItemView::NoSelection</enum>
         </property>
         <property name="spacing">
-         <number>2</number>
+         <number>0</number>
         </property>
        </widget>
       </item>

@@ -2,6 +2,7 @@
 #include <QScrollBar>
 #include "panelsettingswidget.h"
 #include "ui_panelsettingswidget.h"
+#include "usettings.h"
 
 PanelSettingsWidget::PanelSettingsWidget(QWidget *parent) :
     QWidget(parent),
@@ -19,7 +20,17 @@ PanelSettingsWidget::~PanelSettingsWidget()
 
 void PanelSettingsWidget::initItems()
 {
-    addGroup(new QWidget(ui->scrollAreaWidgetContents), "悬浮面板");
+    auto w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
+    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    addGroup(w, "悬浮面板");
+
     addGroup(new QWidget(ui->scrollAreaWidgetContents), "宇宙传送");
     addGroup(new QWidget(ui->scrollAreaWidgetContents), "交互优化");
     addGroup(new QWidget(ui->scrollAreaWidgetContents), "自动填充");
@@ -32,7 +43,8 @@ void PanelSettingsWidget::addGroup(QWidget *w, QString name)
     QLabel* label = new QLabel(name, ui->scrollAreaWidgetContents);
     label->setStyleSheet("color: #202020; margin: 0.3px;");
     w->setObjectName("SettingsGroup");
-    w->setStyleSheet("#SettingsGroup{ background: white; border: none; border-radius: 5px; }");
+    w->setStyleSheet("#SettingsGroup, SettingsItemListBox{ background: white; border: none; border-radius: 5px; }");
+    w->adjustSize();
 
     labels.append(label);
     boxes.append(w);
