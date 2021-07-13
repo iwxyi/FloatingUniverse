@@ -29,7 +29,8 @@ INCLUDEPATH += third_party/color_octree/\
     third_party/facile_menu/\
     third_party/interactive_buttons/\
     third_party/utils/\
-    global\
+    third_party/\
+    global/\
     widgets/
 
 SOURCES += \
@@ -62,6 +63,8 @@ SOURCES += \
     third_party/utils/fileutil.cpp \
     third_party/utils/stringutil.cpp \
     third_party/utils/textinputdialog.cpp \
+    widgets/anicirclelabel.cpp \
+    widgets/aninumberlabel.cpp \
     widgets/panelsettingswidget.cpp \
     widgets/settingsitemlistbox.cpp
 
@@ -105,6 +108,8 @@ HEADERS += \
     third_party/utils/pinyinutil.h \
     third_party/utils/stringutil.h \
     third_party/utils/textinputdialog.h \
+    widgets/anicirclelabel.h \
+    widgets/aninumberlabel.h \
     widgets/clicklabel.h \
     widgets/customtabstyle.h \
     widgets/lefttabwidget.h \

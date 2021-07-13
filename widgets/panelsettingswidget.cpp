@@ -22,7 +22,7 @@ void PanelSettingsWidget::initItems()
 {
     auto w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->useFacileDirMenu);
-    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "毛玻璃模糊半径", "这是一个描述", &us->panelGrabBlurRadius, 0, 255, 16);
     w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
     w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
     w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);

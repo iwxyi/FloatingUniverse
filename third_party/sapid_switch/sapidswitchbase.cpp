@@ -23,6 +23,11 @@ void SapidSwitchBase::setSuitableHeight(int h)
     setMaximumSize(h * 3, h);
 }
 
+void SapidSwitchBase::setSuitableWidth(int w)
+{
+    setMaximumSize(w, w / 3);
+}
+
 void SapidSwitchBase::setState(bool state)
 {
     bool toggle = state != currentState;

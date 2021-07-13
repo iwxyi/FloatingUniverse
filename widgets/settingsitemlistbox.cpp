@@ -1,11 +1,15 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QStyleOption>
+#include <QInputDialog>
+#include <QColorDialog>
 #include "settingsitemlistbox.h"
 #include "usettings.h"
-#include "third_party/sapid_switch/boundaryswitchbase.h"
-#include "third_party/sapid_switch/lovelyheartswitch.h"
-#include "third_party/sapid_switch/normalswitch.h"
+#include "sapid_switch/boundaryswitchbase.h"
+#include "sapid_switch/lovelyheartswitch.h"
+#include "sapid_switch/normalswitch.h"
+#include "anicirclelabel.h"
+#include "aninumberlabel.h"
 
 SettingsItemListBox::SettingsItemListBox(QWidget *parent) : QWidget(parent)
 {
@@ -19,7 +23,7 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, bool *
     auto btn = createBg(pixmap, text, desc);
     auto layout = static_cast<QHBoxLayout*>(btn->layout());
     auto swtch = new NormalSwitch(*val, btn);
-    swtch->setSuitableHeight(4);
+    swtch->setSuitableWidth(us->widgetSize);
     layout->addWidget(swtch);
 
     auto changed = [=](bool v){
@@ -32,9 +36,28 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, bool *
     connect(swtch, &SapidSwitchBase::stateChanged, btn, [=](bool v){ changed(v); });
 }
 
-void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, int *val)
+void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, int *val, int min, int max, int step)
 {
     auto btn = createBg(pixmap, text, desc);
+    auto layout = static_cast<QHBoxLayout*>(btn->layout());
+    auto label = new AniNumberLabel(*val, btn);
+    label->setAlignment(Qt::AlignCenter);
+    label->setFixedWidth(us->widgetSize);
+    layout->addWidget(label);
+
+    auto changed = [=](int v) {
+        *val = v;
+    };
+    connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
+        bool ok = false;
+        int x = QInputDialog::getInt(this, desc.isEmpty() ? "输入数值" : text,
+                                     desc.isEmpty() ? text : desc,
+                                     *val, min, max, step, &ok);
+        if (!ok)
+            return ;
+        changed(x);
+        label->setShowNum(x);
+    });
 }
 
 void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString *val)
@@ -45,6 +68,21 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QStrin
 void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QColor *val)
 {
     auto btn = createBg(pixmap, text, desc);
+    auto layout = static_cast<QHBoxLayout*>(btn->layout());
+    auto label = new AniCircleLabel(*val, btn);
+    layout->addWidget(label);
+    label->setFixedSize(us->widgetSize, us->widgetSize);
+
+    auto changed = [=](QColor v) {
+        *val = v;
+    };
+    connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
+        QColor c = QColorDialog::getColor(*val, this, text, QColorDialog::ShowAlphaChannel);
+        if (!c.isValid())
+            return ;
+        changed(c);
+        label->setMainColor(c);
+    });
 }
 
 void SettingsItemListBox::addOpen(QPixmap pixmap, QString text, QString desc)
@@ -90,6 +128,7 @@ InteractiveButtonBase *SettingsItemListBox::createBg(QPixmap pixmap, QString tex
         hintHeight += descLabel->height() + vlayout->spacing();
     }
     hlayout->addLayout(vlayout);
+    hlayout->setStretch(hlayout->count() - 1, 1);
     btn->setFixedHeight(hintHeight += hlayout->margin() * 2);
 
     if (items.size())

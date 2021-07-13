@@ -21,8 +21,6 @@ private:
     void restoreSettings();
 
 public:
-
-public:
     Side panelFloatSide = SideTop; // 边：0上，1左，2右，3下，-1任意
     int panelCenterOffset = 0; // 中心点偏移
     int panelWidth = 1000;

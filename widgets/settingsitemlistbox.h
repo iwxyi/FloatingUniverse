@@ -13,7 +13,7 @@ public:
     explicit SettingsItemListBox(QWidget *parent = nullptr);
 
     void add(QPixmap pixmap, QString text, QString desc, bool* val);
-    void add(QPixmap pixmap, QString text, QString desc, int* val);
+    void add(QPixmap pixmap, QString text, QString desc, int* val, int min = 0, int max = 99999, int step = 1);
     void add(QPixmap pixmap, QString text, QString desc, QString* val);
     void add(QPixmap pixmap, QString text, QString desc, QColor* val);
     void addOpen(QPixmap pixmap, QString text, QString desc);

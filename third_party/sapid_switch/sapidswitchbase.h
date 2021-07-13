@@ -25,6 +25,7 @@ public:
     bool isChecked() const;
 
     virtual void setSuitableHeight(int h);
+    virtual void setSuitableWidth(int w);
 
 signals:
     void stateChanged(bool state);
