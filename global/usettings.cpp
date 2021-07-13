@@ -12,5 +12,12 @@ void USettings::restoreSettings()
     assign(panelWidth, "width");
     assign(panelHeight, "height");
     panelBangWidth = panelWidth * 0.8;
+    assign(panelBgColor, "bgColor");
+    assign(panelSelectRectColor, "selectRectColor");
+    assign(panelSelectEdgeColor, "selectEdgeColor");
+    assign(panelHoverEdgeColor, "hoverEdgeColor");
+    assign(panelBlurRadius, "blurRadius");
+    assign(panelBlurOpacity, "blurOpacity");
+    assign(panelIconSize, "iconSize");
     endGroup();
 }

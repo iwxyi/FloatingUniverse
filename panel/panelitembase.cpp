@@ -238,7 +238,7 @@ void PanelItemBase::selectEvent(const QPoint &startPos)
         selectWidget->setGeometry(getSelectorBorder());
     }
 
-    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
+    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdgeColor).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
     selectWidget->raise();
     selectWidget->show();
 }
@@ -259,7 +259,7 @@ void PanelItemBase::hoverEvent(const QPoint &startPos)
         selectWidget->setGeometry(getSelectorBorder());
     }
 
-    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdge).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
+    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdgeColor).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
     selectWidget->raise();
     selectWidget->show();
 }

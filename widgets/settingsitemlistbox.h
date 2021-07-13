@@ -12,16 +12,17 @@ class SettingsItemListBox : public QWidget
 public:
     explicit SettingsItemListBox(QWidget *parent = nullptr);
 
-    void add(QPixmap pixmap, QString text, QString desc, bool* val);
-    void add(QPixmap pixmap, QString text, QString desc, int* val, int min = 0, int max = 99999, int step = 1);
-    void add(QPixmap pixmap, QString text, QString desc, QString* val);
-    void add(QPixmap pixmap, QString text, QString desc, QColor* val);
-    void addOpen(QPixmap pixmap, QString text, QString desc);
+    void add(QPixmap pixmap, QString text, QString desc, QString key, bool* val);
+    void add(QPixmap pixmap, QString text, QString desc, QString key, int* val, int min = 0, int max = 99999, int step = 1);
+    void add(QPixmap pixmap, QString text, QString desc, QString key, QString* val);
+    void add(QPixmap pixmap, QString text, QString desc, QString key, QColor* val);
+    void addOpen(QPixmap pixmap, QString text, QString desc, QString payload);
 
 private:
     InteractiveButtonBase* createBg(QPixmap pixmap, QString text, QString desc);
 
 signals:
+    void openPage(QString payload);
 
 public slots:
     void adjusItemsSize();

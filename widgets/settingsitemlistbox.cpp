@@ -18,7 +18,7 @@ SettingsItemListBox::SettingsItemListBox(QWidget *parent) : QWidget(parent)
     mainLayout->setSpacing(0);
 }
 
-void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, bool *val)
+void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString key, bool *val)
 {
     auto btn = createBg(pixmap, text, desc);
     auto layout = static_cast<QHBoxLayout*>(btn->layout());
@@ -27,7 +27,7 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, bool *
     layout->addWidget(swtch);
 
     auto changed = [=](bool v){
-        *val = v;
+        us->set(key, *val = v);
     };
     connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
         changed(!*val);
@@ -36,7 +36,7 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, bool *
     connect(swtch, &SapidSwitchBase::stateChanged, btn, [=](bool v){ changed(v); });
 }
 
-void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, int *val, int min, int max, int step)
+void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString key, int *val, int min, int max, int step)
 {
     auto btn = createBg(pixmap, text, desc);
     auto layout = static_cast<QHBoxLayout*>(btn->layout());
@@ -46,7 +46,7 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, int *v
     layout->addWidget(label);
 
     auto changed = [=](int v) {
-        *val = v;
+        us->set(key, *val = v);
     };
     connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
         bool ok = false;
@@ -60,21 +60,37 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, int *v
     });
 }
 
-void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString *val)
+void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString key, QString *val)
 {
     auto btn = createBg(pixmap, text, desc);
+    auto layout = static_cast<QHBoxLayout*>(btn->layout());
+    QLabel* label = new QLabel(*val, btn);
+    layout->addWidget(label);
+
+    auto changed = [=](QString v) {
+        us->set(key, *val = v);
+    };
+    connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
+        bool ok = false;
+        QString s = QInputDialog::getText(this, desc.isEmpty() ? "输入文字" : text,
+                                     desc.isEmpty() ? text : desc, QLineEdit::Normal, *val, &ok);
+        if (!ok)
+            return ;
+        changed(s);
+        label->setText(s);
+    });
 }
 
-void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QColor *val)
+void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString key, QColor *val)
 {
     auto btn = createBg(pixmap, text, desc);
     auto layout = static_cast<QHBoxLayout*>(btn->layout());
     auto label = new AniCircleLabel(*val, btn);
     layout->addWidget(label);
-    label->setFixedSize(us->widgetSize, us->widgetSize);
+    label->setFixedWidth(us->widgetSize);
 
     auto changed = [=](QColor v) {
-        *val = v;
+        us->set(key, *val = v);
     };
     connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
         QColor c = QColorDialog::getColor(*val, this, text, QColorDialog::ShowAlphaChannel);
@@ -85,9 +101,16 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QColor
     });
 }
 
-void SettingsItemListBox::addOpen(QPixmap pixmap, QString text, QString desc)
+void SettingsItemListBox::addOpen(QPixmap pixmap, QString text, QString desc, QString payload)
 {
     auto btn = createBg(pixmap, text, desc);
+    auto layout = static_cast<QHBoxLayout*>(btn->layout());
+    auto label = new QLabel(btn);
+    label->setPixmap(QPixmap(":/icons/sub_menu_arrow"));
+    layout->addWidget(label);
+    connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
+        emit openPage(payload);
+    });
 }
 
 InteractiveButtonBase *SettingsItemListBox::createBg(QPixmap pixmap, QString text, QString desc)

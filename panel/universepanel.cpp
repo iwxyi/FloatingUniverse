@@ -344,10 +344,10 @@ void UniversePanel::keepPanelState(FuncType func)
 void UniversePanel::expandPanel()
 {
     // 动态背景
-    if (us->panelGrabBlur && this->pos().y() <= -this->height() + 1)
+    if (us->panelBlur && this->pos().y() <= -this->height() + 1)
     {
         // 截图
-        int radius = us->panelGrabBlurRadius;
+        int radius = us->panelBlurRadius;
         QScreen* screen = QApplication::screenAt(QCursor::pos());
         QPixmap bg = screen->grabWindow(0,
                                         pos().x() - radius,
@@ -368,7 +368,7 @@ void UniversePanel::expandPanel()
         QPixmap blured(pixmap.size());
         blured.fill(Qt::transparent);
         QPainter painter2(&blured);
-        painter2.setOpacity(us->panelGrabBlurOpacity / 255.0);
+        painter2.setOpacity(us->panelBlurOpacity / 255.0);
         painter2.drawPixmap(blured.rect(), pixmap);
 
         // 裁剪掉边缘（模糊后会有黑边）
@@ -383,7 +383,7 @@ void UniversePanel::expandPanel()
     ani->setEndValue(QPoint(pos().x(), 0));
     ani->setDuration(300);
     ani->setEasingCurve(QEasingCurve::OutCubic);
-    if (us->panelGrabBlur)
+    if (us->panelBlur)
     {
         connect(ani, &QPropertyAnimation::valueChanged, this, [=]{
             update();
@@ -410,7 +410,7 @@ void UniversePanel::foldPanel()
     ani->setEndValue(QPoint(pos().x(), -height() + us->panelBangHeight));
     ani->setDuration(300);
     ani->setEasingCurve(QEasingCurve::InOutCubic);
-    if (us->panelGrabBlur)
+    if (us->panelBlur)
     {
         connect(ani, &QPropertyAnimation::valueChanged, this, [=]{
 //            repaint();
@@ -721,9 +721,9 @@ void UniversePanel::paintEvent(QPaintEvent *)
     {
         QPainterPath path;
         path.addRoundedRect(QRect(0, 0, width(), height() - us->panelBangHeight), us->fluentRadius, us->fluentRadius);
-        painter.fillPath(path, us->panelBg);
+        painter.fillPath(path, us->panelBgColor);
 
-        if (us->panelGrabBlur && !panelBlurPixmap.isNull())
+        if (us->panelBlur && !panelBlurPixmap.isNull())
         {
             QRect rect = this->rect();
             rect.moveTop(-this->y());
@@ -750,7 +750,7 @@ void UniversePanel::paintEvent(QPaintEvent *)
             QRect rect(pressPos, draggingPos);
             QPainterPath path;
             path.addRoundedRect(rect, us->fluentRadius, us->fluentRadius);
-            painter.fillPath(path, us->panelSelectBg);
+            painter.fillPath(path, us->panelSelectRectColor);
         }
     }
 }

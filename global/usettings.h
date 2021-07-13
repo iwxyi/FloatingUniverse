@@ -27,16 +27,16 @@ public:
     int panelHeight = 200;
     int panelBangHeight = 1;
     int panelBangWidth = 800;
-    QColor panelBg = QColor(240, 248, 255);
+    QColor panelBgColor = QColor(240, 248, 255);
     QColor panelBangBg = QColor(128, 128, 128, 1);
-    QColor panelSelectBg = QColor(230, 230, 250);
-    QColor panelSelectEdge = QColor(179, 153, 255);
-    QColor panelHoverEdge = QColor(204, 204, 255);
+    QColor panelSelectRectColor = QColor(230, 230, 250);
+    QColor panelSelectEdgeColor = QColor(179, 153, 255);
+    QColor panelHoverEdgeColor = QColor(204, 204, 255);
     int panelItemSize = 64; // Item大小
     int panelIconSize = 32; // 图标大小
-    bool panelGrabBlur = true;
-    int panelGrabBlurRadius = 64; // 毛玻璃背景模糊半径
-    int panelGrabBlurOpacity = 32; // 毛玻璃透明度
+    bool panelBlur = true;
+    int panelBlurRadius = 64; // 毛玻璃背景模糊半径
+    int panelBlurOpacity = 32; // 毛玻璃透明度
 
     int widgetSize = 32;
     int fluentRadius = 5;

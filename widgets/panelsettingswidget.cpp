@@ -21,11 +21,13 @@ PanelSettingsWidget::~PanelSettingsWidget()
 void PanelSettingsWidget::initItems()
 {
     auto w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
-    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->useFacileDirMenu);
-    w->add(QPixmap(":/icons/file"), "毛玻璃模糊半径", "这是一个描述", &us->panelGrabBlurRadius, 0, 255, 16);
-    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
-    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
-    w->add(QPixmap(":/icons/file"), "文本", "这是一个描述", &us->themeMainColor);
+    w->add(QPixmap(":/icons/file"), "背景颜色", "", "panel/bgColor", &us->panelBgColor);
+    w->add(QPixmap(":/icons/file"), "选择区域颜色", "", "panel/selectRectColor", &us->panelSelectRectColor);
+    w->add(QPixmap(":/icons/file"), "选中项边框颜色", "", "panel/selectEdgeColor", &us->panelSelectEdgeColor);
+    w->add(QPixmap(":/icons/file"), "候选项边框颜色", "", "panel/hoverEdgeColor", &us->panelHoverEdgeColor);
+    w->add(QPixmap(":/icons/file"), "毛玻璃模糊半径", "", "panel/blurRadius", &us->panelBlurRadius, 0, 255, 16);
+    w->add(QPixmap(":/icons/file"), "毛玻璃透明度", "", "panel/blurOpacity", &us->panelBlurOpacity, 0, 255, 16);
+    w->add(QPixmap(":/icons/file"), "图标大小", "", "panel/iconSize", &us->panelIconSize, 16, 255, 16);
     addGroup(w, "悬浮面板");
 
     addGroup(new QWidget(ui->scrollAreaWidgetContents), "宇宙传送");
