@@ -44,6 +44,9 @@ public:
     int panelIconSize = 32; // 图标大小
     int widgetSize = 32;
     int fluentRadius = 5;
+    int settingsMaxWidth = 680;
+    int settingsMinWidth = 300;
+    int settingsMargin = 12;
 
     // 交互
     bool fastOpenDir = false; // 默认使用快速打开

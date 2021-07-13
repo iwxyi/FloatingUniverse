@@ -1,14 +1,14 @@
-#ifndef SMOOTHLISTWIDGET_H
-#define SMOOTHLISTWIDGET_H
+#ifndef SMOOTHSCROLLAREA_H
+#define SMOOTHSCROLLAREA_H
 
-#include <QListWidget>
+#include <QScrollArea>
 #include "smoothscrollbean.h"
 
-class SmoothListWidget : public QListWidget
+class SmoothScrollArea : public QScrollArea
 {
     Q_OBJECT
 public:
-    SmoothListWidget(QWidget* parent = nullptr);
+    SmoothScrollArea(QWidget* parent = nullptr);
 
     void setSmoothScrollEnabled(bool e);
     void setSmoothScrollSpeed(int speed);
@@ -40,4 +40,4 @@ private:
     int toBottoming = 0;
 };
 
-#endif // SMOOTHLISTWIDGET_H
+#endif // SMOOTHSCROLLAREA_H

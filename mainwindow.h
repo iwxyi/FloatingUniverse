@@ -29,7 +29,7 @@ private slots:
 
     void on_searchEdit_textEdited(const QString &arg1);
 
-    void on_pushButton_clicked();
+    void on_searchButton_clicked();
 
 private:
     void initView();
@@ -40,6 +40,8 @@ private:
     QRect screenGeometry() const;
 
 public slots:
+    void showDrawer();
+    void hideDrawer();
 
 protected:
     void showEvent(QShowEvent* e) override;
@@ -59,5 +61,6 @@ private:
 #endif
     UniversePanel* panel = nullptr;
     WaterCircleButton *confirmButton = nullptr;
+    bool drawering = true; // 是否显示Drawer（动画中则为动画结束后的状态）
 };
 #endif // MAINWINDOW_H

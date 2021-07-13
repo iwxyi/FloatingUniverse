@@ -115,7 +115,7 @@
            <number>3</number>
           </property>
           <item>
-           <widget class="WaterCircleButton" name="pushButton">
+           <widget class="WaterCircleButton" name="searchButton">
             <property name="cursor">
              <cursorShape>PointingHandCursor</cursorShape>
             </property>
@@ -183,7 +183,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QListWidget" name="sidebarList">
+       <widget class="SmoothListWidget" name="sidebarList">
         <property name="maximumSize">
          <size>
           <width>180</width>
@@ -238,6 +238,11 @@
    <extends>QWidget</extends>
    <header>panelsettingswidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SmoothListWidget</class>
+   <extends>QListWidget</extends>
+   <header>smoothlistwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

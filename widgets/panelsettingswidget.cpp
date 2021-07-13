@@ -86,8 +86,8 @@ void PanelSettingsWidget::focusGroup(int index)
 
 void PanelSettingsWidget::adjustGroupSize()
 {
-    int margin = 12;
-    const int fixedWidth = qMin(qMax(ui->scrollAreaWidgetContents->width() - margin * 2, 300), 680);
+    int margin = us->settingsMargin;
+    const int fixedWidth = qMin(qMax(ui->scrollAreaWidgetContents->width() - margin * 2, us->settingsMinWidth), us->settingsMaxWidth);
     const int groupSpacing = 18;
     const int labelSpacing = 9;
     const int left = qMax(margin, (ui->scrollAreaWidgetContents->width() - fixedWidth) / 2);

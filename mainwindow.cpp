@@ -56,6 +56,7 @@ void MainWindow::initView()
     ui->drawerButton->setFixedSize(us->widgetSize, us->widgetSize);
     setButton(ui->drawerButton);
     setShadow(ui->appbarWidget, 0, 3);
+    setButton(ui->searchButton);
 
     // 应用更改按钮
     confirmButton = new WaterCircleButton(this);
@@ -64,6 +65,7 @@ void MainWindow::initView()
     confirmButton->setIcon(QIcon(":/icons/apply"));
     setButton(confirmButton);
     setShadow(confirmButton, 0, 5);
+    confirmButton->hide();
 
     // sidebar
     auto addGroupItem = [=](QPixmap pixmap, QString groupName) {
@@ -109,7 +111,7 @@ void MainWindow::initView()
     // body
     connect(ui->settingsBody, &PanelSettingsWidget::boxH, this, [=](int left, int width) {
         ui->searchBox->setMaximumWidth(width);
-        ui->spacerWidget->setFixedWidth(ui->settingsBody->x() + left - ui->spacerWidget->x());
+        ui->spacerWidget->setFixedWidth(qMax(0, ui->settingsBody->x() + left - ui->spacerWidget->x()));
     });
 }
 
@@ -122,6 +124,18 @@ QRect MainWindow::screenGeometry() const
     if (index < 0)
         return QRect();
     return screens.at(index)->geometry();
+}
+
+void MainWindow::showDrawer()
+{
+    ui->sidebarList->show();
+    drawering = true;
+}
+
+void MainWindow::hideDrawer()
+{
+    ui->sidebarList->hide();
+    drawering = false;
 }
 
 void MainWindow::showEvent(QShowEvent *e)
@@ -236,8 +250,20 @@ void MainWindow::resizeEvent(QResizeEvent *e)
 {
     QMainWindow::resizeEvent(e);
 
+    // 判断 FloatingActionButton
     if (confirmButton)
         confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.4, confirmButton->width()*1.4));
+
+    // 判断 Drawer
+    bool allBody = width() - ui->sidebarList->width() - ui->centralwidget->layout()->spacing() > us->settingsMinWidth + us->settingsMargin * 2;
+    if (!allBody && drawering)
+    {
+        hideDrawer();
+    }
+    else if (allBody && !drawering)
+    {
+        showDrawer();
+    }
 }
 
 void MainWindow::returnToPrevWindow()
@@ -254,7 +280,7 @@ void MainWindow::on_searchEdit_textEdited(const QString &arg1)
     ui->settingsBody->setFind(arg1);
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_searchButton_clicked()
 {
     ui->searchEdit->selectAll();
     ui->searchEdit->setFocus();

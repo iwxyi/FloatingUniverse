@@ -28,6 +28,7 @@ contains(DEFINES, ENABLE_SHORTCUT) {
 INCLUDEPATH += third_party/color_octree/\
     third_party/facile_menu/\
     third_party/interactive_buttons/\
+    third_party/smooth_scroll/\
     third_party/utils/\
     third_party/\
     global/\
@@ -60,6 +61,7 @@ SOURCES += \
     third_party/slim_scroll_bar/slimscrollbar.cpp \
     third_party/slim_scroll_bar/slimscrollbarpopup.cpp \
     third_party/smooth_scroll/smoothlistwidget.cpp \
+    third_party/smooth_scroll/smoothscrollarea.cpp \
     third_party/utils/fileutil.cpp \
     third_party/utils/stringutil.cpp \
     third_party/utils/textinputdialog.cpp \
@@ -91,6 +93,7 @@ HEADERS += \
     third_party/slim_scroll_bar/slimscrollbar.h \
     third_party/slim_scroll_bar/slimscrollbarpopup.h \
     third_party/smooth_scroll/smoothlistwidget.h \
+    third_party/smooth_scroll/smoothscrollarea.h \
     third_party/smooth_scroll/smoothscrollbean.h \
     third_party/utils/mysettings.h \
     third_party/utils/netimageutil.h \
