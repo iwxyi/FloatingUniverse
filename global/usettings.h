@@ -15,7 +15,7 @@ enum Side
 class USettings : public MySettings
 {
 public:
-    USettings(QObject* parent = nullptr);
+    USettings(QString filePath, QObject* parent = nullptr);
 
 private:
     void restoreSettings();

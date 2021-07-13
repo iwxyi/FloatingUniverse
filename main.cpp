@@ -8,10 +8,10 @@
 
 QString APPLICATION_NAME = "悬浮宇宙";
 QString VERSION_CODE = "0.1";
-Runtime* rt = new Runtime;
-USettings* us = new USettings;
-AccountInfo* ac = new AccountInfo;
-SignalTransfer* sig = new SignalTransfer;
+Runtime* rt;
+USettings* us;
+AccountInfo* ac;
+SignalTransfer* sig;
 
 int main(int argc, char *argv[])
 {
@@ -31,9 +31,12 @@ int main(int argc, char *argv[])
     font.setFamily("微软雅黑");
     font.setPointSize(qMax(10, font.pointSize()));
     a.setFont(font);
-
     // 初始化全局配置
-    rt->setAppPath(QApplication::applicationDirPath() + "/");
+    rt = new Runtime(QApplication::applicationDirPath());
+    us = new USettings(rt->DATA_PATH + "settings.ini");
+    ac = new AccountInfo;
+    sig = new SignalTransfer;
+
     ensureDirExist(rt->ICON_PATH);
     ensureDirExist(rt->PANEL_FILE_PATH);
     ensureDirExist(rt->CACHE_IMAGE_PATH);

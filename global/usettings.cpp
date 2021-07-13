@@ -1,6 +1,6 @@
 #include "usettings.h"
 
-USettings::USettings(QObject *parent) : MySettings("settings.ini", QSettings::Format::IniFormat, parent)
+USettings::USettings(QString filePath, QObject *parent) : MySettings(filePath, QSettings::Format::IniFormat, parent)
 {
     restoreSettings();
 }

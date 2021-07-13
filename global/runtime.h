@@ -7,9 +7,7 @@ class Runtime : public QObject
 {
     Q_OBJECT
 public:
-    explicit Runtime(QObject *parent = nullptr);
-
-    void setAppPath(QString path);
+    explicit Runtime(QString path, QObject *parent = nullptr);
 
 public:
     QString APP_PATH;
