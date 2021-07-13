@@ -31,6 +31,8 @@ private slots:
 
     void on_searchButton_clicked();
 
+    void on_drawerButton_clicked();
+
 private:
     void initView();
     void initTray();

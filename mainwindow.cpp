@@ -285,3 +285,11 @@ void MainWindow::on_searchButton_clicked()
     ui->searchEdit->selectAll();
     ui->searchEdit->setFocus();
 }
+
+void MainWindow::on_drawerButton_clicked()
+{
+    if (drawering)
+        hideDrawer();
+    else
+        showDrawer();
+}
