@@ -37,7 +37,7 @@ void MainWindow::initView()
         QGraphicsDropShadowEffect *shadow_effect = new QGraphicsDropShadowEffect(w);
         shadow_effect->setOffset(x, y);
         shadow_effect->setColor(Qt::gray);
-        shadow_effect->setBlurRadius(32);
+        shadow_effect->setBlurRadius(20);
         w->setGraphicsEffect(shadow_effect);
     };
 
@@ -84,6 +84,11 @@ void MainWindow::initView()
         w->adjustSize();
         w->setCursor(Qt::PointingHandCursor);
         item->setSizeHint(QSize(0, sz + layout->margin() * 2));
+
+        connect(w, &InteractiveButtonBase::clicked, this, [=]{
+            int row = ui->sidebarList->row(item);
+            ui->settingsBody->focusGroup(row);
+        });
     };
     addGroupItem(QPixmap(":/icons/panel"), "悬浮面板");
     addGroupItem(QPixmap(":/icons/universe2"), "宇宙传送");
@@ -93,26 +98,10 @@ void MainWindow::initView()
     addGroupItem(QPixmap(":/icons/about"), "关于程序");
 
     // body
-    auto addSettingsGroupWidget = [=](QWidget* w, QString name){
-        QLabel* label = new QLabel(name, ui->scrollAreaWidgetContents);
-        label->setStyleSheet("color: gray;");
-        w->setObjectName("SettingsGroup");
-        w->setStyleSheet("#SettingsGroup{ background: white; border: none; border-radius: 5px; }");
-
-        groupLabels.append(label);
-        groupBoxes.append(w);
-
-        QGraphicsDropShadowEffect *shadow_effect = new QGraphicsDropShadowEffect(w);
-        shadow_effect->setOffset(0, 1);
-        shadow_effect->setColor(Qt::lightGray);
-        shadow_effect->setBlurRadius(8);
-        w->setGraphicsEffect(shadow_effect);
-    };
-
-    addSettingsGroupWidget(new QWidget(ui->scrollAreaWidgetContents), "测试");
-
-    // 调整body的大小
-    adjustSettingsGroupSize();
+    connect(ui->settingsBody, &PanelSettingsWidget::boxH, this, [=](int left, int width) {
+        ui->searchBox->setMaximumWidth(width);
+        ui->spacerWidget->setFixedWidth(ui->settingsBody->x() + left - ui->spacerWidget->x());
+    });
 }
 
 QRect MainWindow::screenGeometry() const
@@ -205,36 +194,6 @@ void MainWindow::initPanel()
     panel->show();
 }
 
-void MainWindow::adjustSettingsGroupSize()
-{
-    int margin = 12;
-    const int fixedWidth = qMin(qMax(ui->scrollAreaWidgetContents->width() - margin * 2, 300), 680);
-    const int groupSpacing = 12;
-    const int labelSpacing = 9;
-    const int left = qMax(margin, (ui->scrollAreaWidgetContents->width() - fixedWidth) / 2);
-    int top = 18;
-    for (int i = 0; i < groupLabels.size(); i++)
-    {
-        auto label = groupLabels.at(i);
-        auto box = groupBoxes.at(i);
-        label->setFixedWidth(fixedWidth);
-        box->setFixedWidth(fixedWidth);
-        label->adjustSize();
-        box->adjustSize();
-        box->setMinimumHeight(64);
-
-        label->move(left, top);
-        top += label->height() + labelSpacing;
-
-        box->move(left, top);
-        top += box->height() + groupSpacing;
-    }
-
-    ui->scrollAreaWidgetContents->setFixedHeight(top + labelSpacing);
-    ui->searchBox->setMaximumWidth(fixedWidth);
-    ui->spacerWidget->setFixedWidth(ui->scrollArea->x() + left - ui->spacerWidget->x());
-}
-
 void MainWindow::closeEvent(QCloseEvent *e)
 {
     us->setValue("mainwindow/geometry", this->saveGeometry());
@@ -263,9 +222,8 @@ void MainWindow::resizeEvent(QResizeEvent *e)
 {
     QMainWindow::resizeEvent(e);
 
-    adjustSettingsGroupSize();
     if (confirmButton)
-        confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.3, confirmButton->width()*1.3));
+        confirmButton->move(this->rect().bottomRight() - QPoint(confirmButton->width() * 1.4, confirmButton->width()*1.4));
 }
 
 void MainWindow::returnToPrevWindow()

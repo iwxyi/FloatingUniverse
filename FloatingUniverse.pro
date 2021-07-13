@@ -58,7 +58,8 @@ SOURCES += \
     third_party/utils/fileutil.cpp \
     third_party/utils/stringutil.cpp \
     third_party/utils/textinputdialog.cpp \
-    widgets/panelsettingswidget.cpp
+    widgets/panelsettingswidget.cpp \
+    widgets/settingsitemlistbox.cpp
 
 HEADERS += \
     global/accountinfo.h \
@@ -99,7 +100,8 @@ HEADERS += \
     widgets/clicklabel.h \
     widgets/customtabstyle.h \
     widgets/lefttabwidget.h \
-    widgets/panelsettingswidget.h
+    widgets/panelsettingswidget.h \
+    widgets/settingsitemlistbox.h
 
 FORMS += \
     mainwindow.ui \

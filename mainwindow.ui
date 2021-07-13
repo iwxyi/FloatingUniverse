@@ -204,35 +204,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QScrollArea" name="scrollArea">
-        <property name="styleSheet">
-         <string notr="true">#scrollArea
-{
-	background: transparent;
-	border: none;
-}</string>
-        </property>
-        <property name="widgetResizable">
-         <bool>true</bool>
-        </property>
-        <widget class="QWidget" name="scrollAreaWidgetContents">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>642</width>
-           <height>535</height>
-          </rect>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">#scrollAreaWidgetContents
-{
-	background: transparent;
-	border: none;
-}</string>
-         </property>
-        </widget>
-       </widget>
+       <widget class="PanelSettingsWidget" name="settingsBody" native="true"/>
       </item>
      </layout>
     </item>
@@ -254,6 +226,12 @@
    <class>WaterCircleButton</class>
    <extends>QPushButton</extends>
    <header>watercirclebutton.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PanelSettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>panelsettingswidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

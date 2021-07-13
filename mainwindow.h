@@ -9,12 +9,11 @@
 #endif
 #include "watercirclebutton.h"
 #include "panel/universepanel.h"
+#include "panelsettingswidget.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
-
 
 class QListWidgetItem;
 
@@ -33,7 +32,6 @@ private:
     void initTray();
     void initKey();
     void initPanel();
-    void adjustSettingsGroupSize();
 
     QRect screenGeometry() const;
 
@@ -57,8 +55,5 @@ private:
 #endif
     UniversePanel* panel = nullptr;
     WaterCircleButton *confirmButton = nullptr;
-
-    QList<QLabel*> groupLabels;
-    QList<QWidget*> groupBoxes;
 };
 #endif // MAINWINDOW_H
