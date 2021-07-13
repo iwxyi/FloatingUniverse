@@ -40,9 +40,9 @@ private:
     void resetAnimationProgress();
 
 private:
-    QColor color;
-    int dr, dg, db, da;
-    int animation_progress;
+    QColor color = Qt::transparent;
+    int dr = 0, dg = 0, db = 0, da = 0;
+    int animation_progress = 0;
     bool split = false;
     QColor split_color = Qt::white;
 };

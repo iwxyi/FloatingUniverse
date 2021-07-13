@@ -107,7 +107,7 @@ void AniCircleLabel::paintEvent(QPaintEvent *e)
 
     // 添加表示正中心的圆
     pathBack.addEllipse(QRect(left, top, dia, dia));
-    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillPath(pathBack, QBrush(c));
 
     return QLabel::paintEvent(e);

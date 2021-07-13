@@ -27,6 +27,10 @@ public:
 private slots:
     void trayAction(QSystemTrayIcon::ActivationReason reason);
 
+    void on_searchEdit_textEdited(const QString &arg1);
+
+    void on_pushButton_clicked();
+
 private:
     void initView();
     void initTray();

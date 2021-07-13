@@ -9,7 +9,7 @@ public:
     NormalSwitch(QWidget* parent);
     NormalSwitch(bool state, QWidget* parent);
 
-    virtual void setSuitableHeight(int h) override;
+    virtual void setSuitableWidth(int w) override;
 
 protected:
     virtual void calculateGeometry() override;

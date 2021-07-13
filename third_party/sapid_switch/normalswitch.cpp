@@ -2,7 +2,7 @@
 
 NormalSwitch::NormalSwitch(QWidget *parent) : BoundarySwitchBase(parent)
 {
-    setMinimumSize(60, 20);
+    setMinimumSize(50, 20);
     setAnimationEasingCurve(QEasingCurve::OutBack);
     setForeground(Qt::white);
     setBorder(Qt::gray, 2);
@@ -14,9 +14,9 @@ NormalSwitch::NormalSwitch(bool state, QWidget *parent) : NormalSwitch(parent)
     setState(state);
 }
 
-void NormalSwitch::setSuitableHeight(int h)
+void NormalSwitch::setSuitableWidth(int w)
 {
-    BoundarySwitchBase::setSuitableHeight(h);
+    setMaximumSize(w, w / 2.5);
 }
 
 void NormalSwitch::calculateGeometry()

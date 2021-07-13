@@ -111,6 +111,23 @@ void PanelSettingsWidget::adjustGroupSize()
     emit boxH(left, fixedWidth);
 }
 
+void PanelSettingsWidget::setFind(QString key)
+{
+    bool finded = false;
+    for (int i = 0; i < boxes.size(); i++)
+    {
+        auto w = qobject_cast<SettingsItemListBox*>(boxes.at(i));
+        if (!w)
+            continue;
+        int rst = w->setFind(key);
+        if (!finded && rst > -1)
+        {
+            focusGroup(i);
+            finded = true;
+        }
+    }
+}
+
 void PanelSettingsWidget::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);

@@ -140,6 +140,37 @@ InteractiveButtonBase *SettingsItemListBox::lastItem() const
     return _lastItem;
 }
 
+int SettingsItemListBox::setFind(QString key)
+{
+    const QColor normalColor = Qt::transparent;
+    const QColor selectColor = Qt::lightGray;
+    if (key.isEmpty())
+    {
+        foreach (auto item, items)
+        {
+            item->setNormalColor(normalColor);
+        }
+        return -1;
+    }
+
+    int index = -1;
+    for (int i = 0; i < texts.size(); i++)
+    {
+        if (texts.at(i).contains(key))
+        {
+            if (index == -1)
+                index = i;
+            items.at(i)->setNormalColor(selectColor);
+        }
+        else
+        {
+            items.at(i)->setNormalColor(normalColor);
+        }
+    }
+
+    return index;
+}
+
 InteractiveButtonBase *SettingsItemListBox::createBg(QPixmap pixmap, QString text, QString desc)
 {
     InteractiveButtonBase* btn = new InteractiveButtonBase(this);
@@ -191,8 +222,9 @@ InteractiveButtonBase *SettingsItemListBox::createBg(QPixmap pixmap, QString tex
         w->setCursor(Qt::PointingHandCursor);
     }
     mainLayout->addWidget(btn);
-    items.append(btn);
     _lastItem = btn;
+    items.append(btn);
+    texts.append(text + "\n" + desc);
     return btn;
 }
 

@@ -22,6 +22,8 @@ public:
 
     InteractiveButtonBase* lastItem() const;
 
+    int setFind(QString key);
+
 private:
     InteractiveButtonBase* createBg(QPixmap pixmap, QString text, QString desc);
 
@@ -37,6 +39,7 @@ protected:
 private:
     QVBoxLayout* mainLayout;
     QList<InteractiveButtonBase*> items;
+    QList<QString> texts; // 包含标题与描述，用于查找
     InteractiveButtonBase* _lastItem = nullptr;
 };
 

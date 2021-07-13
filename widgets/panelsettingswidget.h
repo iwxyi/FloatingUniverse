@@ -22,6 +22,8 @@ public:
     void focusGroup(int index);
     void adjustGroupSize();
 
+    void setFind(QString key);
+
 signals:
     void boxH(int left, int width);
 

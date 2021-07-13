@@ -246,3 +246,14 @@ void MainWindow::returnToPrevWindow()
         prevWindow = nullptr;
 #endif
 }
+
+void MainWindow::on_searchEdit_textEdited(const QString &arg1)
+{
+    ui->settingsBody->setFind(arg1);
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    ui->searchEdit->selectAll();
+    ui->searchEdit->setFocus();
+}
