@@ -143,6 +143,10 @@ void MainWindow::showEvent(QShowEvent *e)
     QMainWindow::showEvent(e);
     us->set("mainwindow/hide", false);
 
+    QTimer::singleShot(0, [=]{
+        ui->settingsBody->adjustGroupSize();
+    });
+
     static bool first = true;
     if (first)
     {
