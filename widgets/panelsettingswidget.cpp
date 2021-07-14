@@ -52,7 +52,7 @@ void PanelSettingsWidget::initItems()
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->addOpen(QPixmap(":/icons/appicon"), "悬浮宇宙", "本程序由杭州懒一夕智能科技有限公司开发", QUrl("http://lyixi.com"));
-    w->addOpen(QPixmap(":/icons/st/GitHub"), "GitHub", "点击前往开源仓库：iwxyi/FloatingUniverse", QUrl("http://lyixi.com"));
+    w->addOpen(QPixmap(":/icons/st/GitHub"), "GitHub", "点击前往开源仓库：iwxyi/FloatingUniverse", QUrl("https://github.com/iwxyi/FloatingUniverse"));
     addGroup(w, "关于程序");
 }
 
@@ -81,7 +81,7 @@ void PanelSettingsWidget::focusGroup(int index)
 
     int margin = labels.first()->y();
     int top = labels.at(index)->y() - margin;
-    ui->scrollArea->verticalScrollBar()->setSliderPosition(top);
+    ui->scrollArea->scrollTo(top);
 }
 
 void PanelSettingsWidget::adjustGroupSize()
