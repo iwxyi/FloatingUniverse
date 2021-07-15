@@ -89,6 +89,9 @@ private:
     QRect getSelectorBorder() const;
     QRect getHalfRect(QRect big) const;
 
+public:
+    static bool _blockPress;
+
 protected:
     QWidget* selectWidget;
 

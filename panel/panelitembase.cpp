@@ -8,6 +8,8 @@
 #include "usettings.h"
 #include "runtime.h"
 
+bool PanelItemBase::_blockPress = false;
+
 PanelItemBase::PanelItemBase(QWidget *parent) : QWidget(parent)
 {
     selectWidget = new QWidget(this);
@@ -133,6 +135,10 @@ void PanelItemBase::setHover(bool sh, const QPoint &startPos)
 
 void PanelItemBase::mousePressEvent(QMouseEvent *event)
 {
+    // 动画中，忽略按下操作
+    if (_blockPress)
+        return QWidget::mousePressEvent(event);
+
     if (event->button() == Qt::LeftButton)
     {
         // 不被选中，跳过单击选择

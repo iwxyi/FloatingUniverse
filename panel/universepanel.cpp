@@ -391,12 +391,12 @@ void UniversePanel::expandPanel()
     }
     connect(ani, &QPropertyAnimation::finished, this, [=]{
         ani->deleteLater();
-        animating = false;
+        PanelItemBase::_blockPress = animating = false;
         update();
     });
     ani->start();
     expanding = true;
-    animating = true;
+    PanelItemBase::_blockPress = animating = true;
 }
 
 /// 从显示状态收起面板
@@ -419,12 +419,12 @@ void UniversePanel::foldPanel()
     }
     connect(ani, &QPropertyAnimation::finished, this, [=]{
         ani->deleteLater();
-        animating = false;
+        PanelItemBase::_blockPress = animating = false;
         update();
     });
     ani->start();
     expanding = false;
-    animating = true;
+    PanelItemBase::_blockPress = animating = true;
 }
 
 void UniversePanel::save()
