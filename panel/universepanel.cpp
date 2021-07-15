@@ -757,6 +757,8 @@ void UniversePanel::paintEvent(QPaintEvent *)
 
 void UniversePanel::mousePressEvent(QMouseEvent *event)
 {
+    if (animating) // 动画中禁止按下的误操作
+        return ;
     if (event->button() == Qt::LeftButton)
     {
         pressing = true;
