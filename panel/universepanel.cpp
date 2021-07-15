@@ -819,7 +819,8 @@ void UniversePanel::mouseMoveEvent(QMouseEvent *event)
     else if (pressing) // 拖拽
     {
         draggingPos = event->pos();
-        if (event->buttons() & Qt::RightButton || QGuiApplication::keyboardModifiers() & Qt::AltModifier) // 拖拽移动
+        if (event->buttons() & Qt::RightButton ||
+                (event->buttons() & Qt::LeftButton && QGuiApplication::keyboardModifiers() & Qt::AltModifier)) // 拖拽移动空间
         {
             if (!scening)
             {
@@ -829,6 +830,7 @@ void UniversePanel::mouseMoveEvent(QMouseEvent *event)
             if (scening)
             {
                 QPoint delta = draggingPos - pressPos;
+                delta *= us->spatialMoveRatio;
                 foreach (auto item, items)
                 {
                     item->move(item->pos() + delta);

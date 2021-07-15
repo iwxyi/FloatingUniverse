@@ -193,6 +193,8 @@ void PanelItemBase::mouseMoveEvent(QMouseEvent *event)
         }
         return ;
     }
+    // 这里右键是穿透了的，自己不监听
+    // 右键菜单都是有画板来管理
 
     QWidget::mouseMoveEvent(event);
 }
