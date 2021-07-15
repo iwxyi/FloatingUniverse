@@ -32,7 +32,8 @@ INCLUDEPATH += third_party/color_octree/\
     third_party/utils/\
     third_party/\
     global/\
-    widgets/
+    widgets/\
+	mainwindow/
 
 SOURCES += \
     global/usettings.cpp \
@@ -51,7 +52,7 @@ SOURCES += \
     third_party/facile_menu/facilemenuitem.cpp \
     third_party/interactive_buttons/interactivebuttonbase.cpp \
     main.cpp \
-    mainwindow.cpp \
+    mainwindow/mainwindow.cpp \
     global/runtime.cpp \
     third_party/interactive_buttons/watercirclebutton.cpp \
     third_party/sapid_switch/boundaryswitchbase.cpp \
@@ -67,8 +68,8 @@ SOURCES += \
     third_party/utils/textinputdialog.cpp \
     widgets/anicirclelabel.cpp \
     widgets/aninumberlabel.cpp \
-    widgets/panelsettingswidget.cpp \
-    widgets/settingsitemlistbox.cpp
+    mainwindow/settingscontroller.cpp \
+    mainwindow/settingsitemlistbox.cpp
 
 HEADERS += \
     global/accountinfo.h \
@@ -102,7 +103,7 @@ HEADERS += \
     third_party/facile_menu/facilemenu.h \
     third_party/facile_menu/facilemenuitem.h \
     third_party/interactive_buttons/interactivebuttonbase.h \
-    mainwindow.h \
+    mainwindow/mainwindow.h \
     global/runtime.h \
     third_party/utils/dlog.h \
     third_party/utils/fileutil.h \
@@ -116,13 +117,13 @@ HEADERS += \
     widgets/clicklabel.h \
     widgets/customtabstyle.h \
     widgets/lefttabwidget.h \
-    widgets/panelsettingswidget.h \
-    widgets/settingsitemlistbox.h
+    mainwindow/settingscontroller.h \
+    mainwindow/settingsitemlistbox.h
 
 FORMS += \
-    mainwindow.ui \
-    third_party/utils/textinputdialog.ui \
-    widgets/panelsettingswidget.ui
+    mainwindow/mainwindow.ui \
+    mainwindow/settingscontroller.ui \
+    third_party/utils/textinputdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

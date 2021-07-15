@@ -68,5 +68,8 @@
         <file>st/bootCount.png</file>
         <file>st/linkOpenCount.png</file>
         <file alias="space_transmission">icons/space_transmission.png</file>
+        <file alias="hide">icons/hide.png</file>
+        <file alias="quit">icons/quit.png</file>
+        <file>st/spatialMoveRatio.png</file>
     </qresource>
 </RCC>

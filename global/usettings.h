@@ -39,7 +39,7 @@ public:
     int panelBlurRadius = 64; // 毛玻璃背景模糊半径
     int panelBlurOpacity = 32; // 毛玻璃透明度
 
-    // 一些尺寸
+    // 控件尺寸（宇宙荧光）
     int panelItemSize = 64; // Item大小
     int panelIconSize = 32; // 图标大小
     int widgetSize = 32;
@@ -47,6 +47,9 @@ public:
     int settingsMaxWidth = 680;
     int settingsMinWidth = 300;
     int settingsMargin = 12;
+
+    // 交互
+    int spatialMoveRatio = 1; // 控件移动倍率
 
     // 交互
     bool fastOpenDir = false; // 默认使用快速打开

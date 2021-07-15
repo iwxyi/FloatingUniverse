@@ -109,7 +109,7 @@ void MainWindow::initView()
     addGroupItem(QPixmap(":/icons/about"), "关于程序");
 
     // body
-    connect(ui->settingsBody, &PanelSettingsWidget::boxH, this, [=](int left, int width) {
+    connect(ui->settingsBody, &SettingsController::boxH, this, [=](int left, int width) {
         ui->searchBox->setMaximumWidth(width);
         ui->spacerWidget->setFixedWidth(qMax(0, ui->settingsBody->x() + left - ui->spacerWidget->x()));
     });
@@ -185,14 +185,14 @@ void MainWindow::trayAction(QSystemTrayIcon::ActivationReason reason)
     {
         FacileMenu* menu = new FacileMenu;
 
-        menu->addAction(QIcon("://icons/hide.png"), "隐藏", [=]{
+        menu->addAction(QIcon(":/icons/hide"), "隐藏", [=]{
             if (panel->isHidden())
                 panel->show();
             else
                 panel->hide();
         })->check(panel->isHidden());
 
-        menu->split()->addAction(QIcon("://icons/quit.png"), "退出", [=]{
+        menu->split()->addAction(QIcon(":/icons/quit"), "退出", [=]{
             qApp->quit();
         });
 

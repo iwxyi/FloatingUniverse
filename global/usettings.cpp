@@ -25,6 +25,7 @@ void USettings::restoreSettings()
     assign(modifyFileNameSync, "modifyFileNameSync");
     assign(fastOpenDir, "fastOpenDir");
     assign(fastOpenDirLevel, "fastOpenDirLevel");
+    assign(spatialMoveRatio, "spatialMoveRatio");
     endGroup();
 
     beginGroup("usage");

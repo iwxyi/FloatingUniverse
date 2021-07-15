@@ -1,10 +1,10 @@
 #include <QGraphicsDropShadowEffect>
 #include <QScrollBar>
-#include "panelsettingswidget.h"
+#include "settingscontroller.h"
 #include "ui_panelsettingswidget.h"
 #include "usettings.h"
 
-PanelSettingsWidget::PanelSettingsWidget(QWidget *parent) :
+SettingsController::SettingsController(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PanelSettingsWidget)
 {
@@ -13,12 +13,12 @@ PanelSettingsWidget::PanelSettingsWidget(QWidget *parent) :
     initItems();
 }
 
-PanelSettingsWidget::~PanelSettingsWidget()
+SettingsController::~SettingsController()
 {
     delete ui;
 }
 
-void PanelSettingsWidget::initItems()
+void SettingsController::initItems()
 {
     auto w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/bgColor"), "背景颜色", "", "panel/bgColor", &us->panelBgColor);
@@ -31,6 +31,7 @@ void PanelSettingsWidget::initItems()
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/iconSize"), "图标大小", "最大尺寸(非强制,可能更小)，新图标生效", "panel/iconSize", &us->panelIconSize, 16, 255, 16);
+    w->add(QPixmap(":/icons/st/spatialMoveRatio"), "空间移动倍率", "右键移动画布的速度的几何倍率", "interactive/spatialMoveRatio", &us->spatialMoveRatio, 1, 10, 1);
     addGroup(w, "宇宙荧光");
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
@@ -56,7 +57,7 @@ void PanelSettingsWidget::initItems()
     addGroup(w, "关于程序");
 }
 
-void PanelSettingsWidget::addGroup(QWidget *w, QString name)
+void SettingsController::addGroup(QWidget *w, QString name)
 {
     QLabel* label = new QLabel(name, ui->scrollAreaWidgetContents);
     label->setStyleSheet("color: #202020; margin: 0.3px;");
@@ -74,7 +75,7 @@ void PanelSettingsWidget::addGroup(QWidget *w, QString name)
     w->setGraphicsEffect(shadow_effect);
 }
 
-void PanelSettingsWidget::focusGroup(int index)
+void SettingsController::focusGroup(int index)
 {
     if (index < 0 || index >= labels.size())
         return ;
@@ -84,7 +85,7 @@ void PanelSettingsWidget::focusGroup(int index)
     ui->scrollArea->scrollTo(top);
 }
 
-void PanelSettingsWidget::adjustGroupSize()
+void SettingsController::adjustGroupSize()
 {
     int margin = us->settingsMargin;
     const int fixedWidth = qMin(qMax(ui->scrollAreaWidgetContents->width() - margin * 2, us->settingsMinWidth), us->settingsMaxWidth);
@@ -114,7 +115,7 @@ void PanelSettingsWidget::adjustGroupSize()
     emit boxH(left, fixedWidth);
 }
 
-void PanelSettingsWidget::setFind(QString key)
+void SettingsController::setFind(QString key)
 {
     bool finded = false;
     for (int i = 0; i < boxes.size(); i++)
@@ -131,7 +132,7 @@ void PanelSettingsWidget::setFind(QString key)
     }
 }
 
-void PanelSettingsWidget::resizeEvent(QResizeEvent *event)
+void SettingsController::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
 

@@ -9,7 +9,7 @@
 #endif
 #include "watercirclebutton.h"
 #include "panel/universepanel.h"
-#include "panelsettingswidget.h"
+#include "settingscontroller.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

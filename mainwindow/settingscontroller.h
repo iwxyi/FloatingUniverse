@@ -9,12 +9,12 @@ namespace Ui {
 class PanelSettingsWidget;
 }
 
-class PanelSettingsWidget : public QWidget
+class SettingsController : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PanelSettingsWidget(QWidget *parent = nullptr);
-    ~PanelSettingsWidget() override;
+    explicit SettingsController(QWidget *parent = nullptr);
+    ~SettingsController() override;
 
     void initItems();
 
