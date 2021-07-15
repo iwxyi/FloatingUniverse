@@ -38,6 +38,7 @@ protected:
     virtual bool canDropEvent(const QMimeData *mime) override;
     void dropEvent(QDropEvent *event) override;
     virtual void hoverEvent(const QPoint &startPos) override;
+    void enterEvent(QEvent* event) override;
 
 private:
     void showFacileDir(QString path, FacileMenu *parentMenu, int level);

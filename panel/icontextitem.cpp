@@ -586,6 +586,15 @@ void IconTextItem::hoverEvent(const QPoint &startPos)
     }
 }
 
+void IconTextItem::enterEvent(QEvent *event)
+{
+    if (!isSelected() && !isHovered())
+    {
+        jitter(mapFromGlobal(QCursor::pos()));
+    }
+    PanelItemBase::enterEvent(event);
+}
+
 void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level)
 {
     if (level >= openLevel)
