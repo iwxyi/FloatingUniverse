@@ -419,6 +419,6 @@ bool recycleFile(const QString &filename)
     }
     return ret;
 #else
-    return false;
+    return deleteFile(filename);
 #endif
 }

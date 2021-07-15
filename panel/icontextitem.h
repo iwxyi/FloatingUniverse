@@ -3,6 +3,8 @@
 
 #include "panelitembase.h"
 
+#define FILE_PREFIX QString("_local:///")
+
 class IconTextItem : public PanelItemBase
 {
     Q_OBJECT
@@ -21,6 +23,7 @@ public:
     QString getText() const;
     QString getIconName() const;
     QString getLink() const;
+    QString getRealLink() const;
     bool isFastOpen() const;
 
     static QString saveIconFile(const QIcon& icon);

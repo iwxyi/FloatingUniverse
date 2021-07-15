@@ -555,7 +555,9 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QString path = urls.at(i).toLocalFile();
                 QIcon icon = icon_provider.icon(QFileInfo(path));
                 QFileInfo info(path);
-                item = createLinkItem(pos, icon, info.isDir() ? info.fileName() : info.baseName(), path, PanelItemType::LocalFile);
+                QString link = path;
+                link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
+                item = createLinkItem(pos, icon, info.isDir() ? info.fileName() : info.baseName(), link, PanelItemType::LocalFile);
             }
             else // 拖拽网络URL
             {
@@ -623,7 +625,9 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QFileInfo info(text);
                 QString path = info.absoluteFilePath();
                 QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-                createLinkItem(pos, icon, info.fileName(), path, PanelItemType::LocalFile);
+                QString link = path;
+                link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
+                createLinkItem(pos, icon, info.fileName(), link, PanelItemType::LocalFile);
                 return ;
             }
         }
@@ -1271,7 +1275,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
 
     addMenu->split()->addRow([=]{
         addMenu->split()->addAction(QIcon(":icons/file"), "文件 (&F)", [=]{
-            QString name = QInputDialog::getText(this, "创建文件", "请输入文件名");
+            QString name = QInputDialog::getText(this, "创建文件", "请输入文件名，包括后缀");
             if (name.isEmpty())
                 return ;
 
@@ -1295,7 +1299,9 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
 
             // 创建item
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-            createLinkItem(cursorPos, icon, name, path, PanelItemType::LocalFile);
+            QString link = path;
+            link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
+            createLinkItem(cursorPos, icon, name, link, PanelItemType::LocalFile);
 
             // 创建并打开文件
             ensureFileExist(path);
@@ -1318,7 +1324,9 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
 
             // 创建item
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-            createLinkItem(cursorPos, icon, name, path, PanelItemType::LocalFile);
+            QString link = path;
+            link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
+            createLinkItem(cursorPos, icon, name, link, PanelItemType::LocalFile);
 
             // 创建并打开文件
             ensureDirExist(path);
