@@ -628,20 +628,28 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
         if (info.isDir())
         {
             auto m = menu->addMenu(provicer.icon(info), info.fileName(), [=]{
-                menu->close(); // 先关闭菜单，得以隐藏面板；否则即使隐藏也会重新触发enter事件
+                menu->toClose(); // 先关闭菜单，得以隐藏面板；否则即使隐藏也会重新触发enter事件
                 QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
                 if (hideAfterTrigger)
-                    emit hidePanel();
+                {
+                    QTimer::singleShot(0, [=]{
+                        emit hidePanel();
+                    });
+                }
             });
             showFacileDir(info.absoluteFilePath(), m, level+1);
         }
         else
         {
             menu->addAction(provicer.icon(info), info.fileName(), [=]{
-                menu->close(); // 先关闭菜单，得以隐藏面板；否则即使隐藏也会重新触发enter事件
+                menu->toClose(); // 先关闭菜单，得以隐藏面板；否则即使隐藏也会重新触发enter事件
                 QDesktopServices::openUrl("file:///" + info.absoluteFilePath());
                 if (hideAfterTrigger)
-                    emit hidePanel();
+                {
+                    QTimer::singleShot(0, [=]{
+                        emit hidePanel();
+                    });
+                }
             });
         }
     }

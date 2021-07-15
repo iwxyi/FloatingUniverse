@@ -73,6 +73,7 @@ public:
     void exec(QRect expt, bool vertical = false, QPoint pos = QPoint(-1, -1));
     void execute();
     void toHide(int focusIndex = -1);
+    void toClose();
     FacileMenu* finished(FuncType func);
 
     FacileMenu* addOptions(QList<QString>texts, QList<bool>states, FuncIntType clicked);

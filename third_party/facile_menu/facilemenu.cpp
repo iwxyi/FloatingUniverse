@@ -722,6 +722,14 @@ void FacileMenu::toHide(int focusIndex)
     startAnimationOnHidden(focusIndex);
 }
 
+void FacileMenu::toClose()
+{
+    if (parent_menu)
+        parent_menu->toClose();
+    else
+        this->close();
+}
+
 /**
  * 菜单结束的时候调用
  * 例如多选，确认多选后可调用此项
