@@ -25,6 +25,7 @@ public:
 
 private:
     void initPanel();
+    void initAction();
     void readItems();
     IconTextItem *createLinkItem(QPoint pos, const QIcon& icon, const QString& text, const QString& link, PanelItemType type);
     IconTextItem *createLinkItem(QPoint pos, const QString& iconName, const QString& text, const QString& link, PanelItemType type);
@@ -44,7 +45,7 @@ public slots:
     void expandPanel();
     void foldPanel();
     void save();
-    void selectAll();
+    void selectAll(bool containIgnored = true);
     void unselectAll();
     void selectItem(PanelItemBase* item, const QPoint& pos = UNDEFINED_POS);
     void unselectItem(PanelItemBase* item);

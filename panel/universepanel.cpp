@@ -38,6 +38,8 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
     setAcceptDrops(true);
 
     initPanel();
+
+    initAction();
 }
 
 UniversePanel::~UniversePanel()
@@ -66,6 +68,30 @@ void UniversePanel::initPanel()
                     foldPanel();
             });
         }
+    });
+}
+
+void UniversePanel::initAction()
+{
+    auto createAction = [=](QString key, FuncType fun){
+        QAction* action = new QAction(this);
+        action->setShortcut(QKeySequence(key));
+        connect(action, &QAction::triggered, this, fun);
+        this->addAction(action);
+    };
+
+    createAction("ctrl+a", [=]{
+        auto selects = selectedItems;
+        unselectAll();
+        // 第一次全选，不包括忽略选择的
+        selectAll(false);
+        // 第二次全选，包括忽略选择
+        if (selects == selectedItems)
+            selectAll(true);
+    });
+    createAction("delete", [=]{
+        foreach (auto item, selectedItems)
+            deleteItem(item);
     });
 }
 
@@ -413,7 +439,6 @@ void UniversePanel::foldPanel()
     if (us->panelBlur)
     {
         connect(ani, &QPropertyAnimation::valueChanged, this, [=]{
-//            repaint();
             update();
         });
     }
@@ -439,11 +464,25 @@ void UniversePanel::save()
     writeTextFile(rt->PANEL_PATH, json.toBa());
 }
 
-void UniversePanel::selectAll()
+void UniversePanel::selectAll(bool containIgnored)
 {
-    foreach (auto item, items)
-        item->setSelect(true);
-    selectedItems = items.toSet();
+    if (containIgnored)
+    {
+        foreach (auto item, items)
+            item->setSelect(true);
+        selectedItems = items.toSet();
+    }
+    else
+    {
+        selectedItems.clear();
+        foreach (auto item, items)
+        {
+            if (item->isIgnoreSelect())
+                continue;
+            item->setSelect(true);
+            selectedItems.insert(item);
+        }
+    }
 }
 
 void UniversePanel::unselectAll()
