@@ -539,7 +539,7 @@ void FacileMenuItem::paintEvent(QPaintEvent *event)
     {
         // 画右边箭头的图标
         QRect rect(right, fore_paddings.top, icon_text_size, icon_text_size);
-        painter.drawPixmap(rect, QPixmap(":/icons/sub_menu_arrow"));
+        painter.drawPixmap(rect, QPixmap("://sub_menu_arrow"));
     }
 
     if (!shortcut_tip.isEmpty())

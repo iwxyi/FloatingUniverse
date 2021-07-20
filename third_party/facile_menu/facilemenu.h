@@ -91,6 +91,9 @@ public:
     FacileMenu* setTipArea(QString longestTip);
     FacileMenu* setSplitInRow(bool split = true);
 
+    void setAppearAnimation(bool en);
+    void setDisappearAnimation(bool en);
+
 signals:
     void signalActionTriggered(FacileMenuItem* action);
     void signalHidden(); // 只是隐藏了自己
@@ -152,6 +155,9 @@ private:
     QRect window_rect;
     int window_height = 0; // 窗口高度，每次打开都更新一次
     QPoint _enter_later_pos = QPoint(-1, -1); // 避免连续两次触发 enterLater 事件
+
+    bool enable_appear_animation = true;
+    bool enable_disappear_animation = true;
 };
 
 #endif // FACILEMENU_H
