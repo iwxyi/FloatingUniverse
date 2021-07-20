@@ -667,10 +667,23 @@ bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixma
         QRegularExpressionMatch match;
         if (source.indexOf(QRegularExpression("<(?:title|TITLE)>(.+)</\\s*(?:title|TITLE)>"), 0, &match) > -1)
         {
-            pageName = match.captured(1).trimmed();
-            qInfo() << "网页标题：" << pageName;
-            if (pageName.contains("-") && !pageName.startsWith("-"))
-                pageName = pageName.left(pageName.lastIndexOf("-")).trimmed();
+            QString fullTitle = match.captured(1).trimmed();
+            qInfo() << "网页标题：" << fullTitle;
+            if (fullTitle.contains("-") && !fullTitle.startsWith("-"))
+            {
+                pageName = fullTitle.left(fullTitle.lastIndexOf("-")).trimmed();
+                if (url.contains(pageName.toLower())) // 左边的是名字，要用右边的
+                    pageName = fullTitle.right(fullTitle.length() - fullTitle.indexOf("-") - 1).trimmed();
+            }
+            else
+            {
+                pageName = fullTitle;
+            }
+
+            if (pageName.isEmpty())
+                pageName = fullTitle;
+            if (pageName.contains(":") && !pageName.startsWith(":"))
+                pageName = pageName.left(pageName.indexOf(":")).trimmed();
         }
         else
         {
