@@ -42,7 +42,7 @@ void SettingsController::initItems()
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/fileName"), "同步修改文件名", "修改文件快捷方式的名字时，询问修改文件名", "interactive/modifyFileNameSync", &us->modifyFileNameSync);
-    w->add(QPixmap(":/icons/st/fastOpenDir"), "快速展开目录", "默认使用菜单的形式打开文件夹", "interactive/fastOpenDir", &us->fastOpenDir);
+    w->add(QPixmap(":/icons/st/fastOpenDir"), "快速展开目录", "文件夹链接默认使用菜单的形式打开，可单独设置", "interactive/fastOpenDir", &us->fastOpenDir);
     w->add(QPixmap(":/icons/st/fastOpenDirLevel"), "展开目录级别", "", "interactive/fastOpenDirLevel", &us->fastOpenDirLevel, 1, 10, 1);
     addGroup(w, "交互优化");
 
