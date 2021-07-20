@@ -11,7 +11,7 @@ void USettings::restoreSettings()
     assign(panelCenterOffset, "centerOffset");
     assign(panelWidth, "width");
     assign(panelHeight, "height");
-    panelBangWidth = panelWidth * 0.8;
+    assign(panelBangWidth, "bangWidth");
     assign(panelBgColor, "bgColor");
     assign(panelSelectRectColor, "selectRectColor");
     assign(panelSelectEdgeColor, "selectEdgeColor");
@@ -26,6 +26,7 @@ void USettings::restoreSettings()
     assign(fastOpenDir, "fastOpenDir");
     assign(fastOpenDirLevel, "fastOpenDirLevel");
     assign(spatialMoveRatio, "spatialMoveRatio");
+    assign(autoReboot, "autoReboot");
     endGroup();
 
     beginGroup("usage");

@@ -778,8 +778,6 @@ void UniversePanel::paintEvent(QPaintEvent *)
     if (this->pos().y() <= -this->height() + 1)
     {
         QPainterPath path;
-        // int he = this->height();
-        // int w = us->panelBangWidth - us->panelBangWidth * (he + this->pos().y()) / he;
         int w = us->panelBangWidth;
         path.addRect(QRect((width() - w) / 2, height() - us->panelBangHeight, w, us->panelBangHeight));
         painter.fillPath(path, us->panelBangBg);

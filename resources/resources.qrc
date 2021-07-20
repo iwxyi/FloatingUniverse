@@ -71,5 +71,7 @@
         <file alias="hide">icons/hide.png</file>
         <file alias="quit">icons/quit.png</file>
         <file>st/spatialMoveRatio.png</file>
+        <file>st/bangBar.png</file>
+        <file>st/reboot.png</file>
     </qresource>
 </RCC>

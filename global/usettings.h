@@ -50,12 +50,11 @@ public:
 
     // 交互
     int spatialMoveRatio = 1; // 控件移动倍率
-
-    // 交互
     bool fastOpenDir = false; // 默认使用快速打开
     int fastOpenDirLevel = 5; // 最多显示3级文件
     QColor themeMainColor = QColor(51, 103, 214); // #3367D6
     bool modifyFileNameSync = true; // 询问同步修改文件名
+    bool autoReboot = false; // 开机自启
 
     // 使用记录
     int bootCount = 0; // 程序启动次数

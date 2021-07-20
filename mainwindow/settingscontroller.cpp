@@ -1,5 +1,6 @@
 #include <QGraphicsDropShadowEffect>
 #include <QScrollBar>
+#include <QDir>
 #include "settingscontroller.h"
 #include "ui_panelsettingswidget.h"
 #include "usettings.h"
@@ -25,6 +26,7 @@ void SettingsController::initItems()
     w->add(QPixmap(":/icons/st/selectBgColor"), "选择区域颜色", "", "panel/selectRectColor", &us->panelSelectRectColor);
     w->add(QPixmap(":/icons/st/selectEdgeColor"), "选中项边框颜色", "", "panel/selectEdgeColor", &us->panelSelectEdgeColor);
     w->add(QPixmap(":/icons/st/hoverEdgeColor"), "候选项边框颜色", "", "panel/hoverEdgeColor", &us->panelHoverEdgeColor);
+    // w->add(QPixmap(":/icons/st/bangBar"), "交互边缘宽度", "贴边呼出面板的有效宽度，不会超过面板宽度", "panel/bangWidth", &us->panelBangWidth, 100, 9999, 100);
     w->add(QPixmap(":/icons/st/blurRadius"), "毛玻璃模糊半径", "", "panel/blurRadius", &us->panelBlurRadius, 0, 255, 16);
     w->add(QPixmap(":/icons/st/blurOpacity"), "毛玻璃透明度", "", "panel/blurOpacity", &us->panelBlurOpacity, 0, 255, 16);
     addGroup(w, "悬浮面板");
@@ -49,6 +51,19 @@ void SettingsController::initItems()
     w->lastItem()->setEnabled(false);
     w->add(QPixmap(":/icons/st/linkOpenCount"), "打开链接次数", "", "panel/linkOpenCount", &us->linkOpenCount, 0, 0, 1);
     w->lastItem()->setEnabled(false);
+    w->add(QPixmap(":/icons/st/reboot"), "开机自启", "", "interactive/autoReboot", &us->autoReboot);
+    connect(w->lastItem(), &InteractiveButtonBase::clicked, this, [=]{
+        QString appName = QApplication::applicationName();
+        QString appPath = QDir::toNativeSeparators(QApplication::applicationFilePath());
+        QSettings *reg=new QSettings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+        QString val = reg->value(appName).toString();// 如果此键不存在，则返回的是空字符串
+        if (us->autoReboot)
+            reg->setValue(appName, appPath);
+        else
+            reg->remove(appName);
+        qInfo() << "设置自启：" << us->autoReboot;
+        reg->deleteLater();
+    });
     addGroup(w, "使用数据");
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);

@@ -66,6 +66,31 @@ void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QStrin
     });
 }
 
+void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString key, double *val, double min, double max, double step)
+{
+    auto btn = createBg(pixmap, text, desc);
+    auto layout = static_cast<QHBoxLayout*>(btn->layout());
+    auto label = new AniNumberLabel(btn);
+    label->setNum(*val);
+    label->setAlignment(Qt::AlignCenter);
+    label->setFixedWidth(us->widgetSize);
+    layout->addWidget(label);
+
+    auto changed = [=](double v) {
+        us->set(key, *val = v);
+    };
+    connect(btn, &InteractiveButtonBase::clicked, btn, [=]{
+        bool ok = false;
+        double x = QInputDialog::getDouble(this, desc.isEmpty() ? "输入数值" : text,
+                                           desc.isEmpty() ? text : desc,
+                                           *val, min, max, 2, &ok);
+        if (!ok)
+            return ;
+        changed(x);
+        label->setNum(x);
+    });
+}
+
 void SettingsItemListBox::add(QPixmap pixmap, QString text, QString desc, QString key, QString *val)
 {
     auto btn = createBg(pixmap, text, desc);

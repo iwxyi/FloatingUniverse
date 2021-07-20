@@ -15,6 +15,7 @@ public:
     void add(QPixmap pixmap, QString text, QString desc);
     void add(QPixmap pixmap, QString text, QString desc, QString key, bool* val);
     void add(QPixmap pixmap, QString text, QString desc, QString key, int* val, int min, int max, int step);
+    void add(QPixmap pixmap, QString text, QString desc, QString key, double* val, double min, double max, double step);
     void add(QPixmap pixmap, QString text, QString desc, QString key, QString* val);
     void add(QPixmap pixmap, QString text, QString desc, QString key, QColor* val);
     void addOpen(QPixmap pixmap, QString text, QString desc, QString payload);
