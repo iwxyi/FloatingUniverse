@@ -25,9 +25,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(APPLICATION_NAME);
     QCoreApplication::setApplicationVersion(VERSION_CODE);
 
-    QtSingleApplication a(argc, argv);
+    const QString APP_ID("FloatingUniverse");// 单例ID
+    QtSingleApplication a(APP_ID, argc, argv);
     if (a.isRunning())
-        return !a.sendMessage("SingleApplication");
+        return !a.sendMessage("FUFUFU");
     a.setQuitOnLastWindowClosed(false); // 关闭最后一个窗口的时候程序不退出（菜单也算窗口）
 
     QFont font(a.font());
@@ -48,6 +49,11 @@ int main(int argc, char *argv[])
     MainWindow w;
     if (!us->b("mainwindow/hide", false))
         w.show();
+
+    QObject::connect(&a, &QtSingleApplication::messageReceived, &w, [&](const QString&) {
+        w.show(); // 单例自带的 setActivationWindow() 无法打开hide的窗口，得手动show一下才行
+        w.activateWindow();
+    });
 
     return a.exec();
 }
