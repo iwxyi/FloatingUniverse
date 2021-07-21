@@ -146,13 +146,13 @@ void UniversePanel::readItems()
     }
 }
 
-IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QIcon &icon, const QString &text, const QString &link, PanelItemType type)
+IconTextItem *UniversePanel::createLinkItem(QPoint pos, bool center, const QIcon &icon, const QString &text, const QString &link, PanelItemType type)
 {
     QString iconName = IconTextItem::saveIconFile(icon);
-    return createLinkItem(pos, iconName, text, link, type);
+    return createLinkItem(pos, center, iconName, text, link, type);
 }
 
-IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QString& iconName, const QString &text, const QString &link, PanelItemType type)
+IconTextItem *UniversePanel::createLinkItem(QPoint pos, bool center, const QString& iconName, const QString &text, const QString &link, PanelItemType type)
 {
     auto item = new IconTextItem(this);
     item->setIcon(iconName);
@@ -162,7 +162,9 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QString& iconName,
     item->adjustSize();
 
     item->show();
-    item->move(pos - QPoint(item->width() / 2, item->height() / 2));
+    if (center)
+        pos -= QPoint(item->width() / 2, item->height() / 2);
+    item->move(pos);
 
     items.append(item);
     connectItem(item);
@@ -558,7 +560,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QFileInfo info(path);
                 QString link = path;
                 link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
-                item = createLinkItem(pos, icon, info.isDir() ? info.fileName() : info.baseName(), link, PanelItemType::LocalFile);
+                item = createLinkItem(pos, !i, icon, info.isDir() ? info.fileName() : info.baseName(), link, PanelItemType::LocalFile);
             }
             else // 拖拽网络URL
             {
@@ -587,12 +589,18 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                         }
                     }
                 });
-                item = createLinkItem(pos,
+                item = createLinkItem(pos, !i,
                                       IconTextItem::saveIconFile(pixmap.isNull() ? QPixmap(":/icons/link") : pixmap),
                                       pageName.isEmpty() ? path : pageName,
                                       path, PanelItemType::WebUrl);
             }
-            pos.rx() += item->width();
+            if (!i)
+            {
+                pos.rx() += item->width() / 2;
+                pos.ry() = item->y();
+            }
+            else
+                pos.rx() += item->width();
         }
     }
     else if (mime->hasHtml())
@@ -616,7 +624,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QString pageName;
                 QPixmap pixmap;
                 getWebPageNameAndIcon(text, pageName, pixmap);
-                createLinkItem(pos, QPixmap(":/icons/link"), pageName.isEmpty() ? text : pageName, text, PanelItemType::WebUrl);
+                createLinkItem(pos, true, QPixmap(":/icons/link"), pageName.isEmpty() ? text : pageName, text, PanelItemType::WebUrl);
                 return ;
             }
 
@@ -628,7 +636,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QIcon icon = QFileIconProvider().icon(QFileInfo(path));
                 QString link = path;
                 link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
-                createLinkItem(pos, icon, info.fileName(), link, PanelItemType::LocalFile);
+                createLinkItem(pos, true, icon, info.fileName(), link, PanelItemType::LocalFile);
                 return ;
             }
         }
@@ -1269,7 +1277,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
             QString pageName;
             QPixmap pixmap;
             getWebPageNameAndIcon(url, pageName, pixmap);
-            createLinkItem(cursorPos,
+            createLinkItem(cursorPos, true,
                            IconTextItem::saveIconFile(pixmap.isNull() ? QPixmap(":/icons/link") : pixmap),
                            pageName.isEmpty() ? url : pageName,
                            url, PanelItemType::WebUrl);
@@ -1313,7 +1321,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
             QString link = path;
             link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
-            createLinkItem(cursorPos, icon, name, link, PanelItemType::LocalFile);
+            createLinkItem(cursorPos, true, icon, name, link, PanelItemType::LocalFile);
 
             // 创建并打开文件
             ensureFileExist(path);
@@ -1338,7 +1346,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
             QString link = path;
             link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
-            createLinkItem(cursorPos, icon, name, link, PanelItemType::LocalFile);
+            createLinkItem(cursorPos, true, icon, name, link, PanelItemType::LocalFile);
 
             // 创建并打开文件
             ensureDirExist(path);
@@ -1356,7 +1364,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
                 return ;
             us->set("recent/selectFile", path);
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-            createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
+            createLinkItem(cursorPos, true, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
         });
         addMenu->addAction(QIcon(":icons/link"), "文件夹链接 (&L)", [=]{
             if (currentMenu)
@@ -1367,7 +1375,7 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
                 return ;
             us->set("recent/selectFile", path);
             QIcon icon = QFileIconProvider().icon(QFileInfo(path));
-            createLinkItem(cursorPos, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
+            createLinkItem(cursorPos, true, icon, QFileInfo(path).fileName(), path, PanelItemType::LocalFile);
         });
     });
 

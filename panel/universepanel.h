@@ -27,8 +27,8 @@ private:
     void initPanel();
     void initAction();
     void readItems();
-    IconTextItem *createLinkItem(QPoint pos, const QIcon& icon, const QString& text, const QString& link, PanelItemType type);
-    IconTextItem *createLinkItem(QPoint pos, const QString& iconName, const QString& text, const QString& link, PanelItemType type);
+    IconTextItem *createLinkItem(QPoint pos, bool center, const QIcon& icon, const QString& text, const QString& link, PanelItemType type);
+    IconTextItem *createLinkItem(QPoint pos, bool center, const QString& iconName, const QString& text, const QString& link, PanelItemType type);
     LongTextItem *createTextItem(QPoint pos, const QString& text, bool enableHtml);
     ImageItem *createImageItem(QPoint pos, const QPixmap& pixmap);
     ImageItem *createImageItem(QPoint pos, const QString& image);
