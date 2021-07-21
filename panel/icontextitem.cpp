@@ -506,19 +506,28 @@ void IconTextItem::triggerEvent()
     if (!getLink().isEmpty())
     {
         QString link = getRealLink();
-        if (QFileInfo(link).exists())
+        qInfo() << "打开link：" << link;
+        QFileInfo info(link);
+        if (info.exists()) // 是文件
         {
-            if (QFileInfo(link).isDir() && isFastOpen())
+            if (info.isDir() && isFastOpen()) // 快速打开文件夹
             {
                 showFacileDir(link, nullptr, 0);
                 return ;
             }
-            else
+            else if (link.endsWith(".exe") || link.endsWith(".bat") || link.endsWith(".sh") || link.endsWith(".vbs"))
+            {
+                QProcess* process = new QProcess(this);
+                process->startDetached(link, QStringList{link}, info.path());
+                link = "";
+            }
+            else // 打开文件或者文件夹
             {
                 link = "file:///" +link;
             }
         }
-        QDesktopServices::openUrl(link);
+        if (!link.isEmpty())
+            QDesktopServices::openUrl(link);
         us->set("usage/linkOpenCount", ++us->linkOpenCount);
 
         jump();
