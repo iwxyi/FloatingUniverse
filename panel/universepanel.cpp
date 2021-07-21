@@ -92,6 +92,7 @@ void UniversePanel::initAction()
     createAction("delete", [=]{
         foreach (auto item, selectedItems)
             deleteItem(item);
+        save();
     });
 }
 
@@ -158,6 +159,7 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, const QString& iconName,
     item->setText(text);
     item->setLink(link);
     item->setType(type);
+    item->adjustSize();
 
     item->show();
     item->move(pos - QPoint(item->width() / 2, item->height() / 2));
