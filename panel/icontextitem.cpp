@@ -517,8 +517,8 @@ void IconTextItem::triggerEvent()
             }
             else if (link.endsWith(".exe") || link.endsWith(".bat") || link.endsWith(".sh") || link.endsWith(".vbs"))
             {
-                QProcess* process = new QProcess(this);
-                process->startDetached(link, QStringList{link}, info.path());
+                QProcess process;
+                process.startDetached(link, QStringList{link}, info.path());
                 link = "";
             }
             else // 打开文件或者文件夹
