@@ -244,8 +244,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
         if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) // 多选
         {
             QPoint pos = mapFromGlobal(QCursor::pos());
-            foreach (auto item, items)
-            {
+            eachitem(
                 if (item->geometry().contains(pos))
                 {
                     if (selectedItems.contains(item))
@@ -254,7 +253,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
                         selectItem(item, pos);
                     break;
                 }
-            }
+            )
         }
         else
         {
