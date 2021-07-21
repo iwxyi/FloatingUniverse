@@ -48,6 +48,8 @@ SOURCES += \
     panel/universepanel.cpp \
     third_party/color_octree/coloroctree.cpp \
     third_party/color_octree/imageutil.cpp \
+    third_party/escape_dialog/escapedialog.cpp \
+    third_party/escape_dialog/hoverbutton.cpp \
     third_party/facile_menu/facilemenu.cpp \
     third_party/facile_menu/facilemenuitem.cpp \
     third_party/interactive_buttons/interactivebuttonbase.cpp \
@@ -92,6 +94,8 @@ HEADERS += \
     panel/resizeableitembase.h \
     panel/universepanel.h \
     resources/resource.rc \
+    third_party/escape_dialog/escapedialog.h \
+    third_party/escape_dialog/hoverbutton.h \
     third_party/interactive_buttons/watercirclebutton.h \
     third_party/qtsingleapplication/QtLockedFile \
     third_party/qtsingleapplication/QtSingleApplication \

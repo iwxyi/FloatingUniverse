@@ -73,5 +73,11 @@
         <file>st/spatialMoveRatio.png</file>
         <file>st/bangBar.png</file>
         <file>st/reboot.png</file>
+        <file>st/donate.png</file>
+        <file>st/QQ.png</file>
+    </qresource>
+    <qresource prefix="/documents">
+        <file alias="wx_qr">documents/wx_qr.png</file>
+        <file alias="zfb_qr">documents/zfb_qr.jpg</file>
     </qresource>
 </RCC>

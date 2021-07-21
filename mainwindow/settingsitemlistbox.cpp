@@ -160,6 +160,17 @@ void SettingsItemListBox::addOpen(QPixmap pixmap, QString text, QString desc, QU
     });
 }
 
+void SettingsItemListBox::addPage(QPixmap pixmap, QString text, QString desc)
+{
+    auto btn = createBg(pixmap, text, desc);
+    auto layout = static_cast<QHBoxLayout*>(btn->layout());
+    auto label = new QLabel(btn);
+    label->setPixmap(QPixmap(":/icons/sub_menu_arrow"));
+    label->setScaledContents(true);
+    label->setFixedSize(20, 20);
+    layout->addWidget(label);
+}
+
 InteractiveButtonBase *SettingsItemListBox::lastItem() const
 {
     return _lastItem;

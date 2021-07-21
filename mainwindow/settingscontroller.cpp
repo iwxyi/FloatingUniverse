@@ -4,6 +4,7 @@
 #include "settingscontroller.h"
 #include "ui_panelsettingswidget.h"
 #include "usettings.h"
+#include "escape_dialog/escapedialog.h"
 
 SettingsController::SettingsController(QWidget *parent) :
     QWidget(parent),
@@ -68,6 +69,12 @@ void SettingsController::initItems()
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->addOpen(QPixmap(":/icons/appicon"), "悬浮宇宙", "本程序由杭州懒一夕智能科技有限公司开发", QUrl("http://lyixi.com"));
+    w->addOpen(QPixmap(":/icons/st/QQ"), "QQ交流群", "（群号待定，等人多了再弄）", QUrl(""));
+    w->addPage(QPixmap(":/icons/st/donate"), "捐赠", "好心的老板请开发者吃顿饭吧~");
+    connect(w->lastItem(), &InteractiveButtonBase::clicked, this, [=]{
+        EscapeDialog* dialog = new EscapeDialog("友情赞助", "您的支持是开发者为爱发电的最大动力！", "不想付钱", "感谢支持", this);
+        dialog->exec();
+    });
     w->addOpen(QPixmap(":/icons/st/GitHub"), "GitHub", "点击前往开源仓库：iwxyi/FloatingUniverse", QUrl("https://github.com/iwxyi/FloatingUniverse"));
     addGroup(w, "关于程序");
 }

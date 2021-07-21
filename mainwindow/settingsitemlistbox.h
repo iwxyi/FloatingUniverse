@@ -20,6 +20,7 @@ public:
     void add(QPixmap pixmap, QString text, QString desc, QString key, QColor* val);
     void addOpen(QPixmap pixmap, QString text, QString desc, QString payload);
     void addOpen(QPixmap pixmap, QString text, QString desc, QUrl url);
+    void addPage(QPixmap pixmap, QString text, QString desc);
 
     InteractiveButtonBase* lastItem() const;
 
