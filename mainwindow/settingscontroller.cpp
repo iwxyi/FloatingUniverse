@@ -68,14 +68,14 @@ void SettingsController::initItems()
     addGroup(w, "使用数据");
 
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
-    w->addOpen(QPixmap(":/icons/appicon"), "悬浮宇宙", "本程序由杭州懒一夕智能科技有限公司开发", QUrl("http://lyixi.com"));
-    w->addOpen(QPixmap(":/icons/st/QQ"), "QQ交流群", "（群号待定，等人多了再弄）", QUrl(""));
-    w->addPage(QPixmap(":/icons/st/donate"), "捐赠", "好心的老板请开发者吃顿饭吧~");
+    w->addOpen(QPixmap(":/icons/lyixi"), "开发团队", "本程序由杭州懒一夕智能科技有限公司“混吃等死部”开发", QUrl("http://lyixi.com"));
+    w->addOpen(QPixmap(":/icons/st/QQ"), "交流反馈", "（群号待定，等人多了再建群）", QUrl(""));
+    w->addPage(QPixmap(":/icons/st/donate"), "捐赠赞助", "好心的老板请开发者吃顿饭吧~");
     connect(w->lastItem(), &InteractiveButtonBase::clicked, this, [=]{
         EscapeDialog* dialog = new EscapeDialog("友情赞助", "您的支持是开发者为爱发电的最大动力！", "不想付钱", "感谢支持", this);
         dialog->exec();
     });
-    w->addOpen(QPixmap(":/icons/st/GitHub"), "GitHub", "点击前往开源仓库：iwxyi/FloatingUniverse", QUrl("https://github.com/iwxyi/FloatingUniverse"));
+    w->addOpen(QPixmap(":/icons/st/GitHub"), "GitHub", "开源仓库：iwxyi/FloatingUniverse", QUrl("https://github.com/iwxyi/FloatingUniverse"));
     addGroup(w, "关于程序");
 }
 

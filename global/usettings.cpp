@@ -23,6 +23,7 @@ void USettings::restoreSettings()
 
     beginGroup("interactive");
     assign(modifyFileNameSync, "modifyFileNameSync");
+    assign(allowMoveOut, "allowMoveOut");
     assign(fastOpenDir, "fastOpenDir");
     assign(fastOpenDirLevel, "fastOpenDirLevel");
     assign(spatialMoveRatio, "spatialMoveRatio");

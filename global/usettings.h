@@ -50,6 +50,7 @@ public:
 
     // 交互
     int spatialMoveRatio = 1; // 控件移动倍率
+    bool allowMoveOut = true; // 允许拖拽到面板外面，而不隐藏
     bool fastOpenDir = false; // 默认使用快速打开
     int fastOpenDirLevel = 5; // 最多显示3级文件
     QColor themeMainColor = QColor(51, 103, 214); // #3367D6
