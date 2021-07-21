@@ -1,10 +1,10 @@
-#include <QApplication>
 #include "runtime.h"
 #include "usettings.h"
 #include "accountinfo.h"
 #include "signaltransfer.h"
 #include "mainwindow.h"
 #include "fileutil.h"
+#include "qtsingleapplication/qtsingleapplication.h"
 
 QString APPLICATION_NAME = "悬浮宇宙";
 QString VERSION_CODE = "0.1";
@@ -22,15 +22,19 @@ int main(int argc, char *argv[])
     // 设置后，读取到的窗口会随着显示器倍数而缩小
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
-    QApplication a(argc, argv);
     QCoreApplication::setApplicationName(APPLICATION_NAME);
     QCoreApplication::setApplicationVersion(VERSION_CODE);
+
+    QtSingleApplication a(argc, argv);
+    if (a.isRunning())
+        return !a.sendMessage("SingleApplication");
     a.setQuitOnLastWindowClosed(false); // 关闭最后一个窗口的时候程序不退出（菜单也算窗口）
 
     QFont font(a.font());
     font.setFamily("微软雅黑");
     font.setPointSize(qMax(10, font.pointSize()));
     a.setFont(font);
+
     // 初始化全局配置
     rt = new Runtime(QApplication::applicationDirPath());
     us = new USettings(rt->DATA_PATH + "settings.ini");

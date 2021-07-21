@@ -55,6 +55,12 @@ SOURCES += \
     mainwindow/mainwindow.cpp \
     global/runtime.cpp \
     third_party/interactive_buttons/watercirclebutton.cpp \
+    third_party/qtsingleapplication/qtlocalpeer.cpp \
+    third_party/qtsingleapplication/qtlockedfile.cpp \
+    third_party/qtsingleapplication/qtlockedfile_unix.cpp \
+    third_party/qtsingleapplication/qtlockedfile_win.cpp \
+    third_party/qtsingleapplication/qtsingleapplication.cpp \
+    third_party/qtsingleapplication/qtsinglecoreapplication.cpp \
     third_party/sapid_switch/boundaryswitchbase.cpp \
     third_party/sapid_switch/lovelyheartswitch.cpp \
     third_party/sapid_switch/normalswitch.cpp \
@@ -87,6 +93,12 @@ HEADERS += \
     panel/universepanel.h \
     resources/resource.rc \
     third_party/interactive_buttons/watercirclebutton.h \
+    third_party/qtsingleapplication/QtLockedFile \
+    third_party/qtsingleapplication/QtSingleApplication \
+    third_party/qtsingleapplication/qtlocalpeer.h \
+    third_party/qtsingleapplication/qtlockedfile.h \
+    third_party/qtsingleapplication/qtsingleapplication.h \
+    third_party/qtsingleapplication/qtsinglecoreapplication.h \
     third_party/sapid_switch/boundaryswitchbase.h \
     third_party/sapid_switch/lovelyheartswitch.h \
     third_party/sapid_switch/normalswitch.h \
@@ -137,7 +149,9 @@ DISTFILES += \
     resources/icons/application.png \
     resources/icons/auxiliary.png \
     resources/icons/port.png \
-    resources/icons/settings.png
+    resources/icons/settings.png \
+    third_party/qtsingleapplication/qtsingleapplication.pri \
+    third_party/qtsingleapplication/qtsinglecoreapplication.pri
 
 RESOURCES += \
     resources/resources.qrc
