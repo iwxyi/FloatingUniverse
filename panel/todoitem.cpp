@@ -259,7 +259,7 @@ void TodoItem::showMenu()
         insertAndFocusItem(row);
     })->tip("shift+↑")->disable(row == -1);
 
-    menu->split()->addAction(QIcon(":/icons/select_all"), "全选 (&A)", [=]{
+    menu->addAction(QIcon(":/icons/select_all"), "全选 (&A)", [=]{
         listWidget->selectAll();
     })->tip("Alt+A");
 

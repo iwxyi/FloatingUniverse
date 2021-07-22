@@ -141,3 +141,17 @@ void CustomEdit::wheelEvent(QWheelEvent *event)
         QTextEdit::wheelEvent(event);
     }
 }
+
+void CustomEdit::mousePressEvent(QMouseEvent *e)
+{
+    if (e->button() & Qt::RightButton)
+    {
+        // 这里必须要返回，否则会传递给父控件
+        // CustomEdit -> LongTextItem -> UniversePanel，导致panel获取到右键按下的时间
+        // 但是这里是菜单，释放掉的时候panel获取不到release
+        // 从而会使panel一直处在pressing状态，在它任意位置点击的时候就会出现pressEvent+moveEvent
+        return ;
+    }
+    QTextEdit::mousePressEvent(e);
+}
+

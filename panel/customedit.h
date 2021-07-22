@@ -43,6 +43,7 @@ public slots:
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
+    void mousePressEvent(QMouseEvent *e) override;
 
 private:
     bool enabledSmoothScroll = true;

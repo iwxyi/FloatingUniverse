@@ -158,7 +158,7 @@ void PanelItemBase::mousePressEvent(QMouseEvent *event)
 {
     // 动画中，忽略按下操作
     if (_blockPress)
-        return QWidget::mousePressEvent(event);
+        return ;
 
     if (event->button() == Qt::LeftButton)
     {
