@@ -145,6 +145,7 @@ bool TodoItem::isUsing() const
 void TodoItem::showMenu()
 {
     newFacileMenu;
+    menu->setTipArea("Alt+Delete");
 
     int row = listWidget->currentRow();
 
@@ -163,7 +164,6 @@ void TodoItem::showMenu()
         actionDelete();
     })->tip("Alt+Delete")->disable(row == -1);
 
-    menu->setTipArea("Alt+Delete");
     menu->exec();
     emit facileMenuUsed(menu);
 }

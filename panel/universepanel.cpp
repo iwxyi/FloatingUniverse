@@ -252,6 +252,7 @@ TodoItem *UniversePanel::createTodoItem(QPoint pos)
 
     save();
     selectItem(item);
+    item->insertAndFocusItem(0);
     return item;
 }
 

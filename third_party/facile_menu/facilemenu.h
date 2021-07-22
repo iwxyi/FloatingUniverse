@@ -144,7 +144,9 @@ private:
     FacileMenuItem* last_added_item = nullptr; // 最后添加的item
     FuncType* finished_func = nullptr;
 
-    int addin_tip_area = 0; // 右边用来显示提示文字的区域
+    const int item_padding = 8; // 每个item四周的空白
+    int addin_tip_area = 48; // 右边用来显示提示文字的区域
+    const int tip_area_spacing = 8; // item正文和tip的间距
     bool adding_horizone = false; // 是否正在添加横向菜单
     bool align_mid_if_alone = false; // 是否居中对齐，如果只有icon或text
     bool linger_on_submenu_clicked = false; // 子菜单点击后，父菜单是否逐级隐藏(注意子菜单若有选择项需手动改变)

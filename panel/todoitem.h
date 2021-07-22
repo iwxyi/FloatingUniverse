@@ -21,7 +21,7 @@ public:
 
     void addItem(bool checked, const QString& text);
     void insertItem(int index, bool checked, const QString& text);
-    void insertAndFocusItem(int index);
+    void insertAndFocusItem(int index = 0);
     void deleteItem(int index);
 
     virtual bool isUsing() const override;

@@ -909,6 +909,7 @@ FacileMenu *FacileMenu::setMultiCheck(FuncCheckType clicked)
 /**
  * 设置右边提示的区域内容
  * 一般是快捷键
+ * 尽量在添加菜单项前设置
  */
 FacileMenu *FacileMenu::setTipArea(int x)
 {
@@ -917,14 +918,18 @@ FacileMenu *FacileMenu::setTipArea(int x)
 }
 
 /**
- * 设置左边提示的区域内容
+ * 设置右边提示的区域内容
  * 一般是用来放快捷键
+ * 尽量在添加菜单项前设置
  * @param tip 内容是什么不重要，只要等同于需要容纳的最长字符串即可（例如"ctrl+shit+alt+s"）
  */
 FacileMenu *FacileMenu::setTipArea(QString longestTip)
 {
     QFontMetrics fm(this->font());
-    addin_tip_area = fm.horizontalAdvance(longestTip);
+    addin_tip_area = fm.horizontalAdvance(longestTip + "Ctrl");
+    // 修改现有的
+    foreach (auto item, items)
+        item->setPaddings(item_padding, addin_tip_area > 0 ? tip_area_spacing + addin_tip_area : item_padding, item_padding, item_padding);
     return this;
 }
 
@@ -1037,11 +1042,11 @@ void FacileMenu::setActionButton(InteractiveButtonBase *btn, bool isChip)
     // 设置尺寸
     if (isChip)
     {
-        btn->setPaddings(4);
+        btn->setPaddings(item_padding);
     }
     else
     {
-        btn->setPaddings(8, 48 + addin_tip_area, 8, 8);
+        btn->setPaddings(item_padding, addin_tip_area > 0 ? tip_area_spacing + addin_tip_area : item_padding, item_padding, item_padding);
     }
 
     // 设置颜色

@@ -759,7 +759,7 @@ void InteractiveButtonBase::setFixedForeSize(bool f, int addin)
         int w = fm.horizontalAdvance(text);
         w = icon_width + w + quick_sqrt(w / 2) + fore_paddings.left + fore_paddings.right;
         setMinimumSize(
-            w + addin + fore_paddings.left + fore_paddings.right,
+            w + addin,
             fm.lineSpacing() + fore_paddings.top + fore_paddings.bottom + addin);
     }
     else if (model == PaintModel::Icon || model == PaintModel::PixmapMask)
