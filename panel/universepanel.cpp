@@ -319,8 +319,8 @@ void UniversePanel::connectItem(PanelItemBase *item)
         currentMenu = menu;
         menu->finished([=]{
             currentMenu = nullptr;
-            if (!this->hasFocus())
-                foldPanel();
+            // if (!this->hasItemUsing())
+            //    foldPanel();
         });
     });
 
@@ -777,12 +777,14 @@ void UniversePanel::leaveEvent(QEvent *event)
     // 拖拽到外面的时候，左边没事leave在release之后
     // 右边就在release之前leave了
     // 所以直接判断pressing状态
-    if (us->allowMoveOut && (pressing || scening))
+    if (pressing || scening)
     {
         return ;
     }
+
     // 是否是拖拽的时候不小心移到了外面去了
-    if (_release_outter)
+    // 因为有人对这个操作机制感到迷惑，所以在设置里加了，默认开启
+    if (us->allowMoveOut && _release_outter)
     {
         _release_outter = false;
         return ;
