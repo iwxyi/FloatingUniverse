@@ -777,10 +777,10 @@ void UniversePanel::enterEvent(QEvent *event)
 
 void UniversePanel::leaveEvent(QEvent *event)
 {
-    // 拖拽到外面的时候，左边没事leave在release之后
+    // 拖拽到外面的时候，左键没事leave在release之后
     // 右边就在release之前leave了
     // 所以直接判断pressing状态
-    if (pressing || scening)
+    if (us->allowMoveOut && (pressing || scening))
     {
         return ;
     }
@@ -1027,6 +1027,11 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
             QTimer::singleShot(10, [=]{
                 _block_menu = false;
             });
+
+            // 拖拽到外面，必定会触发 leaveEvent
+            // 右键很坑，事件顺序是：leave(pressing) -> release -> leave(unpressing)
+            if (!this->geometry().contains(QCursor::pos()))
+                _release_outter = true;
             return ;
         }
     }

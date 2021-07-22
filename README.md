@@ -147,10 +147,15 @@
 
   - ItemBase：所有部件的最底层
 
+    ```css
+    /* 设置布局背景为白色圆角矩形 */
+    #ItemBase{background: white; border-radius: 5px; margin: 3px;}
+    ```
+
   - SelectEdge：边缘，需要重启才生效
 
     ```css
-    /* 设置选择框为红色 */
+    /* 设置选择框为宽度为1的红色 */
     #SelectEdge{ border: 1px solid #AA0000;}
     ```
 
