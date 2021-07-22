@@ -305,6 +305,7 @@ FacileMenu *FacileMenu::addMenu(QIcon icon, QString text, FuncType clicked)
         }
     });
     connect(menu, &FacileMenu::signalActionTriggered, this, [=](FacileMenuItem* action){
+        closed_by_clicked = true;
         // 子菜单被点击了，副菜单依次隐藏
         emit signalActionTriggered(action);
         if (!linger_on_submenu_clicked)
@@ -719,6 +720,7 @@ void FacileMenu::toHide(int focusIndex)
     } while (menu);
     this->clearFocus();
 
+    closed_by_clicked = true;
     startAnimationOnHidden(focusIndex);
 }
 
@@ -728,6 +730,15 @@ void FacileMenu::toClose()
         parent_menu->toClose();
     else
         this->close();
+}
+
+/**
+ * 是因为点击了菜单项结束菜单
+ * 还是因为其他原因，比如ESC关闭、鼠标点击其他位置呢
+ */
+bool FacileMenu::isClosedByClick() const
+{
+    return closed_by_clicked;
 }
 
 /**

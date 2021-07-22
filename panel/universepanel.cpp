@@ -318,9 +318,12 @@ void UniversePanel::connectItem(PanelItemBase *item)
     connect(item, &PanelItemBase::facileMenuUsed, this, [=](FacileMenu* menu) {
         currentMenu = menu;
         menu->finished([=]{
+            if (!this->hasItemUsing()
+                    && !menu->isClosedByClick())
+            {
+                foldPanel();
+            }
             currentMenu = nullptr;
-            // if (!this->hasItemUsing())
-            //    foldPanel();
         });
     });
 

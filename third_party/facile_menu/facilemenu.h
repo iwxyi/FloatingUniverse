@@ -74,6 +74,7 @@ public:
     void execute();
     void toHide(int focusIndex = -1);
     void toClose();
+    bool isClosedByClick() const;
     FacileMenu* finished(FuncType func);
 
     FacileMenu* addOptions(QList<QString>texts, QList<bool>states, FuncIntType clicked);
@@ -157,6 +158,7 @@ private:
     QRect window_rect;
     int window_height = 0; // 窗口高度，每次打开都更新一次
     QPoint _enter_later_pos = QPoint(-1, -1); // 避免连续两次触发 enterLater 事件
+    bool closed_by_clicked = false; // 是否因为被单击了才隐藏，还是因为其他原因关闭
 
     bool enable_appear_animation = true;
     bool enable_disappear_animation = true;
