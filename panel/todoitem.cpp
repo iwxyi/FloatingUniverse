@@ -215,7 +215,7 @@ void TodoItem::showMenu()
             int row = listWidget->row(item);
             lines.at(row)->setChecked(true);
         }
-    });
+    })->disable(row == -1);
 
     menu->addAction(QIcon(":/icons/uncheck"), "反勾选 (&R)", [=]{
         auto selects = listWidget->selectedItems();
@@ -224,7 +224,7 @@ void TodoItem::showMenu()
             int row = listWidget->row(item);
             lines.at(row)->setChecked(!lines.at(row)->isChecked());
         }
-    });
+    })->disable(row == -1);
 
     auto selectCount = listWidget->selectedItems().size();
     menu->addAction(QIcon(":/icons/list_copy"), "复制列表 (&G)", [=]{
@@ -236,7 +236,8 @@ void TodoItem::showMenu()
             sl.append(lines.at(row)->getText());
         }
         QApplication::clipboard()->setText(sl.join("\n"));
-    })->text(selectCount > 1, QString("复制列表 %1 (&G)").arg(selectCount));
+    })->text(selectCount > 1, QString("复制列表 %1 (&G)").arg(selectCount))
+            ->disable(selectCount == 0);
 
     QString text = QApplication::clipboard()->text();
     int pasteCount = text.split("\n", QString::SkipEmptyParts).size();
@@ -257,13 +258,13 @@ void TodoItem::showMenu()
     menu->split()->addAction(QIcon(":/icons/add"), "插入 (&I)", [=]{
         int row = listWidget->currentRow();
         if (row == -1)
-            return ;
+            row = 0;
         insertAndFocusItem(row);
-    })->tip("Shift+Enter")->disable(row == -1);
+    })->tip("Shift+Enter");
 
     menu->addAction(QIcon(":/icons/select_all"), "全选 (&A)", [=]{
         listWidget->selectAll();
-    })->tip("Alt+A");
+    })->tip("Alt+A")->disable(!listWidget->count());
 
     menu->addAction(QIcon(":/icons/delete"), "删除行 (&D)", [=]{
         actionDelete();
@@ -311,8 +312,7 @@ void TodoItem::resizeEvent(QResizeEvent *event)
 void TodoItem::enterEvent(QEvent *event)
 {
     ResizeableItemBase::enterEvent(event);
-
-    addButton->show();
+    // addButton->show();
 }
 
 void TodoItem::leaveEvent(QEvent *event)
