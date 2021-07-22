@@ -78,6 +78,7 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragLeaveEvent(QDragLeaveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
+    void paintEvent(QPaintEvent* e) override;
 
     virtual void selectEvent(const QPoint& startPos);
     virtual void unselectEvent();

@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QLayout>
 #include <QPropertyAnimation>
+#include <QStyleOption>
+#include <QPainter>
 #include "panelitembase.h"
 #include "usettings.h"
 #include "runtime.h"
@@ -13,16 +15,15 @@ bool PanelItemBase::_blockPress = false;
 PanelItemBase::PanelItemBase(QWidget *parent) : QWidget(parent)
 {
     setObjectName("ItemBase");
-    selectWidget = new QWidget(this);
-    selectWidget->hide();
-    selectWidget->setObjectName("SelectEdge");
-
     setFocusPolicy(Qt::ClickFocus);
     setCursor(Qt::PointingHandCursor);
     setAcceptDrops(true);
-    type = PanelItemType::DefaultItem;
-
+    setType(PanelItemType::DefaultItem);
     setMinimumSize(ITEM_MIN_SIZE);
+
+    selectWidget = new QWidget(this);
+    selectWidget->hide();
+    selectWidget->setObjectName("SelectEdge");
 }
 
 MyJson PanelItemBase::toJson() const
@@ -253,6 +254,14 @@ void PanelItemBase::dragLeaveEvent(QDragLeaveEvent *event)
 void PanelItemBase::dropEvent(QDropEvent *event)
 {
     QWidget::dropEvent(event);
+}
+
+void PanelItemBase::paintEvent(QPaintEvent *e)
+{
+    QStyleOption option;
+    option.init(this);
+    QPainter p(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &option, &p, this);
 }
 
 void PanelItemBase::selectEvent(const QPoint &startPos)

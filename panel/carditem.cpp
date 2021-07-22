@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QStyleOption>
 #include <QPainter>
 #include <QPainterPath>
 #include <QColorDialog>
@@ -53,12 +54,16 @@ void CardItem::setRadius(int r)
     update();
 }
 
-void CardItem::paintEvent(QPaintEvent *event)
+void CardItem::paintEvent(QPaintEvent *)
 {
-    ResizeableItemBase::paintEvent(event);
-
     if (!customQss.isEmpty())
+    {
+        QStyleOption option;
+        option.init(this);
+        QPainter p(this);
+        style()->drawPrimitive(QStyle::PE_Widget, &option, &p, this);
         return ;
+    }
 
     QPainterPath path;
     path.addRoundedRect(rect(), radius, radius);

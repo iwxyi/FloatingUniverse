@@ -15,7 +15,7 @@ public:
     void setRadius(int r);
 
 protected:
-    void paintEvent(QPaintEvent* event) override;
+    void paintEvent(QPaintEvent*) override;
     virtual void facileMenuEvent(FacileMenu* menu) override;
 
 private:

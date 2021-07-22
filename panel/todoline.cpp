@@ -1,6 +1,8 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QDebug>
+#include <QStyleOption>
+#include <QPainter>
 #include "todoline.h"
 
 TodoLine::TodoLine(QWidget *parent) : TodoLine(false, "", parent)
@@ -103,4 +105,12 @@ void TodoLine::keyPressEvent(QKeyEvent *e)
         return ;
     }
     QWidget::keyPressEvent(e);
+}
+
+void TodoLine::paintEvent(QPaintEvent *e)
+{
+    QStyleOption option;
+    option.init(this);
+    QPainter p(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &option, &p, this);
 }
