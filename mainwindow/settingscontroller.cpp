@@ -22,6 +22,7 @@ SettingsController::~SettingsController()
 
 void SettingsController::initItems()
 {
+    // 悬浮面板设置
     auto w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/bgColor"), "背景颜色", "", "panel/bgColor", &us->panelBgColor);
     w->add(QPixmap(":/icons/st/selectBgColor"), "选择区域颜色", "", "panel/selectRectColor", &us->panelSelectRectColor);
@@ -32,21 +33,26 @@ void SettingsController::initItems()
     w->add(QPixmap(":/icons/st/blurOpacity"), "毛玻璃透明度", "", "panel/blurOpacity", &us->panelBlurOpacity, 0, 255, 16);
     addGroup(w, "悬浮面板");
 
+    // 一些尺寸
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/iconSize"), "图标大小", "最大尺寸(非强制,可能更小)，新图标生效", "panel/iconSize", &us->panelIconSize, 16, 255, 16);
     w->add(QPixmap(":/icons/st/spatialMoveRatio"), "空间移动倍率", "右键移动画布的速度的几何倍率", "interactive/spatialMoveRatio", &us->spatialMoveRatio, 1, 10, 1);
     addGroup(w, "宇宙荧光");
 
+    // 一些位置
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/TODO"), "待添加", "");
     addGroup(w, "空间传送");
 
+    // 用户交互
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
+    w->add(QPixmap(":/icons/st/moveOut"), "允许拖拽到外面", "鼠标拖拽到悬浮面板外面，不自动隐藏面板", "interactive/allowMoveOut", &us->allowMoveOut);
     w->add(QPixmap(":/icons/st/fileName"), "同步修改文件名", "修改文件快捷方式的名字时，询问修改文件名", "interactive/modifyFileNameSync", &us->modifyFileNameSync);
     w->add(QPixmap(":/icons/st/fastOpenDir"), "快速展开目录", "文件夹链接默认使用菜单的形式打开，可单独设置", "interactive/fastOpenDir", &us->fastOpenDir);
     w->add(QPixmap(":/icons/st/fastOpenDirLevel"), "展开目录级别", "", "interactive/fastOpenDirLevel", &us->fastOpenDirLevel, 1, 10, 1);
     addGroup(w, "交互优化");
 
+    // 使用数据
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/bootCount"), "程序启动次数", "", "panel/bootCount", &us->bootCount, 0, 0, 1);
     w->lastItem()->setEnabled(false);
@@ -67,6 +73,7 @@ void SettingsController::initItems()
     });
     addGroup(w, "使用数据");
 
+    // 关于程序
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->addOpen(QPixmap(":/icons/lyixi"), "开发团队", "本程序由杭州懒一夕智能科技有限公司“混吃等死部”开发", QUrl("http://lyixi.com"));
     w->addOpen(QPixmap(":/icons/st/QQ"), "交流反馈", "（群号待定，等人多了再建群）", QUrl(""));

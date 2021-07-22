@@ -744,7 +744,7 @@ void UniversePanel::leaveEvent(QEvent *event)
     // 拖拽到外面的时候，左边没事leave在release之后
     // 右边就在release之前leave了
     // 所以直接判断pressing状态
-    if (pressing || scening)
+    if (us->allowMoveOut && (pressing || scening))
     {
         return ;
     }
