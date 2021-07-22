@@ -5,7 +5,6 @@
 
 TodoLine::TodoLine(QWidget *parent) : TodoLine(false, "", parent)
 {
-
 }
 
 TodoLine::TodoLine(bool state, QString text, QWidget *parent)
@@ -13,6 +12,9 @@ TodoLine::TodoLine(bool state, QString text, QWidget *parent)
 {
     check = new QCheckBox(this);
     edit = new TodoLineEdit(this);
+    setObjectName("TodoLine");
+    check->setObjectName("TodoCheck");
+    edit->setObjectName("TodoEdit");
 
     auto layout = new QHBoxLayout(this);
     layout->addWidget(check);

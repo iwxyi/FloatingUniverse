@@ -12,8 +12,10 @@ bool PanelItemBase::_blockPress = false;
 
 PanelItemBase::PanelItemBase(QWidget *parent) : QWidget(parent)
 {
+    setObjectName("ItemBase");
     selectWidget = new QWidget(this);
     selectWidget->hide();
+    selectWidget->setObjectName("SelectEdge");
 
     setFocusPolicy(Qt::ClickFocus);
     setCursor(Qt::PointingHandCursor);
@@ -32,6 +34,9 @@ MyJson PanelItemBase::toJson() const
     json.insert("top", rect.top());
     json.insert("type", int(type));
 
+    if (!customQss.isEmpty())
+        json.insert("qss", customQss);
+
     return json;
 }
 
@@ -42,6 +47,10 @@ void PanelItemBase::fromJson(const MyJson &json)
 
     // 类型
     this->type = PanelItemType(json.i("type"));
+
+    customQss = json.s("qss");
+    if (!customQss.isEmpty())
+        setStyleSheet(customQss);
 }
 
 void PanelItemBase::setType(PanelItemType type)
@@ -83,6 +92,17 @@ bool PanelItemBase::isAutoRaise() const
 bool PanelItemBase::isIgnoreSelect() const
 {
     return ignoreSelect;
+}
+
+void PanelItemBase::setCustomQss(const QString& qss)
+{
+    customQss = qss;
+    setStyleSheet(qss);
+}
+
+QString PanelItemBase::getCustomQss() const
+{
+    return customQss;
 }
 
 void PanelItemBase::facileMenuEvent(FacileMenu *menu)
@@ -246,7 +266,8 @@ void PanelItemBase::selectEvent(const QPoint &startPos)
         selectWidget->setGeometry(getSelectorBorder());
     }
 
-    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdgeColor).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
+    if (!customQss.contains("#SelectEdge"))
+        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelSelectEdgeColor).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
     selectWidget->raise();
     selectWidget->show();
 }
@@ -267,7 +288,8 @@ void PanelItemBase::hoverEvent(const QPoint &startPos)
         selectWidget->setGeometry(getSelectorBorder());
     }
 
-    selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdgeColor).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
+    if (!customQss.contains("#SelectEdge"))
+        selectWidget->setStyleSheet("background: transparent; border: " + QString::number(selectBorder) + "px solid " + QVariant(us->panelHoverEdgeColor).toString() + "; border-radius: " + QString::number(us->fluentRadius) + "px; ");
     selectWidget->raise();
     selectWidget->show();
 }

@@ -57,6 +57,9 @@ void CardItem::paintEvent(QPaintEvent *event)
 {
     ResizeableItemBase::paintEvent(event);
 
+    if (!customQss.isEmpty())
+        return ;
+
     QPainterPath path;
     path.addRoundedRect(rect(), radius, radius);
 

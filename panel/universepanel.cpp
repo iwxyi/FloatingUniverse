@@ -36,6 +36,7 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
     setAttribute(Qt::WA_TranslucentBackground, true);
     setAutoFillBackground(true);
     setAcceptDrops(true);
+    setFocusPolicy(Qt::ClickFocus);
 
     initPanel();
 
@@ -1240,7 +1241,22 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     // 选中一个或者多个
     if (selectedItems.size())
     {
-        menu->split()->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
+        menu->split();
+
+        menu->addAction(QIcon(":/icons/style"), "样式 (&Y)", [=]{
+            QString text = (*selectedItems.begin())->getCustomQss();
+            bool ok;
+            QString qss = QInputDialog::getText(this, "自定义样式", "设置多个部件的CSS样式", QLineEdit::Normal, text, &ok);
+            if (!ok)
+                return ;
+            foreach (auto item, selectedItems)
+            {
+                item->setCustomQss(qss);
+            }
+            saveLater();
+        });
+
+        menu->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
             foreach (auto item, selectedItems)
             {
                 deleteItem(item);

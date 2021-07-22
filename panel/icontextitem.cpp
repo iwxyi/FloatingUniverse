@@ -16,6 +16,8 @@ IconTextItem::IconTextItem(QWidget *parent) : PanelItemBase(parent)
 {
     iconLabel = new QLabel(this);
     textLabel = new QLabel(this);
+    iconLabel->setObjectName("IconLabel");
+    textLabel->setObjectName("TextLabel");
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(iconLabel);
     layout->addWidget(textLabel);

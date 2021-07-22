@@ -10,6 +10,7 @@ TodoItem::TodoItem(QWidget *parent) : ResizeableItemBase(parent)
 
     // 列表
     listWidget = new QListWidget(this);
+    listWidget->setObjectName("ListWidget");
     auto layout = new QVBoxLayout(this);
     layout->addWidget(listWidget);
 
@@ -21,6 +22,7 @@ TodoItem::TodoItem(QWidget *parent) : ResizeableItemBase(parent)
 
     // 添加按钮
     addButton = new WaterCircleButton(QIcon(":/icons/add"), this);
+    addButton->setObjectName("AddButton");
     addButton->setFixedForePos();
     addButton->setFixedForeSize();
     addButton->setFixedSize(us->widgetSize, us->widgetSize);

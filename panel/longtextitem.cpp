@@ -11,6 +11,7 @@ LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
     setType(LongText);
 
     edit = new CustomEdit(this);
+    edit->setObjectName("TextEdit");
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(edit);
 

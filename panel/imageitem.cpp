@@ -11,6 +11,7 @@
 ImageItem::ImageItem(QWidget *parent) : ResizeableItemBase(parent)
 {
     imageLabel = new QLabel(this);
+    imageLabel->setObjectName("ImageLabel");
     imageLabel->setScaledContents(true);
     imageLabel->setAlignment(Qt::AlignCenter);
 
