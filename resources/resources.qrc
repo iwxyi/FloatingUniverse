@@ -78,6 +78,10 @@
         <file alias="lyixi">icons/lyixi.png</file>
         <file>st/moveOut.png</file>
         <file alias="select_all">icons/select_all.png</file>
+        <file alias="list_copy">icons/list_copy.png</file>
+        <file alias="list_paste">icons/list_paste.png</file>
+        <file alias="check">icons/check.png</file>
+        <file alias="uncheck">icons/uncheck.png</file>
     </qresource>
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>

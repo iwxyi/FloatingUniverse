@@ -20,7 +20,7 @@ public:
     MyJson toJson() const override;
 
     void addItem(bool checked, const QString& text);
-    void insertItem(int index, bool checked, const QString& text);
+    QListWidgetItem *insertItem(int index, bool checked, const QString& text);
     void insertAndFocusItem(int index = 0);
     void deleteItem(int index);
 

@@ -44,7 +44,7 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 
 UniversePanel::~UniversePanel()
 {
-    save();
+    saveLater();
 }
 
 /// 初始化面板所有数据
@@ -53,6 +53,10 @@ void UniversePanel::initPanel()
     QRect screen = screenGeometry();
     resize(us->panelWidth, us->panelHeight);
     move((screen.width() - width()) / 2 + us->panelCenterOffset, -height() + us->panelBangHeight); //
+
+    saveTimer = new QTimer(this);
+    saveTimer->setInterval(10);
+    connect(saveTimer, SIGNAL(timeout()), this, SLOT(save()));
 
     readItems();
 
@@ -92,7 +96,7 @@ void UniversePanel::initAction()
     createAction("delete", [=]{
         foreach (auto item, selectedItems)
             deleteItem(item);
-        save();
+        saveLater();
     });
 }
 
@@ -172,7 +176,7 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, bool center, const QStri
 
     items.append(item);
     connectItem(item);
-    save();
+    saveLater();
     selectItem(item);
     return item;
 }
@@ -191,7 +195,7 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
     items.append(item);
     connectItem(item);
 
-    save();
+    saveLater();
     selectItem(item);
     return item;
 }
@@ -213,7 +217,7 @@ ImageItem *UniversePanel::createImageItem(QPoint pos, const QString &image)
 
     items.append(item);
     connectItem(item);
-    save();
+    saveLater();
     selectItem(item);
     return item;
 }
@@ -234,7 +238,7 @@ CardItem *UniversePanel::createCardItem(QPoint pos)
 
     items.append(item);
     connectItem(item);
-    save();
+    saveLater();
     selectItem(item);
     return item;
 }
@@ -250,7 +254,7 @@ TodoItem *UniversePanel::createTodoItem(QPoint pos)
     items.append(item);
     connectItem(item);
 
-    save();
+    saveLater();
     selectItem(item);
     item->insertAndFocusItem(0);
     return item;
@@ -299,7 +303,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::modified, this, [=]{
-        save();
+        saveLater();
     });
 
     connect(item, &PanelItemBase::moveItems, this, [=](QPoint delta) {
@@ -307,7 +311,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
         {
             item->move(item->pos() + delta);
         }
-        save();
+        saveLater();
     });
 
     connect(item, &PanelItemBase::facileMenuUsed, this, [=](FacileMenu* menu) {
@@ -330,17 +334,17 @@ void UniversePanel::connectItem(PanelItemBase *item)
 
     connect(item, &PanelItemBase::deleteMe, this, [=]{
         deleteItem(item);
-        save();
+        saveLater();
     });
 
     connect(item, &PanelItemBase::raiseMe, this, [=]{
         raiseItem(item);
-        save();
+        saveLater();
     });
 
     connect(item, &PanelItemBase::lowerMe, this, [=]{
         lowerItem(item);
-        save();
+        saveLater();
     });
 
     connect(item, &PanelItemBase::keepPanelFixing, this, [=]{
@@ -474,6 +478,13 @@ void UniversePanel::foldPanel()
     ani->start();
     expanding = false;
     PanelItemBase::_blockPress = animating = true;
+}
+
+/// 延迟保存
+/// 因为很多动作都会触发修改，导致重复保存
+void UniversePanel::saveLater()
+{
+    saveTimer->start();
 }
 
 void UniversePanel::save()
@@ -960,7 +971,7 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
             // 批量选中
             if (scening) // 移动面板位置
             {
-                save();
+                saveLater();
                 scening = false;
             }
             else if ((pressPos - draggingPos).manhattanLength() > QApplication::startDragDistance()) // 拖拽选中结束
@@ -1075,7 +1086,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             {
                 item->move(item->pos().x(), minY);
             }
-            save();
+            saveLater();
         });
         alignMenu->addAction("行中对齐 (&H)", [=]{
             auto sItems = selectedItems.toList();
@@ -1095,7 +1106,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             {
                 item->move(item->pos().x(), alignY - item->height() / 2);
             }
-            save();
+            saveLater();
         });
         alignMenu->addAction("下对齐 (&B)", [=]{
             auto sItems = selectedItems.toList();
@@ -1112,7 +1123,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             {
                 item->move(item->pos().x(), maxY - item->height());
             }
-            save();
+            saveLater();
         });
         alignMenu->split()->addAction("左对齐 (&L)", [=]{
             auto sItems = selectedItems.toList();
@@ -1129,7 +1140,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             {
                 item->move(minX, item->pos().y());
             }
-            save();
+            saveLater();
         });
         alignMenu->addAction("列中对齐 (&V)", [=]{
             auto sItems = selectedItems.toList();
@@ -1149,7 +1160,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             {
                 item->move(alignX - item->width() / 2, item->pos().y());
             }
-            save();
+            saveLater();
         });
         alignMenu->addAction("右对齐 (&R)", [=]{
             auto sItems = selectedItems.toList();
@@ -1166,7 +1177,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             {
                 item->move(maxX - item->width(), item->pos().y());
             }
-            save();
+            saveLater();
         });
 
         auto spaceMenu = menu->addMenu(QIcon(":/icons/spacing"), "分布 (&F)");
@@ -1188,7 +1199,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
                 item->move(left, item->y());
                 left += item->width() + each;
             }
-            save();
+            saveLater();
         });
         spaceMenu->addAction("垂直等间距 (&V)", [=]{
             auto sItems = selectedItems.toList();
@@ -1208,7 +1219,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
                 item->move(item->x(), top);
                 top += item->height() + each;
             }
-            save();
+            saveLater();
         });
         spaceMenu->split()->addAction("自动分布 (&A)", [=]{
 
@@ -1234,7 +1245,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
             {
                 deleteItem(item);
             }
-            save();
+            saveLater();
         });
     }
 

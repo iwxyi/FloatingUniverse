@@ -1,4 +1,5 @@
 #include <QVBoxLayout>
+#include <QClipboard>
 #include "todoitem.h"
 #include "usettings.h"
 #include "facilemenu.h"
@@ -79,7 +80,7 @@ void TodoItem::addItem(bool checked, const QString &text)
     insertItem(-1, checked, text);
 }
 
-void TodoItem::insertItem(int index, bool checked, const QString &text)
+QListWidgetItem* TodoItem::insertItem(int index, bool checked, const QString &text)
 {
     auto line = new TodoLine(checked, text, listWidget);
     auto item = index < 0 ? new QListWidgetItem(listWidget) : new QListWidgetItem;
@@ -149,6 +150,7 @@ void TodoItem::insertItem(int index, bool checked, const QString &text)
         }
     });
     connect(line, &TodoLine::signalEsc, listWidget, [=]{
+        listWidget->clearSelection();
         listWidget->setFocus();
     });
     connect(line, &TodoLine::signalInsertNext, listWidget, [=](bool rev) {
@@ -166,6 +168,8 @@ void TodoItem::insertItem(int index, bool checked, const QString &text)
         if (newRow >= 0 && newRow < lines.count())
             lines.at(newRow)->setEdit();
     });
+
+    return item;
 }
 
 void TodoItem::insertAndFocusItem(int index)
@@ -200,14 +204,60 @@ void TodoItem::showMenu()
 
     int row = listWidget->currentRow();
 
-    menu->addAction(QIcon(":/icons/add"), "插入 (&I)", [=]{
+    menu->addAction(QIcon(":/icons/check"), "勾选 (&C)", [=]{
+        auto selects = listWidget->selectedItems();
+        foreach (auto item, selects)
+        {
+            int row = listWidget->row(item);
+            lines.at(row)->setChecked(true);
+        }
+    });
+
+    menu->addAction(QIcon(":/icons/uncheck"), "反勾选 (&R)", [=]{
+        auto selects = listWidget->selectedItems();
+        foreach (auto item, selects)
+        {
+            int row = listWidget->row(item);
+            lines.at(row)->setChecked(!lines.at(row)->isChecked());
+        }
+    });
+
+    auto selectCount = listWidget->selectedItems().size();
+    menu->addAction(QIcon(":/icons/list_copy"), "复制列表 (&G)", [=]{
+        auto selects = listWidget->selectedItems();
+        QStringList sl;
+        foreach (auto item, selects)
+        {
+            int row = listWidget->row(item);
+            sl.append(lines.at(row)->getText());
+        }
+        QApplication::clipboard()->setText(sl.join("\n"));
+    })->text(selectCount > 1, QString("复制列表 %1 (&G)").arg(selectCount));
+
+    QString text = QApplication::clipboard()->text();
+    int pasteCount = text.split("\n", QString::SkipEmptyParts).size();
+    menu->addAction(QIcon(":/icons/list_paste"), "粘贴列表 (&P)", [=]{
+        QStringList sl = text.split("\n", QString::SkipEmptyParts);
+        int index = listWidget->currentRow();
+        if (index == -1)
+            index = 0;
+        listWidget->clearSelection();
+        foreach (auto s, sl)
+        {
+            insertItem(index, false, s.trimmed());
+            listWidget->setCurrentRow(index, QItemSelectionModel::Select);
+            index++;
+        }
+    })->text(pasteCount > 1, QString("粘贴列表 %1 (&P)").arg(pasteCount))->disable(!pasteCount);
+
+    menu->split()->addAction(QIcon(":/icons/add"), "插入 (&I)", [=]{
         int row = listWidget->currentRow();
         if (row == -1)
             return ;
         insertAndFocusItem(row);
     })->tip("shift+↑")->disable(row == -1);
 
-    menu->addAction(QIcon(":/icons/select_all"), "全选 (&A)", [=]{
+    menu->split()->addAction(QIcon(":/icons/select_all"), "全选 (&A)", [=]{
         listWidget->selectAll();
     })->tip("Alt+A");
 

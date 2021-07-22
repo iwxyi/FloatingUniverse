@@ -55,6 +55,11 @@ void TodoLine::setChecked(bool ch)
     check->setChecked(ch);
 }
 
+bool TodoLine::isChecked() const
+{
+    return check->isChecked();
+}
+
 void TodoLine::setText(const QString &text)
 {
     edit->setText(text);

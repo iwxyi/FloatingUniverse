@@ -46,6 +46,7 @@ signals:
 public slots:
     void expandPanel();
     void foldPanel();
+    void saveLater();
     void save();
     void selectAll(bool containIgnored = true);
     void unselectAll();
@@ -103,6 +104,7 @@ private:
     bool _release_outter = false; // 鼠标松开的时候，是不是在外面
     bool _prev_fixing = false;
     QPixmap panelBlurPixmap;
+    QTimer* saveTimer;
 
     QList<PanelItemBase*> items;
     QSet<PanelItemBase*> selectedItems;
