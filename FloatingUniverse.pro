@@ -45,6 +45,9 @@ SOURCES += \
     panel/moveablewidget.cpp \
     panel/panelitembase.cpp \
     panel/resizeableitembase.cpp \
+    panel/todoitem.cpp \
+    panel/todoline.cpp \
+    panel/todolineedit.cpp \
     panel/universepanel.cpp \
     third_party/color_octree/coloroctree.cpp \
     third_party/color_octree/imageutil.cpp \
@@ -92,6 +95,9 @@ HEADERS += \
     panel/moveablewidget.h \
     panel/panelitembase.h \
     panel/resizeableitembase.h \
+    panel/todoitem.h \
+    panel/todoline.h \
+    panel/todolineedit.h \
     panel/universepanel.h \
     resources/resource.rc \
     third_party/escape_dialog/escapedialog.h \

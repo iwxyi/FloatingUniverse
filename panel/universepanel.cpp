@@ -119,6 +119,7 @@ void UniversePanel::readItems()
         switch (type)
         {
         case DefaultItem:
+            qWarning() << "未设置类型的组件";
             continue;
         case IconText:
         case LocalFile:
@@ -133,6 +134,9 @@ void UniversePanel::readItems()
             break;
         case CardView:
             item = new CardItem(this);
+            break;
+        case TodoList:
+            item = new TodoItem(this);
             break;
         }
 
@@ -230,6 +234,22 @@ CardItem *UniversePanel::createCardItem(QPoint pos)
 
     items.append(item);
     connectItem(item);
+    save();
+    selectItem(item);
+    return item;
+}
+
+TodoItem *UniversePanel::createTodoItem(QPoint pos)
+{
+    auto item = new TodoItem(this);
+
+    item->show();
+    QFontMetrics fm(item->font());
+    item->move(pos - item->contentsRect().topLeft() - QPoint(2, fm.height() / 2 + 2));
+
+    items.append(item);
+    connectItem(item);
+
     save();
     selectItem(item);
     return item;
@@ -1286,8 +1306,10 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
 
     addMenu->addRow([=]{
         addMenu->addAction(QIcon(":icons/todo"), "待办 (&T)", [=]{
-
-        })->disable();
+            if (currentMenu)
+                currentMenu->close();
+            createTodoItem(cursorPos);
+        });
         addMenu->addAction(QIcon(":icons/remind"), "提醒 (&R)", [=]{
 
         })->disable();

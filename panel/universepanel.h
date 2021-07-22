@@ -9,6 +9,7 @@
 #include "longtextitem.h"
 #include "imageitem.h"
 #include "carditem.h"
+#include "todoitem.h"
 
 #define eachitem(x) for (int i = items.size() - 1; i >= 0; i--)\
 {\
@@ -33,6 +34,7 @@ private:
     ImageItem *createImageItem(QPoint pos, const QPixmap& pixmap);
     ImageItem *createImageItem(QPoint pos, const QString& image);
     CardItem *createCardItem(QPoint pos);
+    TodoItem *createTodoItem(QPoint pos);
     void connectItem(PanelItemBase* item);
     void deleteItem(PanelItemBase* item);
     bool hasItemUsing() const;

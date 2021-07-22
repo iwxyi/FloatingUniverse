@@ -42,7 +42,8 @@ public:
     // 控件尺寸（宇宙荧光）
     int panelItemSize = 64; // Item大小
     int panelIconSize = 32; // 图标大小
-    int widgetSize = 32;
+    int buttonSize = 24; // 小型按钮控件的大小
+    int widgetSize = 32; // 一些中型控件
     int fluentRadius = 5;
     int settingsMaxWidth = 680;
     int settingsMinWidth = 300;

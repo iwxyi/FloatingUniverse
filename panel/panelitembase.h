@@ -16,7 +16,8 @@ enum PanelItemType
     WebUrl,
     LongText,
     ImageView,
-    CardView
+    CardView,
+    TodoList
 };
 
 #define UNDEFINED_POS QPoint(-1, -1)
