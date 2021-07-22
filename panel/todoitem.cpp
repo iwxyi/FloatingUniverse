@@ -98,6 +98,8 @@ QListWidgetItem* TodoItem::insertItem(int index, bool checked, const QString &te
     connect(line, &TodoLine::modified, this, &TodoItem::modified);
     connect(line, &TodoLine::signalMenu, this, &TodoItem::showMenu);
     connect(line, &TodoLine::focused, listWidget, [=]{
+        if (!isSelected())
+            emit selectMe();
         if (listWidget->selectedItems().contains(listWidget->item(lines.indexOf(line))))
             // 这个item已经选中了，不需要重复选中
             return ;
@@ -202,7 +204,7 @@ bool TodoItem::isUsing() const
 void TodoItem::showMenu()
 {
     newFacileMenu;
-    menu->setTipArea("Alt+Delete");
+    menu->setTipArea("Shift+Enter");
 
     int row = listWidget->currentRow();
 
@@ -257,7 +259,7 @@ void TodoItem::showMenu()
         if (row == -1)
             return ;
         insertAndFocusItem(row);
-    })->tip("shift+↑")->disable(row == -1);
+    })->tip("Shift+Enter")->disable(row == -1);
 
     menu->addAction(QIcon(":/icons/select_all"), "全选 (&A)", [=]{
         listWidget->selectAll();
