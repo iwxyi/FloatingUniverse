@@ -95,7 +95,58 @@ void TodoItem::insertItem(int index, bool checked, const QString &text)
     connect(line, &TodoLine::modified, this, &TodoItem::modified);
     connect(line, &TodoLine::signalMenu, this, &TodoItem::showMenu);
     connect(line, &TodoLine::focused, listWidget, [=]{
-        listWidget->setCurrentRow(lines.indexOf(line));
+        if (listWidget->selectedItems().contains(listWidget->item(lines.indexOf(line))))
+            // 这个item已经选中了，不需要重复选中
+            return ;
+        int index = lines.indexOf(line);
+        auto modifier = QApplication::keyboardModifiers();
+        if (modifier == Qt::NoModifier)
+        {
+            listWidget->clearSelection();
+            listWidget->setCurrentRow(index);
+        }
+        else if (modifier & Qt::ShiftModifier)
+        {
+            int current = listWidget->currentRow();
+            if (current < 0)
+                current = 0;
+            // 从 current ~ index 之间的选中
+            if (current > index)
+            {
+                int temp = current;
+                current = index;
+                index = temp;
+            }
+            for (int i = current; i <= index; i++)
+            {
+                listWidget->setCurrentRow(i, QItemSelectionModel::Select);
+            }
+            listWidget->setCurrentRow(lines.indexOf(line), QItemSelectionModel::Current);
+        }
+        else if (modifier & Qt::ControlModifier)
+        {
+            // 多选（此项必须选中）
+            listWidget->setCurrentRow(index, QItemSelectionModel::Select);
+        }
+        else if (modifier & Qt::AltModifier)
+        {
+            // 全部反选
+            int current = listWidget->currentRow();
+            if (current < 0)
+                current = 0;
+            // 从 current ~ index 之间的选中
+            if (current > index)
+            {
+                int temp = current;
+                current = index;
+                index = temp;
+            }
+            for (int i = current; i <= index; i++)
+            {
+                listWidget->setCurrentRow(i, QItemSelectionModel::Toggle);
+            }
+            listWidget->setCurrentRow(lines.indexOf(line), QItemSelectionModel::Current);
+        }
     });
     connect(line, &TodoLine::signalEsc, listWidget, [=]{
         listWidget->setFocus();

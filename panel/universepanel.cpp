@@ -245,7 +245,7 @@ TodoItem *UniversePanel::createTodoItem(QPoint pos)
 
     item->show();
     QFontMetrics fm(item->font());
-    item->move(pos - item->contentsRect().topLeft() - QPoint(2, fm.height() / 2 + 2));
+    item->move(pos - item->contentsRect().topLeft() - QPoint(2, 2));
 
     items.append(item);
     connectItem(item);
