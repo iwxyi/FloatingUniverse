@@ -924,7 +924,7 @@ FacileMenu *FacileMenu::setTipArea(int x)
 FacileMenu *FacileMenu::setTipArea(QString longestTip)
 {
     QFontMetrics fm(this->font());
-    addin_tip_area = fm.horizontalAdvance(longestTip+"Ctrl");
+    addin_tip_area = fm.horizontalAdvance(longestTip);
     return this;
 }
 
@@ -1037,7 +1037,7 @@ void FacileMenu::setActionButton(InteractiveButtonBase *btn, bool isChip)
     // 设置尺寸
     if (isChip)
     {
-        btn->setPaddings(8, 8, 8, 8);
+        btn->setPaddings(4);
     }
     else
     {

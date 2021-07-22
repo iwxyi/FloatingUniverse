@@ -77,6 +77,7 @@
         <file>st/QQ.png</file>
         <file alias="lyixi">icons/lyixi.png</file>
         <file>st/moveOut.png</file>
+        <file alias="select_all">icons/select_all.png</file>
     </qresource>
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>

@@ -21,6 +21,7 @@ TodoLine::TodoLine(bool state, QString text, QWidget *parent)
 
     check->setCursor(Qt::PointingHandCursor);
     edit->setStyleSheet("QLineEdit { background: transparent; border: none; }");
+    // setFocusProxy(edit); // 想要自定义更多事件，暂且不用它了
 
     setChecked(state);
     setText(text);

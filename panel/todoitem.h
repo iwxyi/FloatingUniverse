@@ -28,7 +28,7 @@ public:
 
 public slots:
     void showMenu();
-    void deleteAction();
+    void actionDelete();
 
 protected:
     void selectEvent(const QPoint &startPos) override;

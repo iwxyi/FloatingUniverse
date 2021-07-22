@@ -30,6 +30,20 @@ TodoItem::TodoItem(QWidget *parent) : ResizeableItemBase(parent)
     });
 
     listWidget->setStyleSheet("QListWidget { background: transparent; border: none; }");
+    listWidget->setFocusPolicy(Qt::StrongFocus);
+    this->setFocusProxy(listWidget);
+
+    // 添加action
+    auto createAction = [=](QString key, FuncType fun){
+        QAction* action = new QAction(listWidget);
+        action->setShortcut(QKeySequence(key));
+        connect(action, &QAction::triggered, this, fun);
+        listWidget->addAction(action);
+    };
+
+    /* createAction("ctrl+a", [=]{ // 快捷键冲突了
+        listWidget->selectAll();
+    }); */
 }
 
 void TodoItem::fromJson(const MyJson &json)
@@ -139,26 +153,39 @@ void TodoItem::showMenu()
         if (row == -1)
             return ;
         insertAndFocusItem(row);
-    })->disable(row == -1);
+    })->tip("shift+↑")->disable(row == -1);
+
+    menu->addAction(QIcon(":/icons/select_all"), "全选 (&A)", [=]{
+        listWidget->selectAll();
+    })->tip("Alt+A");
 
     menu->addAction(QIcon(":/icons/delete"), "删除行 (&D)", [=]{
-        deleteAction();
-    })->disable(row == -1);
+        actionDelete();
+    })->tip("Alt+Delete")->disable(row == -1);
 
+    menu->setTipArea("Alt+Delete");
     menu->exec();
     emit facileMenuUsed(menu);
 }
 
-void TodoItem::deleteAction()
+void TodoItem::actionDelete()
 {
+    int selectRow = listWidget->currentRow();
     auto selects = listWidget->selectedItems();
     foreach (auto item, selects)
     {
         int row = listWidget->row(item);
+        if (row < selectRow)
+            selectRow--;
         if (row == -1)
             continue;
         deleteItem(row);
     }
+
+    if (selectRow >= listWidget->count())
+        selectRow = listWidget->count() - 1;
+    if (selectRow >= 0 && selectRow < listWidget->count())
+        listWidget->setCurrentRow(selectRow);
 }
 
 void TodoItem::selectEvent(const QPoint &startPos)
@@ -193,11 +220,33 @@ void TodoItem::leaveEvent(QEvent *event)
 void TodoItem::keyPressEvent(QKeyEvent *e)
 {
     auto key = e->key();
-    // qDebug() << "item.key" << key;
+    auto modifier = e->modifiers();
+    // qDebug() << "item.key" << modifier << key;
     if (key == Qt::Key_Delete)
     {
-        deleteAction();
+        actionDelete();
         return ;
     }
+    else if (!modifier && (key == Qt::Key_Enter || key == Qt::Key_Return))
+    {
+        int row = listWidget->currentRow();
+        if (row != -1)
+        {
+            lines.at(row)->setEdit();
+        }
+        return ;
+    }
+    else if ((modifier & Qt::ControlModifier || modifier & Qt::AltModifier) && key == Qt::Key_A)
+    {
+        // 因为快捷键冲突了，只能这样子覆盖了
+        listWidget->selectAll();
+        return ;
+    }
+    else if (modifier & Qt::AltModifier && key == Qt::Key_Delete)
+    {
+        actionDelete();
+        return ;
+    }
+
     ResizeableItemBase::keyPressEvent(e);
 }
