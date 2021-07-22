@@ -3,7 +3,9 @@
 
 #include <QLineEdit>
 
-class TodoLineEdit : public QLineEdit
+#define TODO_EDIT_TYPE QLineEdit
+
+class TodoLineEdit : public TODO_EDIT_TYPE
 {
     Q_OBJECT
 public:
@@ -12,7 +14,8 @@ public:
 signals:
     void focusIn();
     void focusOut();
-    void finished();
+    void escKey();
+    void enterKey(bool ctrl);
 
 protected:
     void focusInEvent(QFocusEvent *e) override;

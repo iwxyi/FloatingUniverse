@@ -1,4 +1,6 @@
 #include <QHBoxLayout>
+#include <QKeyEvent>
+#include <QDebug>
 #include "todoline.h"
 
 TodoLine::TodoLine(QWidget *parent) : TodoLine(false, "", parent)
@@ -24,9 +26,11 @@ TodoLine::TodoLine(bool state, QString text, QWidget *parent)
     setText(text);
 
     connect(check, SIGNAL(stateChanged(int)), this, SIGNAL(modified()));
-    connect(edit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SIGNAL(customMenu()));
+    connect(edit, SIGNAL(customContextMenuRequested(const QPoint&)), this, SIGNAL(signalMenu()));
     connect(edit, SIGNAL(editingFinished()), this, SIGNAL(modified()));
     connect(edit, SIGNAL(focusIn()), this, SIGNAL(focused()));
+    connect(edit, SIGNAL(escKey()), this, SIGNAL(signalEsc()));
+    connect(edit, SIGNAL(enterKey(bool)), this, SIGNAL(signalInsertNext(bool)));
 }
 
 MyJson TodoLine::toJson() const
@@ -60,7 +64,35 @@ QString TodoLine::getText() const
     return edit->text();
 }
 
+bool TodoLine::hasFocus() const
+{
+    return QWidget::hasFocus() || edit->hasFocus();
+}
+
 void TodoLine::setEdit()
 {
     edit->setFocus();
+}
+
+void TodoLine::keyPressEvent(QKeyEvent *e)
+{
+    auto key = e->key();
+    auto modifier = e->modifiers();
+    // qDebug() << "line.key" << key;
+    if (key == Qt::Key_Delete)
+    {
+        emit signalDeleteAction();
+        return ;
+    }
+    else if (key == Qt::Key_Up && !modifier)
+    {
+        emit signalMoveNext(true);
+        return ;
+    }
+    else if (key == Qt::Key_Down && !modifier)
+    {
+        emit signalMoveNext(false);
+        return ;
+    }
+    QWidget::keyPressEvent(e);
 }

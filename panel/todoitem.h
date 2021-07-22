@@ -19,20 +19,23 @@ public:
     void fromJson(const MyJson &json) override;
     MyJson toJson() const override;
 
-    void insertNewItem();
     void addItem(bool checked, const QString& text);
     void insertItem(int index, bool checked, const QString& text);
+    void insertAndFocusItem(int index);
     void deleteItem(int index);
 
     virtual bool isUsing() const override;
 
 public slots:
     void showMenu();
+    void deleteAction();
 
 protected:
     void selectEvent(const QPoint &startPos) override;
-
     void resizeEvent(QResizeEvent *event) override;
+    void enterEvent(QEvent *event) override;
+    void leaveEvent(QEvent *event) override;
+    void keyPressEvent(QKeyEvent *e) override;
 
 private:
     QListWidget* listWidget;

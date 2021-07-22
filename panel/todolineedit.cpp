@@ -9,14 +9,14 @@ TodoLineEdit::TodoLineEdit(QWidget *parent) : QLineEdit(parent)
 
 void TodoLineEdit::focusInEvent(QFocusEvent *e)
 {
-    QLineEdit::focusInEvent(e);
+    TODO_EDIT_TYPE::focusInEvent(e);
 
     emit focusIn();
 }
 
 void TodoLineEdit::focusOutEvent(QFocusEvent *e)
 {
-    QLineEdit::focusOutEvent(e);
+    TODO_EDIT_TYPE::focusOutEvent(e);
 
     emit focusOut();
 }
@@ -24,12 +24,19 @@ void TodoLineEdit::focusOutEvent(QFocusEvent *e)
 void TodoLineEdit::keyPressEvent(QKeyEvent *e)
 {
     auto key = e->key();
-    if (key == Qt::Key_Escape || key == Qt::Key_Enter || key == Qt::Key_Return)
+    // qDebug() << "edit.key" << key;
+    if (key == Qt::Key_Escape)
     {
-        emit finished();
+        emit escKey();
+        return ;
+    }
+    else if (key == Qt::Key_Enter || key == Qt::Key_Return)
+    {
+        auto modify = e->modifiers();
+        emit enterKey(modify != Qt::NoModifier);
         return ;
     }
 
-    QLineEdit::keyPressEvent(e);
+    TODO_EDIT_TYPE::keyPressEvent(e);
 }
 

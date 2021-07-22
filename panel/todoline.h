@@ -22,12 +22,20 @@ public:
     void setText(const QString& text);
     QString getText() const;
 
+    bool hasFocus() const;
     void setEdit();
 
 signals:
     void modified();
     void focused();
-    void customMenu();
+    void signalMenu();
+    void signalEsc();
+    void signalInsertNext(bool rev);
+    void signalDeleteAction();
+    void signalMoveNext(bool rev);
+
+protected:
+    void keyPressEvent(QKeyEvent *e) override;
 
 public slots:
 
