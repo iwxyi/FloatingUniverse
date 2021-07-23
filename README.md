@@ -149,16 +149,20 @@
   - ItemBase：所有部件的最底层
 
     ```css
-    /* 设置布局背景为白色圆角矩形 */
+    /* 设置部件背景为白色圆角矩形 */
     #ItemBase { background: white; border-radius: 5px; margin: 3px; }
     ```
 
-  - SelectEdge：边缘，需要重启才生效
+    ![自定义样式](screenshots/自定义样式_白.png)
+
+  - SelectEdge：选中后才出现的背景，修改需重启
 
     ```css
     /* 设置选择框为宽度为1的红色 */
     #SelectEdge { border: 1px solid #AA0000; }
     ```
+    
+    ![自定义样式](screenshots/自定义样式_边.png)
 
 - 链接
 
@@ -175,8 +179,21 @@
   - TextEdit
 
     ```css
-    /* 设置文字为蓝色 */
-    #TextEdit { color: blue; }
+    /* 设置文字为蓝色宋体、增大、删除线 */
+    #TextEdit {
+        color: blue;
+        font-family: 宋体;
+        font-size: 30px;
+        text-decoration:line-through;
+    }
+    ```
+    
+    ![自定义样式](screenshots/自定义样式_文.png)
+    
+    图中的彩色边缘样式：
+    
+    ```css
+    #SelectEdge { background: transparent; border: 5px solid qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(0, 0, 0, 0), stop:0.52 rgba(0, 0, 0, 0), stop:0.565 rgba(82, 121, 76, 33), stop:0.65 rgba(159, 235, 148, 64), stop:0.721925 rgba(255, 238, 150, 129), stop:0.77 rgba(255, 128, 128, 204), stop:0.89 rgba(191, 128, 255, 64), stop:1 rgba(0, 0, 0, 0));}
     ```
 
 - 待办
@@ -201,7 +218,7 @@
     margin: 3px;
     ```
   
-    ![自定义样式](screenshots/自定义样式.png)
+    ![自定义样式](screenshots/自定义样式_渐.png)
 
 
 
