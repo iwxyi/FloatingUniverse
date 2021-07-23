@@ -134,6 +134,7 @@
 
 - `Ctrl+A`：第一次全选可选中的（不包括设置“不被选中”）的部件；连续的第二次全选所有部件
 - `Delete`：删除选中项
+- 一些部件（比如“待办”）有自己的快捷键，右键菜单可看到
 
 
 
@@ -149,14 +150,14 @@
 
     ```css
     /* 设置布局背景为白色圆角矩形 */
-    #ItemBase{background: white; border-radius: 5px; margin: 3px;}
+    #ItemBase { background: white; border-radius: 5px; margin: 3px; }
     ```
 
   - SelectEdge：边缘，需要重启才生效
 
     ```css
     /* 设置选择框为宽度为1的红色 */
-    #SelectEdge{ border: 1px solid #AA0000;}
+    #SelectEdge { border: 1px solid #AA0000; }
     ```
 
 - 链接
@@ -175,7 +176,7 @@
 
     ```css
     /* 设置文字为蓝色 */
-    #TextEdit{ color: blue; }
+    #TextEdit { color: blue; }
     ```
 
 - 待办
@@ -191,10 +192,23 @@
 
 - 矩形
 
-  - 使用 ItemBase，或干脆不用选择器
+  - 可以不需要选择器；设置样式后，将**完全替代**原本的圆角矩形
+  
+    ```css
+    /* 一个横向渐变，如下图 */
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 178, 102, 64), stop:0.55 rgba(235, 148, 61, 64), stop:0.98 rgba(255, 255, 255, 64), stop:1 rgba(255, 255, 255, 0));
+    border-radius: 5px;
+    margin: 3px;
+    ```
+  
+    ![自定义样式](screenshots/自定义样式.png)
 
 
 
-一些注意点：
 
-- “矩形”部件设置CSS后，将**完全替代**原本的圆角矩形；但是设置背景颜色无效，因此显示不出来。
+
+
+
+## 附录
+
+1. 渐变样式示例：https://blog.csdn.net/wzs250969969/article/details/78458151

@@ -826,7 +826,7 @@ void UniversePanel::paintEvent(QPaintEvent *)
         path.addRoundedRect(QRect(0, 0, width(), height() - us->panelBangHeight), us->fluentRadius, us->fluentRadius);
         painter.fillPath(path, us->panelBgColor);
 
-        if (us->panelBlur && !panelBlurPixmap.isNull())
+        if (us->panelBlur && us->panelBlurOpacity && !panelBlurPixmap.isNull())
         {
             QRect rect = this->rect();
             rect.moveTop(-this->y());
