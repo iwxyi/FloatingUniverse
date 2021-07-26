@@ -36,6 +36,7 @@ TodoLine::TodoLine(bool state, QString text, QWidget *parent)
     connect(edit, SIGNAL(focusIn()), this, SIGNAL(focused()));
     connect(edit, SIGNAL(escKey()), this, SIGNAL(signalEsc()));
     connect(edit, SIGNAL(enterKey(bool)), this, SIGNAL(signalInsertNext(bool)));
+    connect(edit, SIGNAL(deleteMe(bool)), this, SIGNAL(signalDeleteMe(bool)));
 }
 
 MyJson TodoLine::toJson() const

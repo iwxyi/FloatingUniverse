@@ -33,6 +33,7 @@ signals:
     void signalInsertNext(bool rev);
     void signalDeleteAction();
     void signalMoveNext(bool rev);
+    void signalDeleteMe(bool next);
 
 protected:
     void keyPressEvent(QKeyEvent *e) override;

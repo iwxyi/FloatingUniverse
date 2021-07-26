@@ -172,6 +172,23 @@ QListWidgetItem* TodoItem::insertItem(int index, bool checked, const QString &te
         if (newRow >= 0 && newRow < lines.count())
             lines.at(newRow)->setEdit();
     });
+    connect(line, &TodoLine::signalDeleteMe, listWidget, [=](bool next) {
+        int row = lines.indexOf(line);
+        deleteItem(row);
+        if (!next)
+            row--;
+
+        if (row >= listWidget->count())
+            row = listWidget->count() - 1;
+        else if (row < 0)
+            row = 0;
+
+        if (row >= 0 && row < listWidget->count())
+        {
+            listWidget->setCurrentRow(row);
+            lines.at(row)->setEdit();
+        }
+    });
 
     return item;
 }

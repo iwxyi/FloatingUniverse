@@ -16,6 +16,7 @@ signals:
     void focusOut();
     void escKey();
     void enterKey(bool ctrl);
+    void deleteMe(bool next);
 
 protected:
     void focusInEvent(QFocusEvent *e) override;
