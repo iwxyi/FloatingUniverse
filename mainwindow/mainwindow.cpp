@@ -230,6 +230,7 @@ void MainWindow::closeEvent(QCloseEvent *e)
 {
     us->setValue("mainwindow/geometry", this->saveGeometry());
     us->setValue("mainwindow/state", this->saveState());
+	us->sync();
 
 #if defined(ENABLE_TRAY)
     e->ignore();

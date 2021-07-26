@@ -182,9 +182,16 @@ void LongTextItem::showEditMenu()
         }
     });
 
+    auto clip = QApplication::clipboard();
+    auto mime = clip->mimeData();
+    bool canPaste = mime->hasText()
+            || (enableHtml && mime->hasHtml());
     menu->addAction(QIcon(":/icons/paste"), "粘贴 (&V)", [=]{
-        edit->paste();
-    });
+        if (enableHtml)
+            edit->paste();
+        else
+            edit->insertPlainText(mime->text());
+    })->disable(!canPaste)->text(!enableHtml, "粘贴纯文本 (&V)");
 
     menu->split();
     menu->addAction(QIcon(":/icons/html"), "使用HTML (&H)", [=]{
