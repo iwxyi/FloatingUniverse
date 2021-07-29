@@ -1307,7 +1307,9 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     menu->finished([=]{
         currentMenu = nullptr;
         if (!geometry().contains(QCursor::pos()) // 应该使用的，但实测这句加不加问题不大
-                && !menu->rect().contains(menu->mapFromGlobal(QCursor::pos()))
+                && !menu->geometry().contains(QCursor::pos())
+                && !menu->isClosedByClick()
+                && !this->hasItemUsing()
                 && !this->hasFocus()) // 这个判断并没有任何用处，就意思一下
         {
             // 鼠标外面隐藏菜单，隐藏面板
