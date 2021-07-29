@@ -25,6 +25,7 @@
 #include "netutil.h"
 #include "icontextitem.h"
 #include "carditem.h"
+#include "qss_editor/qsseditdialog.h"
 
 UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 {
@@ -1279,7 +1280,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         menu->addAction(QIcon(":/icons/style"), "样式 (&Y)", [=]{
             QString text = (*selectedItems.begin())->getCustomQss();
             bool ok;
-            QString qss = QInputDialog::getText(this, "自定义样式", "设置多个部件的CSS样式", QLineEdit::Normal, text, &ok);
+            QString qss = QssEditDialog::getText(this, "自定义样式", "设置多个部件的CSS样式", text, &ok);
             if (!ok)
                 return ;
             foreach (auto item, selectedItems)

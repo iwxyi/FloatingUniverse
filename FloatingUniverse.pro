@@ -80,7 +80,9 @@ SOURCES += \
     widgets/anicirclelabel.cpp \
     widgets/aninumberlabel.cpp \
     mainwindow/settingscontroller.cpp \
-    mainwindow/settingsitemlistbox.cpp
+    mainwindow/settingsitemlistbox.cpp \
+    widgets/qss_editor/qsseditdialog.cpp \
+    widgets/qss_editor/qsshighlighteditor.cpp
 
 HEADERS += \
     global/accountinfo.h \
@@ -140,12 +142,15 @@ HEADERS += \
     widgets/customtabstyle.h \
     widgets/lefttabwidget.h \
     mainwindow/settingscontroller.h \
-    mainwindow/settingsitemlistbox.h
+    mainwindow/settingsitemlistbox.h \
+    widgets/qss_editor/qsseditdialog.h \
+    widgets/qss_editor/qsshighlighteditor.h
 
 FORMS += \
     mainwindow/mainwindow.ui \
     mainwindow/settingscontroller.ui \
-    third_party/utils/textinputdialog.ui
+    third_party/utils/textinputdialog.ui \
+    widgets/qss_editor/qsseditdialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
