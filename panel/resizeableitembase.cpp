@@ -4,6 +4,7 @@
 #include <windowsx.h>
 #endif
 #include "resizeableitembase.h"
+#include "usettings.h"
 
 ResizeableItemBase::ResizeableItemBase(QWidget *parent) : PanelItemBase(parent)
 {
@@ -75,6 +76,7 @@ void ResizeableItemBase::resizeEvent(QResizeEvent *event)
     PanelItemBase::resizeEvent(event);
 
     adjustCornerPos();
+    saveMyModuleSize();
 }
 
 void ResizeableItemBase::selectEvent(const QPoint& startPos)
@@ -85,4 +87,24 @@ void ResizeableItemBase::selectEvent(const QPoint& startPos)
     {
         resizeCorner[i]->raise();
     }
+}
+
+/// 保存该类型组件的尺寸
+/// 下次添加同一类型时，依旧是这个大小
+#include <QDebug>
+void ResizeableItemBase::saveModuleSize(QSize &size, QString key)
+{
+    if (this->isHidden())
+        return ;
+
+    // 太小了不保存
+    if (this->size().width() < 16 || this->size().height() < 16)
+        return ;
+
+    size = this->size();
+    us->set("geometry/" + key, size);
+}
+
+void ResizeableItemBase::saveMyModuleSize()
+{
 }

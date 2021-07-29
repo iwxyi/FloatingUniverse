@@ -32,6 +32,7 @@ public slots:
 protected:
     virtual void selectEvent(const QPoint& startPos) override;
     virtual void unselectEvent() override;
+    virtual void saveMyModuleSize() override;
 
 private:
     CustomEdit* edit;

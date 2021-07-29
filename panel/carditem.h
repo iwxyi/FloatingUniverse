@@ -17,6 +17,7 @@ public:
 protected:
     void paintEvent(QPaintEvent*) override;
     virtual void facileMenuEvent(FacileMenu* menu) override;
+    virtual void saveMyModuleSize() override;
 
 private:
     QColor bg = QColor(0xff, 0xff, 0xff, 192);

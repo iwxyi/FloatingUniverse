@@ -114,3 +114,8 @@ void CardItem::facileMenuEvent(FacileMenu *menu)
             emit unselectMe();
     })->check(ignoreSelect)->tooltip("屏蔽鼠标左键点击或者框选；不影响显示右键菜单");
 }
+
+void CardItem::saveMyModuleSize()
+{
+    saveModuleSize(us->moduleSize_Card, "moduleCard");
+}

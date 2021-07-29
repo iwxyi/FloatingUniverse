@@ -2,6 +2,7 @@
 #define USERSETTINGS_H
 
 #include <QColor>
+#include <QSize>
 #include "mysettings.h"
 
 enum Side
@@ -48,6 +49,11 @@ public:
     int settingsMaxWidth = 680;
     int settingsMinWidth = 300;
     int settingsMargin = 12;
+
+    QSize moduleSize_Text; // 该类型模块默认大小
+    QSize moduleSize_Todo;
+    QSize moduleSize_Image;
+    QSize moduleSize_Card;
 
     // 交互
     int spatialMoveRatio = 1; // 控件移动倍率

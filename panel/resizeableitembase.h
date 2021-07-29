@@ -19,6 +19,9 @@ protected:
     void resizeEvent(QResizeEvent *event) override;
     void selectEvent(const QPoint& startPos) override;
 
+    void saveModuleSize(QSize& size, QString key);
+    virtual void saveMyModuleSize();
+
 protected:
     int boundaryWidth = 8;
 

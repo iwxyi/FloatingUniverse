@@ -188,6 +188,8 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
     item->setText(text, enableHtml);
     if (!text.isEmpty())
         item->adjustSizeByText(ITEM_MAX_SIZE);
+    else if (!us->moduleSize_Text.isEmpty())
+        item->resize(us->moduleSize_Text);
 
     item->show();
     QFontMetrics fm(item->font());
@@ -212,6 +214,10 @@ ImageItem *UniversePanel::createImageItem(QPoint pos, const QString &image)
     auto item = new ImageItem(this);
     item->setImage(image);
     item->adjustSizeByImage(ITEM_MAX_SIZE);
+    if (!us->moduleSize_Image.isEmpty()
+            && item->width() * us->moduleSize_Image.height()
+                == item->height() * us->moduleSize_Image.width()) // 宽高比相同，调整为同一大小
+        item->resize(us->moduleSize_Image);
 
     item->show();
     item->move(pos - QPoint(item->width() / 2, item->height() / 2));
@@ -232,7 +238,12 @@ CardItem *UniversePanel::createCardItem(QPoint pos)
         item->setRadius(us->fluentRadius);
     if (us->contains("recent/cardColor"))
         item->setColor(us->value("recent/cardColor").toString());
-    item->resize(us->panelItemSize * 3, us->panelItemSize * 2);
+
+
+    if (!us->moduleSize_Card.isEmpty())
+        item->resize(us->moduleSize_Card);
+    else
+        item->resize(us->panelItemSize * 3, us->panelItemSize * 2);
 
     item->show();
     item->move(pos);
@@ -247,6 +258,9 @@ CardItem *UniversePanel::createCardItem(QPoint pos)
 TodoItem *UniversePanel::createTodoItem(QPoint pos)
 {
     auto item = new TodoItem(this);
+
+    if (!us->moduleSize_Todo.isEmpty())
+        item->resize(us->moduleSize_Todo);
 
     item->show();
     QFontMetrics fm(item->font());

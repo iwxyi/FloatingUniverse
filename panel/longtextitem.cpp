@@ -5,6 +5,7 @@
 #include <QScrollBar>
 #include "longtextitem.h"
 #include "facilemenu.h"
+#include "usettings.h"
 
 LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
 {
@@ -220,4 +221,9 @@ void LongTextItem::unselectEvent()
 
     if (edit->hasFocus())
         cancelEdit();
+}
+
+void LongTextItem::saveMyModuleSize()
+{
+    saveModuleSize(us->moduleSize_Text, "moduleText");
 }

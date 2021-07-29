@@ -7,6 +7,7 @@
 #include "fileutil.h"
 #include "runtime.h"
 #include "facilemenu.h"
+#include "usettings.h"
 
 ImageItem::ImageItem(QWidget *parent) : ResizeableItemBase(parent)
 {
@@ -177,4 +178,9 @@ void ImageItem::triggerEvent()
         if (hideAfterTrigger)
             emit hidePanel();
     }
+}
+
+void ImageItem::saveMyModuleSize()
+{
+    saveModuleSize(us->moduleSize_Image, "moduleImage");
 }

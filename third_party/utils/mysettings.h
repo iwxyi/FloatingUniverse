@@ -3,6 +3,7 @@
 
 #include <QSettings>
 #include <QColor>
+#include <QRect>
 
 class MySettings : public QSettings
 {
@@ -111,6 +112,21 @@ public:
     void assign(QColor& val, QString key)
     {
         val = value(key, val).toString();
+    }
+
+    void assign(QSize& val, QString key)
+    {
+        val = value(key, val).toSize();
+    }
+
+    void assign(QPoint& val, QString key)
+    {
+        val = value(key, val).toPoint();
+    }
+
+    void assign(QRect& val, QString key)
+    {
+        val = value(key, val).toRect();
     }
 
     void assign(QList<qint64>& val, QString key)

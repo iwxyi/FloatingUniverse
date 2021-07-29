@@ -21,6 +21,7 @@ public:
 protected:
     virtual void facileMenuEvent(FacileMenu* menu) override;
     virtual void triggerEvent() override;
+    virtual void saveMyModuleSize() override;
 
 private:
     QLabel* imageLabel;

@@ -21,6 +21,13 @@ void USettings::restoreSettings()
     assign(panelIconSize, "iconSize");
     endGroup();
 
+    beginGroup("geometry");
+    assign(moduleSize_Text, "moduleText");
+    assign(moduleSize_Todo, "moduleTodo");
+    assign(moduleSize_Image, "moduleImage");
+    assign(moduleSize_Card, "moduleCard");
+    endGroup();
+
     beginGroup("interactive");
     assign(modifyFileNameSync, "modifyFileNameSync");
     assign(allowMoveOut, "allowMoveOut");

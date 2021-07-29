@@ -372,3 +372,8 @@ void TodoItem::keyPressEvent(QKeyEvent *e)
 
     ResizeableItemBase::keyPressEvent(e);
 }
+
+void TodoItem::saveMyModuleSize()
+{
+    saveModuleSize(us->moduleSize_Todo, "moduleTodo");
+}

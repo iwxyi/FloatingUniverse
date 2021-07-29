@@ -36,6 +36,7 @@ protected:
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void keyPressEvent(QKeyEvent *e) override;
+    virtual void saveMyModuleSize() override;
 
 private:
     QListWidget* listWidget;
