@@ -113,6 +113,7 @@ void UniversePanel::readItems()
     selectedItems.clear();
 
     // 读取设置
+    rt->flag_readingItems = true;
     MyJson json(readTextFileIfExist(rt->PANEL_PATH).toUtf8());
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
@@ -153,6 +154,11 @@ void UniversePanel::readItems()
             connectItem(item);
         }
     }
+    QTimer::singleShot(0, [=]{
+        // widget 的 resize 可能会在 show 之后一些事件调用
+        // 所以这里关闭状态有需要延迟
+        rt->flag_readingItems = false;
+    });
 }
 
 IconTextItem *UniversePanel::createLinkItem(QPoint pos, bool center, const QIcon &icon, const QString &text, const QString &link, PanelItemType type)

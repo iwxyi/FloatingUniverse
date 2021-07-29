@@ -5,6 +5,7 @@
 #endif
 #include "resizeableitembase.h"
 #include "usettings.h"
+#include "runtime.h"
 
 ResizeableItemBase::ResizeableItemBase(QWidget *parent) : PanelItemBase(parent)
 {
@@ -91,10 +92,9 @@ void ResizeableItemBase::selectEvent(const QPoint& startPos)
 
 /// 保存该类型组件的尺寸
 /// 下次添加同一类型时，依旧是这个大小
-#include <QDebug>
 void ResizeableItemBase::saveModuleSize(QSize &size, QString key)
 {
-    if (this->isHidden())
+    if (rt->flag_readingItems) // 正在读取导致的变化
         return ;
 
     // 太小了不保存

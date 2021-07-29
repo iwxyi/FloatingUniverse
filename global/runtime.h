@@ -20,6 +20,8 @@ public:
     QString CACHE_PATH;
     QString CACHE_IMAGE_PATH;
 
+    bool flag_readingItems = false; // 是否正在读取item，可能会触发一些信号
+
 private:
     const QString imageSuffix = ".png";
 };
