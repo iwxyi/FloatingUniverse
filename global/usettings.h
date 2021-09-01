@@ -27,8 +27,10 @@ public:
     int panelCenterOffset = 0; // 中心点偏移
     int panelWidth = 1000;
     int panelHeight = 200;
-    int panelBangHeight = 1;
+    int panelBangHeight = 5;
     int panelBangWidth = 800;
+    int panelBangMarginLeft = 100;
+    int panelBangMarginRight = 100;
 
     // 面板设置
     QColor panelBgColor = QColor(240, 248, 255);

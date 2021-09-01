@@ -54,7 +54,7 @@ void UniversePanel::initPanel()
 {
     QRect screen = screenGeometry();
     resize(us->panelWidth, us->panelHeight);
-    move((screen.width() - width()) / 2 + us->panelCenterOffset, -height() + us->panelBangHeight); //
+    move((screen.width() - width()) / 2 + us->panelCenterOffset, -height() + us->panelBangHeight);
 
     saveTimer = new QTimer(this);
     saveTimer->setInterval(10);
@@ -792,7 +792,12 @@ void UniversePanel::enterEvent(QEvent *event)
 {
     QWidget::enterEvent(event);
 
-    if (!expanding)
+    if (expanding)
+        return ;
+
+    // 根据位置，判断是否需要展示位置
+    int x = QCursor::pos().x() - this->x();
+    if (x >= us->panelBangMarginLeft && x <= width() - us->panelBangMarginRight)
         expandPanel();
 }
 
@@ -856,11 +861,12 @@ void UniversePanel::paintEvent(QPaintEvent *)
     }
 
     // 画刘海
-    if (this->pos().y() <= -this->height() + 1)
+    if (this->pos().y() <= -this->height() + us->panelBangHeight)
     {
         QPainterPath path;
-        int w = us->panelBangWidth;
-        path.addRect(QRect((width() - w) / 2, height() - us->panelBangHeight, w, us->panelBangHeight));
+        path.addRect(us->panelBangMarginLeft, height() - us->panelBangHeight, qAbs(width() - us->panelBangMarginLeft - us->panelBangMarginRight), us->panelBangHeight);
+        // int w = qMax(16, width() - us->panelBangMarginLeft - us->panelBangMarginRight);
+        // path.addRect(QRect((width() - w) / 2, height() - us->panelBangHeight, w, us->panelBangHeight));
         painter.fillPath(path, us->panelBangBg);
     }
 

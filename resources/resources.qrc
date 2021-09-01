@@ -83,6 +83,9 @@
         <file alias="check">icons/check.png</file>
         <file alias="uncheck">icons/uncheck.png</file>
         <file alias="style">icons/style.png</file>
+        <file>st/marginRight.png</file>
+        <file>st/marginLeft.png</file>
+        <file>st/barHeight.png</file>
     </qresource>
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>

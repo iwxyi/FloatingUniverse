@@ -31,6 +31,9 @@ void SettingsController::initItems()
     // w->add(QPixmap(":/icons/st/bangBar"), "交互边缘宽度", "贴边呼出面板的有效宽度，不会超过面板宽度", "panel/bangWidth", &us->panelBangWidth, 100, 9999, 100);
     w->add(QPixmap(":/icons/st/blurRadius"), "毛玻璃模糊半径", "", "panel/blurRadius", &us->panelBlurRadius, 0, 255, 16);
     w->add(QPixmap(":/icons/st/blurOpacity"), "毛玻璃透明度", "", "panel/blurOpacity", &us->panelBlurOpacity, 0, 255, 16);
+    w->add(QPixmap(":/icons/st/barHeight"), "触发条高度", "", "panel/bangHeight", &us->panelBangHeight, 0, 100, 1);
+    w->add(QPixmap(":/icons/st/marginLeft"), "触发条左边距", "", "panel/bangMarginLeft", &us->panelBangMarginLeft, 0, 9999, 50);
+    w->add(QPixmap(":/icons/st/marginRight"), "触发条右边距", "", "panel/bangMarginRight", &us->panelBangMarginRight, 0, 9999, 50);
     addGroup(w, "悬浮面板");
 
     // 一些尺寸

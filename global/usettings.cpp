@@ -11,7 +11,9 @@ void USettings::restoreSettings()
     assign(panelCenterOffset, "centerOffset");
     assign(panelWidth, "width");
     assign(panelHeight, "height");
-    assign(panelBangWidth, "bangWidth");
+    // assign(panelBangWidth, "bangWidth");
+    assign(panelBangMarginLeft, "bangMarginLeft");
+    assign(panelBangMarginRight, "bangMarginRight");
     assign(panelBgColor, "bgColor");
     assign(panelSelectRectColor, "selectRectColor");
     assign(panelSelectEdgeColor, "selectEdgeColor");
