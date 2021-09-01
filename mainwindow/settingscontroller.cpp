@@ -40,9 +40,9 @@ void SettingsController::initItems()
     UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/blurOpacity"), "毛玻璃透明度", "", "panel/blurOpacity", &us->panelBlurOpacity, 0, 255, 16);
     UPDATE_PANEL;
-    w->add(QPixmap(":/icons/st/barColor"), "触发条颜色", "", "panel/bangBg", &us->panelBangBg);
-    UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/barHeight"), "触发条高度", "", "panel/bangHeight", &us->panelBangHeight, 0, 100, 1);
+    UPDATE_PANEL;
+    w->add(QPixmap(":/icons/st/barColor"), "触发条颜色", "", "panel/bangBg", &us->panelBangBg);
     UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/marginLeft"), "触发条左边距", "", "panel/bangMarginLeft", &us->panelBangMarginLeft, 0, 9999, 50);
     UPDATE_PANEL;

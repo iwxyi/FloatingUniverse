@@ -81,6 +81,7 @@ SOURCES += \
     widgets/aninumberlabel.cpp \
     mainwindow/settingscontroller.cpp \
     mainwindow/settingsitemlistbox.cpp \
+    widgets/clock/clockdialog.cpp \
     widgets/qss_editor/qsseditdialog.cpp \
     widgets/qss_editor/qsshighlighteditor.cpp
 
@@ -139,6 +140,8 @@ HEADERS += \
     widgets/anicirclelabel.h \
     widgets/aninumberlabel.h \
     widgets/clicklabel.h \
+    widgets/clock/clockbean.h \
+    widgets/clock/clockdialog.h \
     widgets/customtabstyle.h \
     widgets/lefttabwidget.h \
     mainwindow/settingscontroller.h \
@@ -150,6 +153,7 @@ FORMS += \
     mainwindow/mainwindow.ui \
     mainwindow/settingscontroller.ui \
     third_party/utils/textinputdialog.ui \
+    widgets/clock/clockdialog.ui \
     widgets/qss_editor/qsseditdialog.ui
 
 # Default rules for deployment.
