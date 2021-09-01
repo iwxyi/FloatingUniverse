@@ -15,6 +15,7 @@ void USettings::restoreSettings()
     assign(panelBangMarginLeft, "bangMarginLeft");
     assign(panelBangMarginRight, "bangMarginRight");
     assign(panelBgColor, "bgColor");
+    assign(panelBangBg, "bangBg");
     assign(panelSelectRectColor, "selectRectColor");
     assign(panelSelectEdgeColor, "selectEdgeColor");
     assign(panelHoverEdgeColor, "hoverEdgeColor");

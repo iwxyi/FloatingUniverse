@@ -86,6 +86,7 @@
         <file>st/marginRight.png</file>
         <file>st/marginLeft.png</file>
         <file>st/barHeight.png</file>
+        <file>st/barColor.png</file>
     </qresource>
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>

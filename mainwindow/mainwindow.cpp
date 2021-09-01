@@ -224,6 +224,7 @@ void MainWindow::initPanel()
     panel = new UniversePanel(nullptr);
     connect(panel, SIGNAL(openSettings()), this, SLOT(show()));
     panel->show();
+    connect(ui->settingsBody, SIGNAL(updatePanel()), panel, SLOT(update()));
 }
 
 void MainWindow::closeEvent(QCloseEvent *e)

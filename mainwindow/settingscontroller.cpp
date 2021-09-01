@@ -6,6 +6,8 @@
 #include "usettings.h"
 #include "escape_dialog/escapedialog.h"
 
+#define UPDATE_PANEL connect(w->lastItem(), SIGNAL(clicked()), this, SIGNAL(updatePanel()))
+
 SettingsController::SettingsController(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::PanelSettingsWidget)
@@ -25,15 +27,27 @@ void SettingsController::initItems()
     // 悬浮面板设置
     auto w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/bgColor"), "背景颜色", "", "panel/bgColor", &us->panelBgColor);
+    UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/selectBgColor"), "选择区域颜色", "", "panel/selectRectColor", &us->panelSelectRectColor);
+    UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/selectEdgeColor"), "选中项边框颜色", "", "panel/selectEdgeColor", &us->panelSelectEdgeColor);
+    UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/hoverEdgeColor"), "候选项边框颜色", "", "panel/hoverEdgeColor", &us->panelHoverEdgeColor);
+    UPDATE_PANEL;
     // w->add(QPixmap(":/icons/st/bangBar"), "交互边缘宽度", "贴边呼出面板的有效宽度，不会超过面板宽度", "panel/bangWidth", &us->panelBangWidth, 100, 9999, 100);
+    // UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/blurRadius"), "毛玻璃模糊半径", "", "panel/blurRadius", &us->panelBlurRadius, 0, 255, 16);
+    UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/blurOpacity"), "毛玻璃透明度", "", "panel/blurOpacity", &us->panelBlurOpacity, 0, 255, 16);
+    UPDATE_PANEL;
+    w->add(QPixmap(":/icons/st/barColor"), "触发条颜色", "", "panel/bangBg", &us->panelBangBg);
+    UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/barHeight"), "触发条高度", "", "panel/bangHeight", &us->panelBangHeight, 0, 100, 1);
+    UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/marginLeft"), "触发条左边距", "", "panel/bangMarginLeft", &us->panelBangMarginLeft, 0, 9999, 50);
+    UPDATE_PANEL;
     w->add(QPixmap(":/icons/st/marginRight"), "触发条右边距", "", "panel/bangMarginRight", &us->panelBangMarginRight, 0, 9999, 50);
+    UPDATE_PANEL;
     addGroup(w, "悬浮面板");
 
     // 一些尺寸

@@ -26,6 +26,7 @@ public:
 
 signals:
     void boxH(int left, int width);
+    void updatePanel();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;
