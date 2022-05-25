@@ -219,10 +219,8 @@
         background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 178, 102, 64), stop:0.55 rgba(235, 148, 61, 64), stop:0.98 rgba(255, 255, 255, 64), stop:1 rgba(255, 255, 255, 0));
     	border-radius: 5px;
     	margin: 3px;
-  }
+    }
     ```
-    
-    
     
     ![自定义样式](screenshots/自定义样式_渐.png)
 

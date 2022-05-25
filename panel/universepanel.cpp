@@ -393,6 +393,15 @@ void UniversePanel::deleteItem(PanelItemBase *item)
     item->deleteLater();
 }
 
+bool UniversePanel::isMouseInPanel() const
+{
+    if (!geometry().contains(QCursor::pos())) // 这里包含了触发条的高度
+        return false;
+    if (QCursor::pos().y() <= geometry().height() - us->panelBangHeight)
+        return true;
+    return false;
+}
+
 /// 判断item是否正在使用
 /// 有些情况会误判为leaveEvent，可能是：
 /// - 弹出的右键菜单
@@ -402,10 +411,15 @@ bool UniversePanel::hasItemUsing() const
     if (currentMenu && currentMenu->hasFocus())
         return true;
 
-    bool ct = geometry().contains(QCursor::pos()); // 鼠标是否在面板上
+    // 鼠标是否在面板上
+    /* bool ct = geometry().contains(QCursor::pos()); // 这里包含了触发条的高度
+    if (!ct)
+        return false; */
+
     foreach (auto item, items)
-        if (item->isUsing() && ct)
+        if (item->isUsing())
             return true;
+
     return false;
 }
 
@@ -811,8 +825,9 @@ void UniversePanel::leaveEvent(QEvent *event)
         return ;
     }
 
-    // 是否是拖拽的时候不小心移到了外面去了
+    // 是否是拖拽的时候移到了外面去了
     // 因为有人对这个操作机制感到迷惑，所以在设置里加了，默认开启
+    // 拖拽到外面松开，触发了 leaveEvent
     if (us->allowMoveOut && _release_outter)
     {
         _release_outter = false;
@@ -820,7 +835,11 @@ void UniversePanel::leaveEvent(QEvent *event)
     }
 
     // 是否有item正在使用
-    if (hasItemUsing())
+    if (us->keepOnItemUsing && hasItemUsing())
+        return ;
+
+    // 弹出菜单，也会触发
+    if (currentMenu && currentMenu->hasFocus())
         return ;
 
     QWidget::leaveEvent(event);

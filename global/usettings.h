@@ -65,6 +65,7 @@ public:
     QColor themeMainColor = QColor(51, 103, 214); // #3367D6
     bool modifyFileNameSync = true; // 询问同步修改文件名
     bool autoReboot = false; // 开机自启
+    bool keepOnItemUsing = true; // 组件正在使用时不隐藏面板
 
     // 使用记录
     int bootCount = 0; // 程序启动次数

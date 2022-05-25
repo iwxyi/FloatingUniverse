@@ -37,6 +37,7 @@ private:
     TodoItem *createTodoItem(QPoint pos);
     void connectItem(PanelItemBase* item);
     void deleteItem(PanelItemBase* item);
+    bool isMouseInPanel() const;
     bool hasItemUsing() const;
     void keepPanelState(FuncType func);
 

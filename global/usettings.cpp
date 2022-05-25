@@ -38,6 +38,7 @@ void USettings::restoreSettings()
     assign(fastOpenDirLevel, "fastOpenDirLevel");
     assign(spatialMoveRatio, "spatialMoveRatio");
     assign(autoReboot, "autoReboot");
+    assign(keepOnItemUsing, "keepOnItemUsing");
     endGroup();
 
     beginGroup("usage");

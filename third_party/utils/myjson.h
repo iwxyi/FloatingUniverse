@@ -4,7 +4,6 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include <QStringList>
 #include "functional"
 
 #define jsona(x, y) y = x.a(#y)
@@ -78,14 +77,23 @@ public:
         return QJsonObject::value(key).toBool();
     }
 
+    bool b(QString key, bool def) const
+    {
+        if (!contains(key))
+            return def;
+        return QJsonObject::value(key).toBool();
+    }
+
     double d(QString key) const
     {
         return QJsonObject::value(key).toDouble();
     }
 
-    QString d2(QString key) const
+    double d(QString key, double def) const
     {
-        return QString::number(d(key), 'f', 2);
+        if (!contains(key))
+            return def;
+        return QJsonObject::value(key).toDouble();
     }
 
     int i(QString key) const
@@ -93,8 +101,22 @@ public:
         return QJsonObject::value(key).toInt();
     }
 
+    int i(QString key, int def) const
+    {
+        if (!contains(key))
+            return def;
+        return QJsonObject::value(key).toInt();
+    }
+
     qint64 l(QString key) const
     {
+        return qint64(QJsonObject::value(key).toDouble());
+    }
+
+    qint64 l(QString key, qint64 def) const
+    {
+        if (!contains(key))
+            return def;
         return qint64(QJsonObject::value(key).toDouble());
     }
 
@@ -105,6 +127,13 @@ public:
 
     QString s(QString key) const
     {
+        return QJsonObject::value(key).toString();
+    }
+
+    QString s(QString key, QString def) const
+    {
+        if (!contains(key))
+            return def;
         return QJsonObject::value(key).toString();
     }
 
@@ -137,42 +166,6 @@ public:
     MyJson data() const
     {
         return o("data");
-    }
-
-    QString msg() const
-    {
-        if (contains("msg"))
-            return s("msg");
-        if (contains("message"))
-            return s("message");
-        return "";
-    }
-
-    QString err() const
-    {
-        if (contains("err"))
-            return s("err");
-        if (contains("error"))
-            return s("error");
-        if (contains("errorMsg"))
-            return s("errorMsg");
-        if (contains("errMsg"))
-            return s("errMsg");
-        if (contains("errorMessage"))
-            return s("errorMessage");
-        return "";
-    }
-
-    // ["aaa", "bbb", "ccc"]
-    QStringList ss(QString key) const
-    {
-        QStringList sl;
-        if (!contains(key))
-            return sl;
-        eachVal(key, [&](QJsonValue val){
-            sl.append(val.toString());
-        });
-        return sl;
     }
 };
 

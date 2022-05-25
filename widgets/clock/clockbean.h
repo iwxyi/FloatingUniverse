@@ -33,7 +33,8 @@ enum TimeUnit
     TimeHour,
     TimeDay,
     TimeMonth,
-    TimeYear
+    TimeYear,
+    TimeWeek
 };
 
 static QStringList timeUnitString {
@@ -205,6 +206,10 @@ public:
             else if (intervalUnit == TimeYear)
             {
                 while (alarmTime.addMonths(1) < currentDT);
+            }
+            else if (intervalUnit == TimeWeek)
+            {
+                while (alarmTime.addDays(7) < currentDT);
             }
             else
             {
