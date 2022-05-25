@@ -339,7 +339,8 @@ void UniversePanel::connectItem(PanelItemBase *item)
     connect(item, &PanelItemBase::facileMenuUsed, this, [=](FacileMenu* menu) {
         currentMenu = menu;
         menu->finished([=]{
-            if (!this->hasItemUsing()
+            if (!this->isMouseInPanel()
+                    && !this->hasItemUsing()
                     && !menu->isClosedByClick())
             {
                 foldPanel();
@@ -397,9 +398,9 @@ bool UniversePanel::isMouseInPanel() const
 {
     if (!geometry().contains(QCursor::pos())) // 这里包含了触发条的高度
         return false;
-    if (QCursor::pos().y() <= geometry().height() - us->panelBangHeight)
-        return true;
-    return false;
+    if (QCursor::pos().y() > geometry().height() - us->panelBangHeight)
+        return false;
+    return true;
 }
 
 /// 判断item是否正在使用
@@ -495,7 +496,7 @@ void UniversePanel::expandPanel()
 /// 从显示状态收起面板
 void UniversePanel::foldPanel()
 {
-    if (fixing) // 固定不隐藏
+    if (fixing || animating) // 固定不隐藏
         return ;
 
     QPropertyAnimation* ani = new QPropertyAnimation(this, "pos");
@@ -834,6 +835,10 @@ void UniversePanel::leaveEvent(QEvent *event)
         return ;
     }
 
+    // 鼠标正在面板内，大概率是由于菜单引起的
+    /* if (isMouseInPanel())
+        return ; */
+
     // 是否有item正在使用
     if (us->keepOnItemUsing && hasItemUsing())
         return ;
@@ -1102,8 +1107,8 @@ void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
     menu->exec();
     menu->finished([=]{
         currentMenu = nullptr;
-        if (!this->hasFocus())
-            foldPanel();
+        if (!this->hasFocus() && !isMouseInPanel() && !hasItemUsing())
+                foldPanel();
     });
 }
 
@@ -1352,7 +1357,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
     menu->exec();
     menu->finished([=]{
         currentMenu = nullptr;
-        if (!geometry().contains(QCursor::pos()) // 应该使用的，但实测这句加不加问题不大
+        if (!isMouseInPanel() // 应该使用的，但实测这句加不加问题不大
                 && !menu->geometry().contains(QCursor::pos())
                 && !menu->isClosedByClick()
                 && !this->hasItemUsing()
