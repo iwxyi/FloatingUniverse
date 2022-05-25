@@ -171,12 +171,20 @@ void MainWindow::trayAction(QSystemTrayIcon::ActivationReason reason)
     switch(reason)
     {
     case QSystemTrayIcon::Trigger:
-        if (!this->isHidden())
-            this->hide();
+        if (!us->trayClickOpenPanel)
+        {
+            if (!this->isHidden())
+                this->hide();
+            else
+            {
+                this->showNormal();
+                this->activateWindow();
+            }
+        }
         else
         {
-            this->showNormal();
-            this->activateWindow();
+            panel->show();
+            panel->expandPanel();
         }
         break;
     case QSystemTrayIcon::MiddleClick:
@@ -184,6 +192,19 @@ void MainWindow::trayAction(QSystemTrayIcon::ActivationReason reason)
     case QSystemTrayIcon::Context:
     {
         FacileMenu* menu = new FacileMenu;
+
+        menu->addAction(QIcon(":/icons/show_panel"), "唤出", [=]{
+            if (!us->trayClickOpenPanel)
+            {
+                panel->show();
+                panel->expandPanel();
+            }
+            else
+            {
+                this->showNormal();
+                this->activateWindow();
+            }
+        });
 
         menu->addAction(QIcon(":/icons/hide"), "隐藏", [=]{
             if (panel->isHidden())

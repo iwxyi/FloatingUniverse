@@ -66,6 +66,7 @@ public:
     bool modifyFileNameSync = true; // 询问同步修改文件名
     bool autoReboot = false; // 开机自启
     bool keepOnItemUsing = true; // 组件正在使用时不隐藏面板
+    bool trayClickOpenPanel = false; // 交换托盘手势，单击打开托盘
 
     // 使用记录
     int bootCount = 0; // 程序启动次数

@@ -88,6 +88,8 @@
         <file>st/barHeight.png</file>
         <file>st/barColor.png</file>
         <file>st/editing.png</file>
+        <file alias="show_panel">icons/show_panel.png</file>
+        <file>st/clickGesture.png</file>
     </qresource>
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>

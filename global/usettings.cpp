@@ -39,6 +39,7 @@ void USettings::restoreSettings()
     assign(spatialMoveRatio, "spatialMoveRatio");
     assign(autoReboot, "autoReboot");
     assign(keepOnItemUsing, "keepOnItemUsing");
+    assign(trayClickOpenPanel, "trayClickOpenPanel");
     endGroup();
 
     beginGroup("usage");

@@ -68,6 +68,7 @@ void SettingsController::initItems()
     w->add(QPixmap(":/icons/st/fastOpenDir"), "快速展开目录", "文件夹链接默认使用菜单的形式打开，可单独设置", "interactive/fastOpenDir", &us->fastOpenDir);
     w->add(QPixmap(":/icons/st/fastOpenDirLevel"), "展开目录级别", "快速展开目录时菜单的层级数量", "interactive/fastOpenDirLevel", &us->fastOpenDirLevel, 1, 10, 1);
     w->add(QPixmap(":/icons/st/editing"), "使用时保持显示", "编辑文本时鼠标移到面板外面也保持显示", "interactive/keepOnItemUsing", &us->keepOnItemUsing);
+    w->add(QPixmap(":/icons/st/clickGesture"), "交换托盘手势", "右下角托盘单击时打开面板，菜单中唤出设置", "interactive/trayClickOpenPanel", &us->trayClickOpenPanel);
     addGroup(w, "交互优化");
 
     // 使用数据
