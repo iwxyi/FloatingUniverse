@@ -544,7 +544,7 @@ void UniversePanel::save()
     json.insert("items", array);
 
     // 以下阶段可能随时断点，使用断电保护
-    copyFile(rt->PANEL_PATH, rt->PANEL_PATH + ".bak");
+    renameFile(rt->PANEL_PATH, rt->PANEL_PATH + ".bak");
     writeTextFile(rt->PANEL_PATH, json.toBa());
     deleteFile(rt->PANEL_PATH + ".bak");
 }
