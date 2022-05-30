@@ -46,7 +46,7 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 
 UniversePanel::~UniversePanel()
 {
-    saveLater();
+    save();
 }
 
 /// 初始化面板所有数据
@@ -115,6 +115,12 @@ void UniversePanel::readItems()
 
     // 读取设置
     rt->flag_readingItems = true;
+    QString usedPath = rt->PANEL_PATH;
+    QFileInfo fi(usedPath);
+    QFileInfo fiBak(usedPath + ".bak");
+    if (fiBak.exists() && fiBak.size() > fi.size())
+        usedPath = usedPath + ".bak";
+
     MyJson json(readTextFileIfExist(rt->PANEL_PATH).toUtf8());
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
@@ -496,7 +502,7 @@ void UniversePanel::expandPanel()
 /// 从显示状态收起面板
 void UniversePanel::foldPanel()
 {
-    if (fixing || animating) // 固定不隐藏
+    if (fixing) // 固定不隐藏
         return ;
 
     QPropertyAnimation* ani = new QPropertyAnimation(this, "pos");
@@ -536,7 +542,11 @@ void UniversePanel::save()
         array.append(item->toJson());
     }
     json.insert("items", array);
+
+    // 以下阶段可能随时断点，使用断电保护
+    copyFile(rt->PANEL_PATH, rt->PANEL_PATH + ".bak");
     writeTextFile(rt->PANEL_PATH, json.toBa());
+    deleteFile(rt->PANEL_PATH + ".bak");
 }
 
 void UniversePanel::selectAll(bool containIgnored)
@@ -1108,7 +1118,7 @@ void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
     menu->finished([=]{
         currentMenu = nullptr;
         if (!this->hasFocus() && !isMouseInPanel() && !hasItemUsing())
-                foldPanel();
+            foldPanel();
     });
 }
 
