@@ -28,7 +28,7 @@ VS_VERSION_INFO VERSIONINFO
                 VALUE "LegalCopyright", "Copyright (C)2021-2021"
                 VALUE "OriginalFilename", "FloatingUniverse"
                 VALUE "ProductName", "Ðü¸¡ÓîÖæ"
-                VALUE "ProductVersion", "0.2"
+                VALUE "ProductVersion", "0.3"
             END
         END
         BLOCK "VarFileInfo"
