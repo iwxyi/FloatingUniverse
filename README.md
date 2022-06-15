@@ -7,6 +7,7 @@
 
 界面简约，动画俏皮，功能丰富，效果甚佳。
 
+QQ交流群：[280517990](https://qm.qq.com/cgi-bin/qm/qr?k=a3rJlTLgGAhgx5PqvHz0RjinfHDpl4Ll&jump_from=webapi)
 
 
 ## 功能
