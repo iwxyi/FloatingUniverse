@@ -5,7 +5,8 @@
 
 CustomListWidget::CustomListWidget(QWidget *parent) : QListWidget(parent)
 {
-
+    setHorizontalScrollMode(QListWidget::ScrollPerPixel);
+    setVerticalScrollMode(QListWidget::ScrollPerPixel);
 }
 // ---------- scroll ----------
 
