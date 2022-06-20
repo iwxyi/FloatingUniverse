@@ -47,6 +47,7 @@ MyJson LongTextItem::toJson() const
 
     json.insert("enableHtml", enableHtml);
     json.insert("text", getText());
+    json.insert("scrollPos", edit->verticalScrollBar()->sliderPosition());
 
     return json;
 }
@@ -57,6 +58,12 @@ void LongTextItem::fromJson(const MyJson &json)
 
     enableHtml = json.b("enableHtml", enableHtml);
     setText(json.s("text"), enableHtml);
+    if (json.contains("scrollPos"))
+    {
+        QTimer::singleShot(0, [=]{
+            edit->verticalScrollBar()->setSliderPosition(json.i("scrollPos"));
+        });
+    }
 }
 
 bool LongTextItem::isUsing() const

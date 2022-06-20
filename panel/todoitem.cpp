@@ -1,5 +1,6 @@
 #include <QVBoxLayout>
 #include <QClipboard>
+#include <QScrollBar>
 #include "todoitem.h"
 #include "usettings.h"
 #include "facilemenu.h"
@@ -76,6 +77,12 @@ void TodoItem::fromJson(const MyJson &json)
         JB(item, checked);
         addItem(checked, text);
     });
+    if (json.contains("scrollPos"))
+    {
+        QTimer::singleShot(0, [=]{
+            listWidget->verticalScrollBar()->setSliderPosition(json.i("scrollPos"));
+        });
+    }
 }
 
 MyJson TodoItem::toJson() const
@@ -89,6 +96,7 @@ MyJson TodoItem::toJson() const
         array.append(lines.at(i)->toJson());
     }
     json.insert("todos", array);
+    json.insert("scrollPos", listWidget->verticalScrollBar()->sliderPosition());
 
     return json;
 }
