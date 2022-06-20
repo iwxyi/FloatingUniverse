@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDebug>
 #ifdef Q_OS_WIN32
 #include <windows.h>
 #include <windowsx.h>
@@ -15,6 +16,7 @@ ResizeableItemBase::ResizeableItemBase(QWidget *parent) : PanelItemBase(parent)
         resizeCorner[i]->setFixedSize(boundaryWidth, boundaryWidth);
         connect(resizeCorner[i], &MoveableWidget::dragPressed, this, [=]{
             setSelect(true, resizeCorner[i]->geometry().center());
+            emit selectMe();
         });
         connect(resizeCorner[i], &MoveableWidget::dragReleased, this, [=]{
             if (resizeCorner[i]->isMoved())
