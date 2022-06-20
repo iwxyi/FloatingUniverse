@@ -13,7 +13,9 @@ CustomEdit::CustomEdit(QWidget *parent) : QTextEdit(parent)
 void CustomEdit::focusInEvent(QFocusEvent *e)
 {
     //  点击面板会激活第一个文本框
-    if (e->reason() == Qt::ActiveWindowFocusReason)
+    if (e->reason() == Qt::ActiveWindowFocusReason
+            || e->reason() == Qt::TabFocusReason
+            || e->reason() == Qt::BacktabFocusReason)
         return ;
 
     QTextEdit::focusInEvent(e);
