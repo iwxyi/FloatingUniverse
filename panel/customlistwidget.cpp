@@ -1,4 +1,5 @@
 #include <QKeyEvent>
+#include <QApplication>
 #include "customlistwidget.h"
 #include "third_party/slim_scroll_bar/slimscrollbar.h"
 
@@ -114,6 +115,17 @@ void CustomListWidget::wheelEvent(QWheelEvent *event)
 
 void CustomListWidget::mousePressEvent(QMouseEvent *e)
 {
-    emit focusIn();
+    pressGlobalPos = e->globalPos();
+    emit pressedEvent();
     QListWidget::mousePressEvent(e);
+}
+
+void CustomListWidget::mouseReleaseEvent(QMouseEvent *e)
+{
+    if (e->button() == Qt::LeftButton
+            && (e->globalPos() - pressGlobalPos).manhattanLength() < QApplication::startDragDistance())
+    {
+        emit releasedEvent();
+    }
+    QListWidget::mouseReleaseEvent(e);
 }

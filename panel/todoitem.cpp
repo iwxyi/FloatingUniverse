@@ -19,7 +19,23 @@ TodoItem::TodoItem(QWidget *parent) : ResizeableItemBase(parent)
     listWidget->setCursor(Qt::ArrowCursor);
     listWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(listWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showMenu()));
-    connect(listWidget, SIGNAL(focusIn()), this, SIGNAL(selectMe()));
+    connect(listWidget, &CustomListWidget::pressedEvent, this, [=]{
+        if (!isSelected())
+        {
+            selectMe();
+        }
+    });
+    connect(listWidget, &CustomListWidget::releasedEvent, this, [=]{
+        if (listWidget->count() == 0)
+        {
+            addItem(false, "");
+            lines.first()->setEdit();
+        }
+        else if (lines.size() == 1)
+        {
+            lines.first()->setEdit();
+        }
+    });
 
     // 添加按钮
     addButton = new WaterCircleButton(QIcon(":/icons/add"), this);

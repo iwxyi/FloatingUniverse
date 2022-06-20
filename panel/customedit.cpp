@@ -16,7 +16,10 @@ void CustomEdit::focusInEvent(QFocusEvent *e)
     if (e->reason() == Qt::ActiveWindowFocusReason
             || e->reason() == Qt::TabFocusReason
             || e->reason() == Qt::BacktabFocusReason)
+    {
+        emit rejectFocus();
         return ;
+    }
 
     QTextEdit::focusInEvent(e);
 

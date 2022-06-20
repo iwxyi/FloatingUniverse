@@ -11,7 +11,8 @@ public:
     CustomListWidget(QWidget* parent);
 
 signals:
-    void focusIn();
+    void pressedEvent();
+    void releasedEvent();
 
 protected:
     // ---------- scroll ----------
@@ -37,6 +38,7 @@ public slots:
 protected:
     void wheelEvent(QWheelEvent *event) override;
     void mousePressEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *e) override;
 
 private:
     bool enabledSmoothScroll = true;
@@ -44,6 +46,8 @@ private:
     int smoothScrollDuration = 200;
     QList<SmoothScrollBean*> smooth_scrolls;
     int toBottoming = 0;
+
+    QPoint pressGlobalPos;
 };
 
 #endif // CUSTOMLISTWIDGET_H

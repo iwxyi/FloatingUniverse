@@ -36,6 +36,9 @@ LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
     connect(edit, &CustomEdit::finished, this, [=]{
         emit cancelEditMe();
     });
+    connect(edit, &CustomEdit::rejectFocus, this, [=]{
+        this->parentWidget()->setFocus();
+    });
 }
 
 MyJson LongTextItem::toJson() const

@@ -15,6 +15,7 @@ signals:
     void focusIn();
     void focusOut();
     void finished();
+    void rejectFocus();
 
 protected:
     void focusInEvent(QFocusEvent *e) override;
