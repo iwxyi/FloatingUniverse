@@ -183,6 +183,7 @@ void MainWindow::trayAction(QSystemTrayIcon::ActivationReason reason)
         }
         else
         {
+            panel->hide();
             panel->show();
             panel->expandPanel();
         }
@@ -196,6 +197,7 @@ void MainWindow::trayAction(QSystemTrayIcon::ActivationReason reason)
         menu->addAction(QIcon(":/icons/show_panel"), "唤出", [=]{
             if (!us->trayClickOpenPanel)
             {
+                panel->hide();
                 panel->show();
                 panel->expandPanel();
             }
