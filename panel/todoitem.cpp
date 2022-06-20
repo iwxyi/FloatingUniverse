@@ -9,7 +9,7 @@ TodoItem::TodoItem(QWidget *parent) : ResizeableItemBase(parent)
     setType(TodoList);
 
     // 列表
-    listWidget = new QListWidget(this);
+    listWidget = new CustomListWidget(this);
     listWidget->setObjectName("ListWidget");
     auto layout = new QVBoxLayout(this);
     layout->addWidget(listWidget);
@@ -19,6 +19,7 @@ TodoItem::TodoItem(QWidget *parent) : ResizeableItemBase(parent)
     listWidget->setCursor(Qt::ArrowCursor);
     listWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(listWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showMenu()));
+    connect(listWidget, SIGNAL(focusIn()), this, SIGNAL(selectMe()));
 
     // 添加按钮
     addButton = new WaterCircleButton(QIcon(":/icons/add"), this);

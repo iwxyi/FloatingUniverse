@@ -9,6 +9,7 @@
 #include "resizeableitembase.h"
 #include "watercirclebutton.h"
 #include "todoline.h"
+#include "customlistwidget.h"
 
 class TodoItem : public ResizeableItemBase
 {
@@ -40,7 +41,7 @@ protected:
     virtual void saveMyModuleSize() override;
 
 private:
-    QListWidget* listWidget;
+    CustomListWidget* listWidget;
     QList<TodoLine*> lines;
     WaterCircleButton* addButton;
 };
