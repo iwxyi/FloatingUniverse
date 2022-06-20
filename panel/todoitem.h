@@ -31,7 +31,8 @@ public slots:
     void actionDelete();
 
 protected:
-    void selectEvent(const QPoint &startPos) override;
+    virtual void selectEvent(const QPoint &startPos) override;
+    virtual void unselectEvent() override;
     void resizeEvent(QResizeEvent *event) override;
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;

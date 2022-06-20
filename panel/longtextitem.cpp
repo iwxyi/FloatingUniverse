@@ -208,12 +208,6 @@ void LongTextItem::selectEvent(const QPoint &startPos)
 
     edit->raise();
 }
-
-void LongTextItem::unselectEvent()
-{
-    ResizeableItemBase::unselectEvent();
-}
-
 void LongTextItem::saveMyModuleSize()
 {
     saveModuleSize(us->moduleSize_Text, "moduleText");

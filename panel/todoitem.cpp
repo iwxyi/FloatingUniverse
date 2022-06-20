@@ -319,6 +319,13 @@ void TodoItem::selectEvent(const QPoint &startPos)
     addButton->raise();
 }
 
+void TodoItem::unselectEvent()
+{
+    listWidget->clearSelection();
+
+    ResizeableItemBase::unselectEvent();
+}
+
 void TodoItem::resizeEvent(QResizeEvent *event)
 {
     ResizeableItemBase::resizeEvent(event);
@@ -377,3 +384,4 @@ void TodoItem::saveMyModuleSize()
 {
     saveModuleSize(us->moduleSize_Todo, "moduleTodo");
 }
+
