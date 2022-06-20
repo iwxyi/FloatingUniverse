@@ -7,6 +7,8 @@ CustomListWidget::CustomListWidget(QWidget *parent) : QListWidget(parent)
 {
     setHorizontalScrollMode(QListWidget::ScrollPerPixel);
     setVerticalScrollMode(QListWidget::ScrollPerPixel);
+    auto slim = new SlimScrollBar;
+    setVerticalScrollBar(slim);
 }
 // ---------- scroll ----------
 
