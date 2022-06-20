@@ -57,7 +57,8 @@ void UniversePanel::initPanel()
     move((screen.width() - width()) / 2 + us->panelCenterOffset, -height() + us->panelBangHeight);
 
     saveTimer = new QTimer(this);
-    saveTimer->setInterval(10);
+    saveTimer->setInterval(1000);
+    saveTimer->setSingleShot(true);
     connect(saveTimer, SIGNAL(timeout()), this, SLOT(save()));
 
     readItems();
@@ -118,10 +119,13 @@ void UniversePanel::readItems()
     QString usedPath = rt->PANEL_PATH;
     QFileInfo fi(usedPath);
     QFileInfo fiBak(usedPath + ".bak");
-    if (fiBak.exists() && fiBak.size() > fi.size())
+    if (fiBak.exists())
+    {
         usedPath = usedPath + ".bak";
+        qWarning() << "<断电保护>读取备份路径：" << usedPath;
+    }
 
-    MyJson json(readTextFileIfExist(rt->PANEL_PATH).toUtf8());
+    MyJson json(readTextFileIfExist(usedPath).toUtf8());
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
     {
@@ -546,6 +550,11 @@ void UniversePanel::save()
     // 以下阶段可能随时断点，使用断电保护
     renameFile(rt->PANEL_PATH, rt->PANEL_PATH + ".bak");
     writeTextFile(rt->PANEL_PATH, json.toBa());
+    int ct = MyJson::from(readTextFile(rt->PANEL_PATH).toUtf8()).a("items").size();
+    if (ct != items.size()) // 验证数据量
+    {
+        QMessageBox::warning(this, "保存数据有误", "当前的数据：" + QString::number(items.size()) + "\n保存的数据：" + QString::number(ct));
+    }
     deleteFile(rt->PANEL_PATH + ".bak");
 }
 
