@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-
+    delete panel;
     deleteDir(rt->CACHE_PATH);
 }
 

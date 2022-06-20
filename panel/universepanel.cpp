@@ -163,6 +163,8 @@ void UniversePanel::readItems()
             item->show();
             items.append(item);
             connectItem(item);
+            if (json.b("selected"))
+                selectItem(item);
         }
     }
     QTimer::singleShot(0, [=]{

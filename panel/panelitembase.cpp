@@ -37,6 +37,8 @@ MyJson PanelItemBase::toJson() const
 
     if (!customQss.isEmpty())
         json.insert("qss", customQss);
+    if (isSelected())
+        json.insert("selected", true);
 
     return json;
 }
