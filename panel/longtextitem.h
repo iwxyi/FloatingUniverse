@@ -24,7 +24,6 @@ public:
 
     void adjustSizeByText(QSize maxxSize);
     void editText();
-    void cancelEdit();
 
 public slots:
     void showEditMenu();

@@ -56,6 +56,7 @@ signals:
     void modified();
     void selectMe();
     void unselectMe();
+    void cancelEditMe();
     void hidePanel();
     void moveItems(QPoint delta);
     void facileMenuUsed(FacileMenu* menu);

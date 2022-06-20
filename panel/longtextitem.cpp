@@ -34,8 +34,7 @@ LongTextItem::LongTextItem(QWidget *parent) : ResizeableItemBase(parent)
         emit useFinished();
     });
     connect(edit, &CustomEdit::finished, this, [=]{
-        cancelEdit();
-        emit unselectMe();
+        emit cancelEditMe();
     });
 }
 
@@ -131,11 +130,6 @@ void LongTextItem::editText()
     edit->setFocus();
 }
 
-void LongTextItem::cancelEdit()
-{
-    this->parentWidget()->setFocus();
-}
-
 void LongTextItem::showEditMenu()
 {
     newFacileMenu;
@@ -218,9 +212,6 @@ void LongTextItem::selectEvent(const QPoint &startPos)
 void LongTextItem::unselectEvent()
 {
     ResizeableItemBase::unselectEvent();
-
-    if (edit->hasFocus())
-        cancelEdit();
 }
 
 void LongTextItem::saveMyModuleSize()

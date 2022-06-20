@@ -155,7 +155,7 @@ QListWidgetItem* TodoItem::insertItem(int index, bool checked, const QString &te
     });
     connect(line, &TodoLine::signalEsc, listWidget, [=]{
         listWidget->clearSelection();
-        listWidget->setFocus();
+        emit cancelEditMe();
     });
     connect(line, &TodoLine::signalInsertNext, listWidget, [=](bool rev) {
         int row = listWidget->currentRow();

@@ -334,6 +334,14 @@ void UniversePanel::connectItem(PanelItemBase *item)
         }
     });
 
+    connect(item, &PanelItemBase::cancelEditMe, this, [=]{
+        if (selectedItems.size() == 1 && selectedItems.contains(item))
+        {
+            unselectAll();
+            this->setFocus();
+        }
+    });
+
     connect(item, &PanelItemBase::modified, this, [=]{
         saveLater();
     });
@@ -1579,8 +1587,10 @@ void UniversePanel::keyPressEvent(QKeyEvent *event)
     auto key = event->key();
     if (key == Qt::Key_Escape)
     {
-        if (selectedItems.size())
+        if (selectedItems.size())   // 如果有选中，则取消选中
             unselectAll();
+        else                        // 没有选中，隐藏面板
+            foldPanel();
 
         event->ignore();
     }
