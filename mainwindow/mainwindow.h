@@ -62,6 +62,7 @@ private:
     HWND prevWindow = nullptr;
 #endif
     UniversePanel* panel = nullptr;
+    QSystemTrayIcon* tray = nullptr;
     WaterCircleButton *confirmButton = nullptr;
     bool drawering = true; // 是否显示Drawer（动画中则为动画结束后的状态）
 };

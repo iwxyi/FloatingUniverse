@@ -30,6 +30,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete panel;
+    delete tray;
     deleteDir(rt->CACHE_PATH);
 }
 
@@ -158,7 +159,7 @@ void MainWindow::showEvent(QShowEvent *e)
 
 void MainWindow::initTray()
 {
-    QSystemTrayIcon* tray = new QSystemTrayIcon(this);
+    tray = new QSystemTrayIcon(this);
     tray->setIcon(QIcon(":/icons/appicon"));
     tray->setToolTip(APPLICATION_NAME);
     tray->show();
@@ -270,9 +271,8 @@ void MainWindow::closeEvent(QCloseEvent *e)
             return ;
         us->setValue("mainwindow/autoShow", false);
     });
-#else
-    QMainWindow::closeEvent(e);
 #endif
+    QMainWindow::closeEvent(e);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *e)
