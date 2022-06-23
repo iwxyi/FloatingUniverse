@@ -11,6 +11,7 @@
 #include "usettings.h"
 #include "facilemenu.h"
 #include "fileutil.h"
+#include "textinputdialog.h"
 
 IconTextItem::IconTextItem(QWidget *parent) : PanelItemBase(parent)
 {
@@ -71,15 +72,19 @@ void IconTextItem::releaseResource()
         deleteFile(rt->ICON_PATH + iconName);
     }
 
-    QString realLink = getRealLink();
-    if (realLink.startsWith(rt->PANEL_FILE_PATH) && isFileExist(realLink))
+    // 删除临时生成的文件
+    QStringList realLinks = getRealLinks();
+    for (auto realLink: realLinks)
     {
-        qInfo() << "删除文件/目录：" << realLink;
-        if (!recycleFile(realLink))
+        if (realLink.startsWith(rt->PANEL_FILE_PATH) && isFileExist(realLink))
         {
-            qWarning() << "    放入回收站失败，执行强制删除(不可恢复)";
-            // 删除失败，执行强制删除
-            deleteFile(realLink);
+            qInfo() << "删除文件/目录：" << realLink;
+            if (!recycleFile(realLink))
+            {
+                qWarning() << "    放入回收站失败，执行强制删除(不可恢复)";
+                // 删除失败，执行强制删除
+                deleteFile(realLink);
+            }
         }
     }
 }
@@ -139,11 +144,11 @@ QString IconTextItem::getLink() const
     return link;
 }
 
-QString IconTextItem::getRealLink() const
+QStringList IconTextItem::getRealLinks() const
 {
     QString realLink = link;
     realLink.replace(FILE_PREFIX, rt->PANEL_FILE_PATH);
-    return realLink;
+    return realLink.split("\n", QString::SkipEmptyParts);
 }
 
 bool IconTextItem::isFastOpen() const
@@ -376,41 +381,46 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         adjustSize();
 
         // 询问是否修改文件名
-        QString realLink = getRealLink();
-        if (us->modifyFileNameSync && isFileExist(realLink))
+        QStringList realLinks = getRealLinks();
+        QStringList newLinks;
+        for (auto realLink: realLinks)
         {
-            QFileInfo info(realLink);
-            QString fileName = info.isDir() ? info.fileName() : info.baseName();
-            QString suffixName = info.fileName(); // 可能带后缀的强制全文件名
-            if ((fileName == oldName || suffixName == oldName) && canBeFileName(newName))
+            QString newLink = realLink;
+            if (us->modifyFileNameSync && isFileExist(realLink))
             {
-                int recentRename = us->i("recent/renameFileSync", 0);
-                recentRename = 0; // 强制默认修改，而不是上一次的选项
-                if ((recentRename = QMessageBox::question(this, "重命名", "是否同步修改文件名", "修改", "取消", nullptr, recentRename)) == 0)
+                QFileInfo info(realLink);
+                QString fileName = info.isDir() ? info.fileName() : info.baseName();
+                QString suffixName = info.fileName(); // 可能带后缀的强制全文件名
+                if ((fileName == oldName || suffixName == oldName) && canBeFileName(newName))
                 {
-                    QString newLink;
-                    if (info.isDir())
+                    int recentRename = us->i("recent/renameFileSync", 0);
+                    recentRename = 0; // 强制默认修改，而不是上一次的选项
+                    if ((recentRename = QMessageBox::question(this, "重命名", "是否同步修改文件名", "修改", "取消", nullptr, recentRename)) == 0)
                     {
-                        QDir dir(realLink);
-                        dir.cdUp();
-                        newLink = dir.absoluteFilePath(newName);
-                        if (!renameDir(realLink, newLink))
-                            qWarning() << "重命名失败：" << realLink << "  ->  " <<newLink;
+                        if (info.isDir())
+                        {
+                            QDir dir(realLink);
+                            dir.cdUp();
+                            newLink = dir.absoluteFilePath(newName);
+                            if (!renameDir(realLink, newLink))
+                                qWarning() << "重命名失败：" << realLink << "  ->  " <<newLink;
+                        }
+                        else
+                        {
+                            QDir dir(info.absoluteDir());
+                            bool hasSuffix = (suffixName == oldName);
+                            newLink = dir.absoluteFilePath(newName) + (hasSuffix || info.suffix().isEmpty() ? "" : "." + info.suffix());
+                            if (!renameFile(realLink, newLink))
+                                qWarning() << "重命名失败：" << realLink << "  ->  " <<newLink;
+                        }
+                        newLink.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
                     }
-                    else
-                    {
-                        QDir dir(info.absoluteDir());
-                        bool hasSuffix = (suffixName == oldName);
-                        newLink = dir.absoluteFilePath(newName) + (hasSuffix || info.suffix().isEmpty() ? "" : "." + info.suffix());
-                        if (!renameFile(realLink, newLink))
-                            qWarning() << "重命名失败：" << realLink << "  ->  " <<newLink;
-                    }
-                    newLink.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
-                    setLink(newLink);
+                    us->set("recent/renameFileSync", recentRename);
                 }
-                us->set("recent/renameFileSync", recentRename);
             }
+            newLinks.append(newLink);
         }
+        setLink(newLinks.join("\n"));
 
         emit modified();
     });
@@ -419,7 +429,8 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
         menu->close();
         bool ok = false;
         emit keepPanelFixing();
-        QString newLink = QInputDialog::getText(this, "修改链接", "可以是文件路径、网址，点击项目后立即打开", QLineEdit::Normal, link, &ok);
+
+        QString newLink = TextInputDialog::getText(this, "修改链接", "可以是文件路径、网址，点击项目后立即打开\n多行将按顺序打开\n也可以是命令行，加上前缀：cmd://", link, &ok);
         emit restorePanelFixing();
         if (!ok)
             return ;
@@ -507,29 +518,45 @@ void IconTextItem::triggerEvent()
 {
     if (!getLink().isEmpty())
     {
-        QString link = getRealLink();
-        qInfo() << "打开link：" << link;
-        QFileInfo info(link);
-        if (info.exists()) // 是文件
+        QStringList links = getRealLinks();
+        bool dirMenuShowed = false;
+        for (auto link: links)
         {
-            if (info.isDir() && isFastOpen()) // 快速打开文件夹
+            qInfo() << "触发link：" << link;
+
+            // 打开命令行
+            if (link.startsWith("cmd://"))
             {
-                showFacileDir(link, nullptr, 0);
-                return ;
+                QProcess p;
+                p.startDetached(link.right(link.length() - 6));
+                continue;
             }
-            else if (link.endsWith(".exe") || link.endsWith(".bat") || link.endsWith(".sh") || link.endsWith(".vbs"))
+
+            // 打开文件或者文件夹或者网页
+            QFileInfo info(link);
+            if (info.exists()) // 是文件
             {
-                QProcess process;
-                process.startDetached(link, QStringList{link}, info.path());
-                link = "";
+                if (info.isDir() && isFastOpen()) // 快速打开文件夹
+                {
+                    if (!dirMenuShowed)
+                        showFacileDir(link, nullptr, 0);
+                    dirMenuShowed = true;
+                    continue;
+                }
+                else if (link.endsWith(".exe") || link.endsWith(".bat") || link.endsWith(".sh") || link.endsWith(".vbs")) // 直接执行命令
+                {
+                    QProcess process;
+                    process.startDetached(link, QStringList{link}, info.path());
+                    link = "";
+                }
+                else // 打开文件或者文件夹
+                {
+                    link = "file:///" +link;
+                }
             }
-            else // 打开文件或者文件夹
-            {
-                link = "file:///" +link;
-            }
+            if (!link.isEmpty())
+                QDesktopServices::openUrl(link);
         }
-        if (!link.isEmpty())
-            QDesktopServices::openUrl(link);
         us->set("usage/linkOpenCount", ++us->linkOpenCount);
 
         jump();

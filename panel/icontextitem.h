@@ -23,7 +23,7 @@ public:
     QString getText() const;
     QString getIconName() const;
     QString getLink() const;
-    QString getRealLink() const;
+    QStringList getRealLinks() const;
     bool isFastOpen() const;
 
     static QString saveIconFile(const QIcon& icon);

@@ -122,10 +122,10 @@ void UniversePanel::readItems()
     if (fiBak.exists())
     {
         usedPath = usedPath + ".bak";
-        qWarning() << "<断电保护>读取备份路径：" << usedPath;
+        qWarning() << "<断电保护>读取备份配置：" << usedPath;
     }
 
-    MyJson json(readTextFileIfExist(usedPath).toUtf8());
+    MyJson json = MyJson::from(readTextFileIfExist(usedPath).toUtf8());
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
     {
