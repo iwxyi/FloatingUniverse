@@ -191,18 +191,40 @@ void LongTextItem::showEditMenu()
     auto mime = clip->mimeData();
     bool canPaste = mime->hasText()
             || (enableHtml && mime->hasHtml());
-    menu->addAction(QIcon(":/icons/paste"), "粘贴 (&V)", [=]{
-        if (enableHtml)
+    menu->addAction(QIcon(":/icons/paste"), "粘贴纯文本 (&V)", [=]{
+        /*if (enableHtml)
             edit->paste();
-        else
+        else*/
             edit->insertPlainText(mime->text());
-    })->disable(!canPaste)->text(!enableHtml, "粘贴纯文本 (&V)");
+    })->disable(!canPaste)/*->text(!enableHtml, "粘贴纯文本 (&V)")*/;
 
     menu->split();
     menu->addAction(QIcon(":/icons/html"), "使用HTML (&H)", [=]{
         enableHtml = !enableHtml;
         emit modified();
     })->check(enableHtml);
+
+    FacileMenu* insertMenu = menu->addMenu(QIcon(":/icons/add"), "插入");
+    {
+        auto insertHtml = [=](const QString& content) {
+            if (!enableHtml)
+                enableHtml = true;
+
+            QTextCursor cursor = edit->textCursor();
+            int pos = cursor.position();
+            edit->insertHtml(content);
+            int pos2 = cursor.position();
+            cursor.setPosition(pos + 1);
+            cursor.setPosition(pos2, QTextCursor::KeepAnchor);
+            edit->setTextCursor(cursor);
+        };
+        insertMenu->addAction("插入无序列表", [=]{
+            insertHtml("<ul style='margin: 0px; margin-left:-28px;'><li style='margin: 0px;'>UnorderedList</li></ul>");
+        });
+        insertMenu->addAction("插入有序列表", [=]{
+            insertHtml("<ol style='margin: 0px; margin-left:-24px;'><li style='margin: 0px;'>OrderedList</li></ol>");
+        });
+    }
 
     menu->split()->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
         emit deleteMe();
