@@ -61,6 +61,20 @@ void UniversePanel::initPanel()
     saveTimer->setSingleShot(true);
     connect(saveTimer, SIGNAL(timeout()), this, SLOT(save()));
 
+    keepTopTimer = new QTimer(this);
+    keepTopTimer->setInterval(60000);
+    keepTopTimer->setSingleShot(false);
+    connect(keepTopTimer, &QTimer::timeout, this, [=]{
+        if (this->expanding)
+            return ;
+
+        // 在后台的时候
+        this->setWindowFlag(Qt::WindowStaysOnTopHint, false);
+        QTimer::singleShot(0, this, [=]{
+            this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
+        });
+    });
+
     readItems();
 
     // 没有项目，展示一下这里有东西
@@ -119,13 +133,17 @@ void UniversePanel::readItems()
     QString usedPath = rt->PANEL_PATH;
     QFileInfo fi(usedPath);
     QFileInfo fiBak(usedPath + ".bak");
-    if (fiBak.exists())
-    {
-        usedPath = usedPath + ".bak";
-        qWarning() << "<断电保护>读取备份配置：" << usedPath;
-    }
 
     MyJson json = MyJson::from(readTextFileIfExist(usedPath).toUtf8());
+    if (json.empty() && fiBak.exists())
+    {
+        qWarning() << "<断电保护>读取备份配置：" << usedPath;
+        json = MyJson::from(readTextFileIfExist(usedPath + ".bak").toUtf8());
+        if (json.empty())
+        {
+            qCritical() << "<断电保护>无法读取备份配置";
+        }
+    }
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
     {
@@ -557,7 +575,9 @@ void UniversePanel::save()
     }
     json.insert("items", array);
 
-    // 以下阶段可能随时断点，使用断电保护
+    // 以下阶段可能随时断电，使用断电保护
+    if (isFileExist(rt->PANEL_PATH + ".bak"))
+        deleteFile(rt->PANEL_PATH + ".bak");
     renameFile(rt->PANEL_PATH, rt->PANEL_PATH + ".bak");
     writeTextFile(rt->PANEL_PATH, json.toBa());
     int ct = MyJson::from(readTextFile(rt->PANEL_PATH).toUtf8()).a("items").size();
@@ -565,7 +585,7 @@ void UniversePanel::save()
     {
         QMessageBox::warning(this, "保存数据有误", "当前的数据：" + QString::number(items.size()) + "\n保存的数据：" + QString::number(ct));
     }
-    deleteFile(rt->PANEL_PATH + ".bak");
+    // deleteFile(rt->PANEL_PATH + ".bak");
 }
 
 void UniversePanel::selectAll(bool containIgnored)

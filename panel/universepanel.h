@@ -106,6 +106,7 @@ private:
     bool _prev_fixing = false;
     QPixmap panelBlurPixmap;
     QTimer* saveTimer;
+    QTimer* keepTopTimer;
 
     QList<PanelItemBase*> items;
     QSet<PanelItemBase*> selectedItems;
