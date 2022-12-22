@@ -2,7 +2,7 @@
 #include <QScrollBar>
 #include <QDir>
 #include "settingscontroller.h"
-#include "ui_panelsettingswidget.h"
+#include "ui_settingscontroller.h"
 #include "usettings.h"
 #include "escape_dialog/escapedialog.h"
 
