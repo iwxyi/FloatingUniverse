@@ -121,7 +121,17 @@ void IconTextItem::setText(const QString &text)
 void IconTextItem::setLink(const QString &link)
 {
     this->link = link;
-    setToolTip(link);
+
+    // 判断是不是快捷方式
+    QFileInfo info(link);
+    if (info.isFile() && info.exists() && info.isSymLink())
+    {
+        // 如果是快捷方式，则直接指向链接的路径
+        this->link = info.symLinkTarget();
+        qInfo() << " 快捷方式原路径：" << this->link;
+    }
+
+    setToolTip(this->link);
 }
 
 void IconTextItem::setFastOpen(bool fast)

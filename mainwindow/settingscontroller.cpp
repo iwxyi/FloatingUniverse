@@ -81,13 +81,14 @@ void SettingsController::initItems()
     connect(w->lastItem(), &InteractiveButtonBase::clicked, this, [=]{
         QString appName = QApplication::applicationName();
         QString appPath = QDir::toNativeSeparators(QApplication::applicationFilePath());
-        QSettings *reg=new QSettings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+        QSettings *reg = new QSettings("HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
         QString val = reg->value(appName).toString();// 如果此键不存在，则返回的是空字符串
         if (us->autoReboot)
             reg->setValue(appName, appPath);
         else
             reg->remove(appName);
         qInfo() << "设置自启：" << us->autoReboot;
+        reg->sync();
         reg->deleteLater();
     });
     addGroup(w, "使用数据");
