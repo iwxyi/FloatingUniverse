@@ -543,10 +543,17 @@ void IconTextItem::triggerEvent()
                     dirMenuShowed = true;
                     continue;
                 }
-                else if (link.endsWith(".exe") || link.endsWith(".bat") || link.endsWith(".sh") || link.endsWith(".vbs")) // 直接执行命令
+                else if (link.endsWith(".exe")) // 打开程序
                 {
                     QProcess process;
                     process.startDetached(link, QStringList{}, info.path());
+                    link = "";
+                }
+                else if (link.endsWith(".bat") || link.endsWith(".sh") || link.endsWith(".vbs")) // 直接执行命令
+                {
+                    QProcess process;
+                    process.setWorkingDirectory(info.path());
+                    process.startDetached("cmd", {"/c", link});
                     link = "";
                 }
                 else // 打开文件或者文件夹

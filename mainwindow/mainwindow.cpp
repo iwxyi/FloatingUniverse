@@ -9,7 +9,9 @@
 #include "imageutil.h"
 #include "netutil.h"
 #include "signaltransfer.h"
+#ifdef Q_OS_WIN32
 #include "windows.h"
+#endif
 #include "widgets/customtabstyle.h"
 #include "runtime.h"
 
