@@ -66,10 +66,12 @@ public:
     bool trayClickOpenPanel = false; // 交换托盘手势，单击打开托盘
 
     // 文件
+    int fileNameLabelMaxLength = 8; // 文件名最大长度
     bool fastOpenDir = false; // 默认使用快速打开
     int fastOpenDirLevel = 3; // 最多显示3级文件
     int fastOpenDirFileCount = 20; // 单个目录最多显示20个文件
     bool modifyFileNameSync = true; // 询问同步修改文件名
+    bool defaultAsFolder = false; // 默认移动文件（会改变本程序对文件的链接方式！）
 
     // 使用记录
     int bootCount = 0; // 程序启动次数

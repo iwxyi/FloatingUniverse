@@ -32,14 +32,20 @@ void USettings::restoreSettings()
     endGroup();
 
     beginGroup("interactive");
-    assign(modifyFileNameSync, "modifyFileNameSync");
     assign(allowMoveOut, "allowMoveOut");
-    assign(fastOpenDir, "fastOpenDir");
-    assign(fastOpenDirLevel, "fastOpenDirLevel");
     assign(spatialMoveRatio, "spatialMoveRatio");
     assign(autoReboot, "autoReboot");
     assign(keepOnItemUsing, "keepOnItemUsing");
     assign(trayClickOpenPanel, "trayClickOpenPanel");
+    endGroup();
+
+    beginGroup("file");
+    assign(fileNameLabelMaxLength, "fileNameLabelMaxLength");
+    assign(fastOpenDir, "fastOpenDir");
+    assign(fastOpenDirLevel, "fastOpenDirLevel");
+    assign(fastOpenDirFileCount, "fastOpenDirFileCount");
+    assign(modifyFileNameSync, "modifyFileNameSync");
+    assign(defaultAsFolder, "defaultAsFolder");
     endGroup();
 
     beginGroup("usage");

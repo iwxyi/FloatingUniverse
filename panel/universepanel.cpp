@@ -205,6 +205,7 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, bool center, const QStri
     item->setText(text);
     item->setLink(link);
     item->setType(type);
+    item->initResource();
     item->adjustSize();
 
     item->show();

@@ -48,6 +48,7 @@ public:
     virtual void facileMenuEvent(FacileMenu* menu);
     virtual void triggerEvent();
 
+    virtual void initResource();
     virtual void releaseResource();
 
 signals:

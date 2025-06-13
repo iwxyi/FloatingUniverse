@@ -13,12 +13,14 @@ public:
 
     virtual MyJson toJson() const override;
     virtual void fromJson(const MyJson& json) override;
+    virtual void initResource() override;
     virtual void releaseResource() override;
 
     void setIcon(const QString& iconName);
     void setText(const QString& text);
     void setLink(const QString& link);
     void setFastOpen(bool fast);
+    void setOpenDirLevel(int level);
 
     QString getText() const;
     QString getIconName() const;

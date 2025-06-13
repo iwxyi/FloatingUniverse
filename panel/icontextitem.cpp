@@ -61,6 +61,12 @@ void IconTextItem::fromJson(const MyJson &json)
     openLevel = json.i("open_level", openLevel);
 }
 
+void IconTextItem::initResource()
+{
+    setFastOpen(us->fastOpenDir);
+    setOpenDirLevel(us->fastOpenDirLevel);
+}
+
 /// 释放所有的资源
 /// 删除item的时候必须执行，否则变为垃圾文件
 void IconTextItem::releaseResource()
@@ -109,7 +115,10 @@ void IconTextItem::setIcon(const QString &iconName)
 
 void IconTextItem::setText(const QString &text)
 {
-    textLabel->setText(text);
+    if (text.length() > us->fileNameLabelMaxLength + 1)
+        textLabel->setText(text.left(us->fileNameLabelMaxLength) + "...");
+    else
+        textLabel->setText(text);
     this->text = text;
 
     if (text.isEmpty())
@@ -137,6 +146,11 @@ void IconTextItem::setLink(const QString &link)
 void IconTextItem::setFastOpen(bool fast)
 {
     this->fastOpen = fast;
+}
+
+void IconTextItem::setOpenDirLevel(int level)
+{
+    this->openLevel = level;
 }
 
 QString IconTextItem::getText() const
@@ -678,8 +692,15 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
 
     auto infos = QDir(path).entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
     QFileIconProvider provicer;
+    int count = 0;
     foreach (auto info, infos)
     {
+        if (++count > us->fastOpenDirFileCount)
+        {
+            menu->addTitle("总计文件(夹)数量：" + QString::number(infos.count()));
+            break;
+        }
+
         if (info.isDir())
         {
             auto m = menu->addMenu(provicer.icon(info), info.fileName(), [=]{

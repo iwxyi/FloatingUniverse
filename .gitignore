@@ -69,5 +69,6 @@ Thumbs.db
 # --------
 *.dll
 *.exe
+.vscode
 Desktop.ini
 /build/

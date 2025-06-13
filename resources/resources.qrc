@@ -92,6 +92,8 @@
         <file>st/clickGesture.png</file>
         <file>st/file.png</file>
         <file>st/fileCount.png</file>
+        <file>st/asFolder.png</file>
+        <file>st/fileNameLabelMaxLength.png</file>
     </qresource>
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>

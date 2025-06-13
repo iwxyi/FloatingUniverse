@@ -68,12 +68,14 @@ void SettingsController::initItems()
     w->add(QPixmap(":/icons/st/clickGesture"), "交换托盘手势", "右下角托盘单击时打开面板，菜单中唤出设置", "interactive/trayClickOpenPanel", &us->trayClickOpenPanel);
     addGroup(w, "面板交互");
 
-    // 使用数据
+    // 文件操作
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
-    w->add(QPixmap(":/icons/st/fileName"), "同步修改文件名", "修改文件快捷方式的名字时，询问修改文件名", "interactive/modifyFileNameSync", &us->modifyFileNameSync);
-    w->add(QPixmap(":/icons/st/fastOpenDir"), "快速展开目录", "文件夹链接默认使用菜单的形式打开，可单独设置", "interactive/fastOpenDir", &us->fastOpenDir);
-    w->add(QPixmap(":/icons/st/fastOpenDirLevel"), "展开目录级别", "快速展开目录时菜单的层级数量上限", "interactive/fastOpenDirLevel", &us->fastOpenDirLevel, 1, 10, 1);
-    w->add(QPixmap(":/icons/st/fileCount"), "目录文件数量", "快速展开目录时菜单的文件数量上限", "interactive/fastOpenDirFileCount", &us->fastOpenDirFileCount, 1, 100, 1);
+    w->add(QPixmap(":/icons/st/fileNameLabelMaxLength"), "文件名显示最大长度", "文件名显示的最大长度（仅限图标类型）", "file/fileNameLabelMaxLength", &us->fileNameLabelMaxLength, 1, 100, 1);
+    w->add(QPixmap(":/icons/st/fastOpenDir"), "快速展开目录", "文件夹链接默认使用菜单的形式打开，可单独设置", "file/fastOpenDir", &us->fastOpenDir);
+    w->add(QPixmap(":/icons/st/fastOpenDirLevel"), "默认展开目录级别", "快速展开目录时菜单的层级数量上限", "file/fastOpenDirLevel", &us->fastOpenDirLevel, 1, 10, 1);
+    w->add(QPixmap(":/icons/st/fileCount"), "目录展开文件数量上限", "快速展开目录时菜单的文件数量上限", "file/fastOpenDirFileCount", &us->fastOpenDirFileCount, 1, 100, 1);
+    // w->add(QPixmap(":/icons/st/asFolder"), "作为文件夹来面对", "存放文件本身，而非创建快捷方式【注意：会改变本程序对文件的处理方式！】", "file/defaultAsFolder", &us->defaultAsFolder);
+    w->add(QPixmap(":/icons/st/fileName"), "同步修改文件名", "修改文件快捷方式的名字时，询问修改文件名", "file/modifyFileNameSync", &us->modifyFileNameSync);
     addGroup(w, "文件操作");
 
     // 使用数据

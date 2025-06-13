@@ -118,6 +118,11 @@ void PanelItemBase::triggerEvent()
 
 }
 
+void PanelItemBase::initResource()
+{
+
+}
+
 void PanelItemBase::releaseResource()
 {
 
