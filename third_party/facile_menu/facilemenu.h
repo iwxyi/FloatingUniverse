@@ -102,6 +102,7 @@ public:
 
 signals:
     void signalActionTriggered(FacileMenuItem* action);
+    void signalDynamicMenuTriggered(FacileMenuItem* item);
     void signalHidden(); // 只是隐藏了自己
 
 private slots:

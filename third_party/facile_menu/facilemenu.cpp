@@ -292,9 +292,14 @@ FacileMenu *FacileMenu::addMenu(QIcon icon, QString text, FuncType clicked)
         });
     }
 
-    connect(item, &InteractiveButtonBase::signalMouseEnterLater, [=]{
+    connect(item, &InteractiveButtonBase::signalMouseEnterLater, this, [=]{
         if (_showing_animation)
             return ;
+        if (item->getDynamicCreateState() == -1)
+        {
+            item->setDynamicCreateState(1);
+            emit signalDynamicMenuTriggered(item);
+        }
         int index = items.indexOf(item);
         if (using_keyboard && current_index > -1 && current_index < items.size() && current_index != index) // 屏蔽键盘操作
             items.at(current_index)->discardHoverPress(true);

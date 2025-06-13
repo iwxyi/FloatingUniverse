@@ -494,14 +494,14 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
                 emit modified();
             })->check(fastOpen);
 
-            auto levelMenu = menu->addMenu(QIcon(":/icons/open_level"), "加载层数");
+            /* auto levelMenu = menu->addMenu(QIcon(":/icons/open_level"), "加载层数");
             menu->lastAction()->hide(!fastOpen);
             levelMenu->addNumberedActions("%1层", 1, 11, [=](FacileMenuItem* item){
                 item->check(item->getText() == QString::number(openLevel) + "层");
             }, [=](int val){
                 openLevel = val;
                 emit modified();
-            });
+            }); */
         }
     }
 
@@ -684,10 +684,24 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
     if (level >= openLevel)
         return ;
 
+    auto connectDynamicMenu = [=](FacileMenu* menu) {
+        connect(menu, &FacileMenu::signalDynamicMenuTriggered, this, [=](FacileMenuItem* item) {
+            QString path = item->getData().toString();
+            if (path.isEmpty())
+            {
+                qWarning() << "无法获取到目录路径" << path;
+                return;
+            }
+            qInfo() << "动态加载目录列表：" << path;
+            showFacileDir(path, item->subMenu(), -1);
+        });
+    };
+
     FacileMenu* menu = parentMenu;
     if (!parentMenu)
     {
         menu = new FacileMenu(this);
+        connectDynamicMenu(menu);
     }
 
     auto infos = QDir(path).entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
@@ -713,7 +727,9 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
                     });
                 }
             });
-            showFacileDir(info.absoluteFilePath(), m, level+1);
+            // showFacileDir(info.absoluteFilePath(), m, level+1);
+            menu->lastAddedItem()->setDynamicCreate(true)->setData(QString(info.absoluteFilePath()));
+            connectDynamicMenu(m);
         }
         else
         {
@@ -733,6 +749,8 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
     if (!parentMenu)
     {
         emit facileMenuUsed(menu);
-        menu->exec();
+
+        if (level != -1)
+            menu->exec();
     }
 }
