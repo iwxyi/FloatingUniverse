@@ -60,13 +60,16 @@ public:
     // 交互
     int spatialMoveRatio = 1; // 控件移动倍率
     bool allowMoveOut = true; // 允许拖拽到面板外面，而不隐藏
-    bool fastOpenDir = false; // 默认使用快速打开
-    int fastOpenDirLevel = 5; // 最多显示3级文件
     QColor themeMainColor = QColor(51, 103, 214); // #3367D6
-    bool modifyFileNameSync = true; // 询问同步修改文件名
     bool autoReboot = false; // 开机自启
     bool keepOnItemUsing = true; // 组件正在使用时不隐藏面板
     bool trayClickOpenPanel = false; // 交换托盘手势，单击打开托盘
+
+    // 文件
+    bool fastOpenDir = false; // 默认使用快速打开
+    int fastOpenDirLevel = 3; // 最多显示3级文件
+    int fastOpenDirFileCount = 20; // 单个目录最多显示20个文件
+    bool modifyFileNameSync = true; // 询问同步修改文件名
 
     // 使用记录
     int bootCount = 0; // 程序启动次数

@@ -107,7 +107,8 @@ void MainWindow::initView()
     addGroupItem(QPixmap(":/icons/panel"), "悬浮面板");
     addGroupItem(QPixmap(":/icons/universe2"), "宇宙荧光");
     addGroupItem(QPixmap(":/icons/space_transmission"), "空间传送");
-    addGroupItem(QPixmap(":/icons/interaction"), "交互优化");
+    addGroupItem(QPixmap(":/icons/interaction"), "面板交互");
+    addGroupItem(QPixmap(":/icons/st/file"), "文件操作");
     addGroupItem(QPixmap(":/icons/used_data"), "使用数据");
     addGroupItem(QPixmap(":/icons/about"), "关于程序");
 

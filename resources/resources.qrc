@@ -90,6 +90,8 @@
         <file>st/editing.png</file>
         <file alias="show_panel">icons/show_panel.png</file>
         <file>st/clickGesture.png</file>
+        <file>st/file.png</file>
+        <file>st/fileCount.png</file>
     </qresource>
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>
