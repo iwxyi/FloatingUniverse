@@ -132,10 +132,34 @@ void UniversePanel::readItems()
     rt->flag_readingItems = true;
     QString usedPath = rt->PANEL_PATH;
     QFileInfo fi(usedPath);
-    QFileInfo fiBak(usedPath + ".bak");
+    QString fiBak(usedPath + ".bak");
+    QString fiTmp(usedPath + ".tmp");
+
+    // 检查临时文件是否存在且有效
+    if (isFileExist(fiTmp))
+    {
+        MyJson tmpJson = MyJson::from(readTextFileIfExist(fiTmp).toUtf8());
+        if (!tmpJson.empty() && tmpJson.a("items").size() > 0)
+        {
+            qWarning() << "<断电保护>发现未完成的保存操作，使用临时文件：" << fiTmp;
+            // 将临时文件重命名为正式文件
+            if (isFileExist(usedPath))
+            {
+                if (isFileExist(usedPath + ".bak"))
+                    deleteFile(usedPath + ".bak");
+                renameFile(usedPath, usedPath + ".bak");
+            }
+            renameFile(fiTmp, usedPath);
+        }
+        else
+        {
+            // 临时文件无效，删除它
+            deleteFile(fiTmp);
+        }
+    }
 
     MyJson json = MyJson::from(readTextFileIfExist(usedPath).toUtf8());
-    if (json.empty() && fiBak.exists())
+    if (json.empty() && isFileExist(fiBak))
     {
         qWarning() << "<断电保护>读取备份配置：" << usedPath;
         json = MyJson::from(readTextFileIfExist(usedPath + ".bak").toUtf8());
@@ -144,6 +168,8 @@ void UniversePanel::readItems()
             qCritical() << "<断电保护>无法读取备份配置";
         }
     }
+
+    // 读取项目
     QJsonArray array = json.a("items");
     foreach (auto ar, array)
     {
@@ -576,17 +602,29 @@ void UniversePanel::save()
     }
     json.insert("items", array);
 
-    // 以下阶段可能随时断电，使用断电保护
-    if (isFileExist(rt->PANEL_PATH + ".bak"))
-        deleteFile(rt->PANEL_PATH + ".bak");
-    renameFile(rt->PANEL_PATH, rt->PANEL_PATH + ".bak");
-    writeTextFile(rt->PANEL_PATH, json.toBa());
-    int ct = MyJson::from(readTextFile(rt->PANEL_PATH).toUtf8()).a("items").size();
+    // 使用临时文件进行写入
+    QString tempPath = rt->PANEL_PATH + ".tmp";
+    writeTextFile(tempPath, json.toBa());
+    
+    // 验证临时文件内容
+    int ct = MyJson::from(readTextFile(tempPath).toUtf8()).a("items").size();
     if (ct != items.size()) // 验证数据量
     {
         QMessageBox::warning(this, "保存数据有误", "当前的数据：" + QString::number(items.size()) + "\n保存的数据：" + QString::number(ct));
+        deleteFile(tempPath);
+        return;
     }
-    // deleteFile(rt->PANEL_PATH + ".bak");
+
+    // 备份原文件
+    if (isFileExist(rt->PANEL_PATH))
+    {
+        if (isFileExist(rt->PANEL_PATH + ".bak"))
+            deleteFile(rt->PANEL_PATH + ".bak");
+        renameFile(rt->PANEL_PATH, rt->PANEL_PATH + ".bak");
+    }
+
+    // 将临时文件重命名为目标文件
+    renameFile(tempPath, rt->PANEL_PATH);
 }
 
 void UniversePanel::selectAll(bool containIgnored)
