@@ -401,7 +401,7 @@ void IconTextItem::facileMenuEvent(FacileMenu *menu)
                 QFileInfo info(realLink);
                 QString fileName = info.isDir() ? info.fileName() : info.baseName();
                 QString suffixName = info.fileName(); // 可能带后缀的强制全文件名
-                if ((fileName == oldName || suffixName == oldName) && canBeFileName(newName))
+                if (!fileName.isEmpty() && (fileName == oldName || suffixName == oldName) && canBeFileName(newName))
                 {
                     int recentRename = us->i("recent/renameFileSync", 0);
                     recentRename = 0; // 强制默认修改，而不是上一次的选项
