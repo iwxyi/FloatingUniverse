@@ -1,4 +1,4 @@
-QT       += core gui network websockets
+QT       += core gui network websockets svg
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -17,7 +17,10 @@ RC_FILE += resources/resource.rc
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-DEFINES += ENABLE_TRAY ENABLE_SHORTCUT
+DEFINES += ENABLE_TRAY
+win32 {
+    DEFINES += ENABLE_SHORTCUT
+}
 
 contains(DEFINES, ENABLE_SHORTCUT) {
     include($$PWD/third_party/qxtglobalshortcut5/qxt.pri)

@@ -31,10 +31,15 @@ int main(int argc, char *argv[])
         return !a.sendMessage("FUFUFU");
     a.setQuitOnLastWindowClosed(false); // 关闭最后一个窗口的时候程序不退出（菜单也算窗口）
 
+#ifdef Q_OS_WIN32
     QFont font(a.font());
     font.setFamily("微软雅黑");
     font.setPointSize(qMax(10, font.pointSize()));
     a.setFont(font);
+#endif
+
+    // Mac窗口
+    qputenv("QT_MAC_WANTS_LAYER", "1");
 
     // 初始化全局配置
     rt = new Runtime(QApplication::applicationDirPath());
