@@ -681,7 +681,22 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QFileInfo info(path);
                 QString link = path;
                 link.replace(rt->PANEL_FILE_PATH, FILE_PREFIX);
-                item = createLinkItem(pos, !i, icon, info.isDir() ? info.fileName() : info.baseName(), link, PanelItemType::LocalFile);
+                
+                QString displayName;
+                if (info.isDir())
+                {
+                    // 处理文件夹名称
+                    QString dirPath = path;
+                    if (dirPath.endsWith('/'))
+                        dirPath.chop(1); // 移除末尾的斜杠
+                    displayName = dirPath.mid(dirPath.lastIndexOf('/') + 1);
+                }
+                else
+                {
+                    displayName = info.fileName();
+                }
+                
+                item = createLinkItem(pos, !i, icon, displayName, link, PanelItemType::LocalFile);
             }
             else // 拖拽网络URL
             {
