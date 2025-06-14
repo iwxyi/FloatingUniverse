@@ -713,6 +713,21 @@ void FacileMenu::execute()
 {
     current_index = -1;
 
+    getBackgroupPixmap();
+
+    // 有些重复显示的，需要再初始化一遍
+    hidden_by_another = false;
+    using_keyboard = false;
+    closed_by_clicked = false;
+
+    // 显示动画
+    QWidget::show();
+    setFocus();
+    startAnimationOnShowed();
+}
+
+void FacileMenu::getBackgroupPixmap()
+{
     // 设置背景为圆角矩形
     if (height() > 0 && border_radius) // 没有菜单项的时候为0
     {
@@ -727,70 +742,66 @@ void FacileMenu::execute()
     }
 
     // 是否捕获背景模糊图片
-    if (blur_bg_alpha > 0)
+    if (blur_bg_alpha <= 0)
+        return;
+
+    // 获取图片
+    QRect rect = this->geometry();
+    int radius = qMin(64, qMin(width(), height())); // 模糊半径，也是边界
+    int cut = radius;
+    rect.adjust(-cut, -cut, +cut, +cut);
+
+    QScreen* screen = QApplication::screenAt(QCursor::pos());
+    if (!screen)
     {
-        // 获取图片
-        QRect rect = this->geometry();
-        int radius = qMin(64, qMin(width(), height())); // 模糊半径，也是边界
-        int cut = radius;
-        rect.adjust(-cut, -cut, +cut, +cut);
-        QScreen* screen = QApplication::screenAt(QCursor::pos());
-        if (screen)
+        qWarning() << "无法获取屏幕";
+        return;
+    }
+
+    // 截图
+    // 在Mac的Retina显示屏上，QScreen::grabWindow() 返回的是物理像素图像，而不是逻辑像素
+    // 设备像素比（Device Pixel Ratio）：Retina Mac通常为2.0
+    qreal devicePixelRatio = screen->devicePixelRatio();
+    QPixmap bg = screen->grabWindow(QApplication::desktop()->winId(), rect.left(), rect.top(), rect.width(), rect.height());
+
+    // 当截屏有问题的时候，判断是否纯黑
+    static bool is_all_blank = false;
+    static bool judged = false;
+    if (!judged)
+    {
+        judged = true;
+        QColor color = bg.scaled(1, 1).toImage().pixelColor(0, 0);
+        is_all_blank = (color == QColor(0, 0, 0));
+        if (is_all_blank)
         {
-            // 截图
-            // 在Mac的Retina显示屏上，QScreen::grabWindow() 返回的是物理像素图像，而不是逻辑像素
-            // 设备像素比（Device Pixel Ratio）：Retina Mac通常为2.0
-            qreal devicePixelRatio = screen->devicePixelRatio();
-            QPixmap bg = screen->grabWindow(QApplication::desktop()->winId(), rect.left(), rect.top(), rect.width(), rect.height());
-
-            // 当截屏有问题的时候，判断是否纯黑
-            static bool is_all_blank = false;
-            static bool judged = false;
-            if (!judged)
-            {
-                judged = true;
-                QColor color = bg.scaled(1, 1).toImage().pixelColor(0, 0);
-                is_all_blank = (color == QColor(0, 0, 0));
-                if (is_all_blank)
-                {
-                    qWarning() << "FacileMenu: Scrollshot is all black, disabled blur background";
-                }
-            }
-
-            if (!is_all_blank)
-            {
-                // 开始模糊
-                QT_BEGIN_NAMESPACE
-                  extern Q_WIDGETS_EXPORT void qt_blurImage( QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0 );
-                QT_END_NAMESPACE
-
-                QPixmap pixmap = bg;
-                QPainter painter( &pixmap );
-                // 填充半透明的背景颜色，避免太透
-                {
-                    QColor bg_c(normal_bg);
-                    bg_c.setAlpha(normal_bg.alpha() * (100 - blur_bg_alpha) / 100);
-                    painter.fillRect(0, 0, pixmap.width(), pixmap.height(), bg_c);
-                }
-                QImage img = pixmap.toImage(); // img -blur-> painter(pixmap)
-                qt_blurImage( &painter, img, radius, true, false );
-                // 裁剪掉边缘（模糊后会有黑边）
-                cut = cut * devicePixelRatio; // 按照图像进行缩放
-                QRect copy_rect(cut, cut, pixmap.width()-cut*2, pixmap.height()-cut*2);
-                bg_pixmap = pixmap.copy(copy_rect);
-            }
+            qWarning() << "FacileMenu: Scrollshot is all black, disabled blur background";
         }
     }
 
-    // 有些重复显示的，需要再初始化一遍
-    hidden_by_another = false;
-    using_keyboard = false;
-    closed_by_clicked = false;
+    if (is_all_blank)
+        return;
 
-    // 显示动画
-    QWidget::show();
-    setFocus();
-    startAnimationOnShowed();
+    QPixmap pixmap = bg;
+    QPainter painter(&pixmap);
+    // 填充半透明的背景颜色，避免太透
+    QColor bg_c(normal_bg);
+    bg_c.setAlpha(normal_bg.alpha() * (100 - blur_bg_alpha) / 100);
+    painter.fillRect(0, 0, pixmap.width(), pixmap.height(), bg_c);
+
+    // 开始模糊
+    QImage img = pixmap.toImage(); // img -blur-> painter(pixmap)
+    // 模糊函数
+    QT_BEGIN_NAMESPACE
+    extern Q_WIDGETS_EXPORT void qt_blurImage( QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0 );
+    QT_END_NAMESPACE
+    qt_blurImage(&painter, img, radius, true, false);
+
+    // 裁剪掉边缘（模糊后会有黑边）
+    cut = cut * devicePixelRatio; // 按照图像进行缩放
+    QRect copy_rect(cut, cut, pixmap.width()-cut*2, pixmap.height()-cut*2);
+
+    // 设置为背景
+    bg_pixmap = pixmap.copy(copy_rect);
 }
 
 /**
