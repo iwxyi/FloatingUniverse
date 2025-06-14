@@ -751,18 +751,18 @@ void FacileMenu::getBackgroupPixmap()
     int cut = radius;
     rect.adjust(-cut, -cut, +cut, +cut);
 
+    // 屏幕信息
     QScreen* screen = QApplication::screenAt(QCursor::pos());
     if (!screen)
     {
         qWarning() << "无法获取屏幕";
         return;
     }
-
-    // 截图
+    // 屏幕截图
+    QPixmap bg = screen->grabWindow(QApplication::desktop()->winId(), rect.left(), rect.top(), rect.width(), rect.height());
     // 在Mac的Retina显示屏上，QScreen::grabWindow() 返回的是物理像素图像，而不是逻辑像素
     // 设备像素比（Device Pixel Ratio）：Retina Mac通常为2.0
     qreal devicePixelRatio = screen->devicePixelRatio();
-    QPixmap bg = screen->grabWindow(QApplication::desktop()->winId(), rect.left(), rect.top(), rect.width(), rect.height());
 
     // 当截屏有问题的时候，判断是否纯黑
     static bool is_all_blank = false;
