@@ -141,8 +141,8 @@ FacileMenuItem *FacileMenu::addAction(QIcon icon, QString text, T *obj, void (T:
  */
 FacileMenu *FacileMenu::addNumberedActions(QString pattern, int numberStart, int numberEnd, FuncItemType config, FuncIntType clicked, int step)
 {
-	if (!step)
-		step = numberStart <= numberEnd ? 1 : -1;
+    if (!step)
+        step = numberStart <= numberEnd ? 1 : -1;
     for (int i = numberStart; i != numberEnd; i += step)
     {
         auto ac = addAction(pattern.arg(i), [=]{
@@ -163,8 +163,8 @@ FacileMenu *FacileMenu::addNumberedActions(QString pattern, int numberStart, int
  */
 FacileMenu *FacileMenu::addNumberedActions(QString pattern, int numberStart, int numberEnd, FuncItemIntType config, FuncIntType clicked, int step)
 {
-	if (!step)
-    	step = numberStart <= numberEnd ? 1 : -1;
+    if (!step)
+        step = numberStart <= numberEnd ? 1 : -1;
     for (int i = numberStart; i != numberEnd; i += step)
     {
         auto ac = addAction(pattern.arg(i), [=]{
@@ -615,8 +615,8 @@ void FacileMenu::exec(QPoint pos)
     QPoint originPos = pos; // 不包含像素偏移的原始点
     main_vlayout->setEnabled(true);
     main_vlayout->activate(); // 先调整所有控件大小
-	this->adjustSize();
-	
+    this->adjustSize();
+
     // setAttribute(Qt::WA_DontShowOnScreen); // 会触发 setMouseGrabEnabled 错误
     // show();
     // hide(); // 直接显示吧
@@ -732,10 +732,15 @@ void FacileMenu::execute()
         // 获取图片
         QRect rect = this->geometry();
         int radius = qMin(64, qMin(width(), height())); // 模糊半径，也是边界
-        rect.adjust(-radius, -radius, +radius, +radius);
+        int cut = radius;
+        rect.adjust(-cut, -cut, +cut, +cut);
         QScreen* screen = QApplication::screenAt(QCursor::pos());
         if (screen)
         {
+            // 截图
+            // 在Mac的Retina显示屏上，QScreen::grabWindow() 返回的是物理像素图像，而不是逻辑像素
+            // 设备像素比（Device Pixel Ratio）：Retina Mac通常为2.0
+            qreal devicePixelRatio = screen->devicePixelRatio();
             QPixmap bg = screen->grabWindow(QApplication::desktop()->winId(), rect.left(), rect.top(), rect.width(), rect.height());
 
             // 当截屏有问题的时候，判断是否纯黑
@@ -770,9 +775,9 @@ void FacileMenu::execute()
                 QImage img = pixmap.toImage(); // img -blur-> painter(pixmap)
                 qt_blurImage( &painter, img, radius, true, false );
                 // 裁剪掉边缘（模糊后会有黑边）
-                int c = qMin(bg.width(), bg.height());
-                c = qMin(c/2, radius);
-                bg_pixmap = pixmap.copy(c, c, pixmap.width()-c*2, pixmap.height()-c*2);
+                cut = cut * devicePixelRatio; // 按照图像进行缩放
+                QRect copy_rect(cut, cut, pixmap.width()-cut*2, pixmap.height()-cut*2);
+                bg_pixmap = pixmap.copy(copy_rect);
             }
         }
     }
