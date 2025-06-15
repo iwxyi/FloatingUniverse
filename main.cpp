@@ -47,6 +47,8 @@ int main(int argc, char *argv[])
     ac = new AccountInfo;
     sig = new SignalTransfer;
 
+    FacileMenu::auto_theme_by_bg = true;
+
     ensureDirExist(rt->ICON_PATH);
     ensureDirExist(rt->PANEL_FILE_PATH);
     ensureDirExist(rt->CACHE_IMAGE_PATH);
