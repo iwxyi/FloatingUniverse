@@ -98,5 +98,6 @@
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>
         <file alias="zfb_qr">documents/zfb_qr.jpg</file>
+        <file alias="color_list">documents/color_list.txt</file>
     </qresource>
 </RCC>
