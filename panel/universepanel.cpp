@@ -199,6 +199,9 @@ void UniversePanel::readItems()
         case TodoList:
             item = new TodoItem(this);
             break;
+        case GroupBox:
+            item = new GroupBoxItem(this);
+            break;
         }
 
         if (item)
@@ -336,6 +339,20 @@ TodoItem *UniversePanel::createTodoItem(QPoint pos)
     saveLater();
     selectItem(item);
     item->insertAndFocusItem(0);
+    return item;
+}
+
+GroupBoxItem *UniversePanel::createGroupBoxItem(QPoint pos, const QString& title)
+{
+    auto item = new GroupBoxItem(this);
+    item->setTitle(title);
+    item->show();
+    item->move(pos);
+
+    items.append(item);
+    connectItem(item);
+    saveLater();
+    selectItem(item);
     return item;
 }
 
@@ -1604,6 +1621,17 @@ void UniversePanel::showAddMenu(FacileMenu *addMenu)
         addMenu->addAction(QIcon(":icons/rounded_rect"), "矩形 (&B)", [=]{
             createCardItem(cursorPos);
         });
+    });
+
+    addMenu->addRow([=]{
+        addMenu->addAction(QIcon(":icons/group"), "分组 (&G)", [=]{
+            if (currentMenu)
+                currentMenu->close();
+            createGroupBoxItem(cursorPos, "新分组");
+        });
+        addMenu->addAction(QIcon(":icons/paste"), "粘贴 (&V)", [=]{
+
+        })->disable();
     });
 }
 

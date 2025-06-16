@@ -43,6 +43,7 @@ SOURCES += \
     panel/carditem.cpp \
     panel/customedit.cpp \
     panel/customlistwidget.cpp \
+    panel/groupboxitem.cpp \
     panel/icontextitem.cpp \
     panel/imageitem.cpp \
     panel/longtextitem.cpp \
@@ -59,11 +60,25 @@ SOURCES += \
     third_party/escape_dialog/hoverbutton.cpp \
     third_party/facile_menu/facilemenu.cpp \
     third_party/facile_menu/facilemenuitem.cpp \
+    third_party/interactive_buttons/appendbutton.cpp \
+    third_party/interactive_buttons/generalbuttoninterface.cpp \
+    third_party/interactive_buttons/infobutton.cpp \
     third_party/interactive_buttons/interactivebuttonbase.cpp \
     main.cpp \
     mainwindow/mainwindow.cpp \
     global/runtime.cpp \
+    third_party/interactive_buttons/pointmenubutton.cpp \
+    third_party/interactive_buttons/threedimenbutton.cpp \
     third_party/interactive_buttons/watercirclebutton.cpp \
+    third_party/interactive_buttons/waterfallbuttongroup.cpp \
+    third_party/interactive_buttons/waterfloatbutton.cpp \
+    third_party/interactive_buttons/waterzoombutton.cpp \
+    third_party/interactive_buttons/winclosebutton.cpp \
+    third_party/interactive_buttons/winmaxbutton.cpp \
+    third_party/interactive_buttons/winmenubutton.cpp \
+    third_party/interactive_buttons/winminbutton.cpp \
+    third_party/interactive_buttons/winrestorebutton.cpp \
+    third_party/interactive_buttons/winsidebarbutton.cpp \
     third_party/qtsingleapplication/qtlocalpeer.cpp \
     third_party/qtsingleapplication/qtlockedfile.cpp \
     third_party/qtsingleapplication/qtlockedfile_unix.cpp \
@@ -97,6 +112,7 @@ HEADERS += \
     panel/carditem.h \
     panel/customedit.h \
     panel/customlistwidget.h \
+    panel/groupboxitem.h \
     panel/icontextitem.h \
     panel/imageitem.h \
     panel/longtextitem.h \
@@ -110,7 +126,21 @@ HEADERS += \
     resources/resource.rc \
     third_party/escape_dialog/escapedialog.h \
     third_party/escape_dialog/hoverbutton.h \
+    third_party/interactive_buttons/appendbutton.h \
+    third_party/interactive_buttons/generalbuttoninterface.h \
+    third_party/interactive_buttons/infobutton.h \
+    third_party/interactive_buttons/pointmenubutton.h \
+    third_party/interactive_buttons/threedimenbutton.h \
     third_party/interactive_buttons/watercirclebutton.h \
+    third_party/interactive_buttons/waterfallbuttongroup.h \
+    third_party/interactive_buttons/waterfloatbutton.h \
+    third_party/interactive_buttons/waterzoombutton.h \
+    third_party/interactive_buttons/winclosebutton.h \
+    third_party/interactive_buttons/winmaxbutton.h \
+    third_party/interactive_buttons/winmenubutton.h \
+    third_party/interactive_buttons/winminbutton.h \
+    third_party/interactive_buttons/winrestorebutton.h \
+    third_party/interactive_buttons/winsidebarbutton.h \
     third_party/qtsingleapplication/QtLockedFile \
     third_party/qtsingleapplication/QtSingleApplication \
     third_party/qtsingleapplication/qtlocalpeer.h \

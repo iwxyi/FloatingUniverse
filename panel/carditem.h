@@ -3,6 +3,11 @@
 
 #include "resizeableitembase.h"
 
+/**
+ * 卡片组件
+ * 提供了一个可视化的圆角矩形
+ * 可以设置背景颜色、圆角半径等
+ */
 class CardItem : public ResizeableItemBase
 {
 public:

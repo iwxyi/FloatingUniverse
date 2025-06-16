@@ -17,7 +17,8 @@ enum PanelItemType
     LongText,
     ImageView,
     CardView,
-    TodoList
+    TodoList,
+    GroupBox
 };
 
 #define UNDEFINED_POS QPoint(-1, -1)
