@@ -2,12 +2,15 @@
 #define RUNTIME_H
 
 #include <QObject>
+#include <functional>
 
 class Runtime : public QObject
 {
     Q_OBJECT
 public:
     explicit Runtime(QString path, QObject *parent = nullptr);
+
+    std::function<qint64()> getRandomId;
 
 public:
     QString APP_PATH;

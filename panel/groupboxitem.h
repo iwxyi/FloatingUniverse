@@ -2,7 +2,6 @@
 #define GROUPBOXITEM_H
 
 #include "resizeableitembase.h"
-#include "clicklabel.h"
 #include <QScrollArea>
 
 /**
@@ -17,11 +16,13 @@ class GroupBoxItem : public ResizeableItemBase
 public:
     GroupBoxItem(QWidget* parent);
 
+    virtual void initResource() override;
     virtual MyJson toJson() const override;
     virtual void fromJson(const MyJson &json) override;
 
     QString getTitle() const;
     void setTitle(const QString& title);
+    QWidget* getGroupArea() const;
     QList<PanelItemBase*> getSubItems() const;
     void autoArrange();
 
@@ -34,8 +35,8 @@ public slots:
 private:
     QString title;
     QLabel* label = nullptr;
-    QScrollArea* scroll_area = nullptr;
-    QWidget* content_widget = nullptr;
+    QScrollArea* scrollArea = nullptr;
+    QWidget* contentWidget = nullptr;
 };
 
 #endif // GROUPBOXITEM_H

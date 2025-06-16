@@ -29,6 +29,8 @@ PanelItemBase::PanelItemBase(QWidget *parent) : QWidget(parent)
 MyJson PanelItemBase::toJson() const
 {
     MyJson json;
+    if (itemId != 0)
+        json.insert("id", this->itemId);
 
     QRect rect(this->geometry());
     json.insert("left", rect.left());
@@ -56,6 +58,11 @@ void PanelItemBase::fromJson(const MyJson &json)
         setStyleSheet(customQss);
 }
 
+qint64 PanelItemBase::getItemId() const
+{
+    return itemId;
+}
+
 void PanelItemBase::setType(PanelItemType type)
 {
     this->type = type;
@@ -64,6 +71,17 @@ void PanelItemBase::setType(PanelItemType type)
 PanelItemType PanelItemBase::getType() const
 {
     return type;
+}
+
+void PanelItemBase::setGroupId(qint64 id)
+{
+    this->groupId = id;
+    emit modified();
+}
+
+qint64 PanelItemBase::getGroupId() const
+{
+    return groupId;
 }
 
 bool PanelItemBase::isSelected() const
@@ -192,6 +210,7 @@ void PanelItemBase::mouseReleaseEvent(QMouseEvent *event)
 
         if (dragged) // 拖拽移动结束
         {
+            emit moveFinished();
             emit modified();
         }
         else // 点击事件

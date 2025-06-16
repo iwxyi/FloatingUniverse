@@ -28,7 +28,9 @@ public:
 private:
     void initPanel();
     void initAction();
+    void initGlobal();
     void readItems();
+    QList<GroupBoxItem*> getGroupItems() const;
     IconTextItem *createLinkItem(QPoint pos, bool center, const QIcon& icon, const QString& text, const QString& link, PanelItemType type);
     IconTextItem *createLinkItem(QPoint pos, bool center, const QString& iconName, const QString& text, const QString& link, PanelItemType type);
     LongTextItem *createTextItem(QPoint pos, const QString& text, bool enableHtml);
@@ -37,8 +39,8 @@ private:
     CardItem *createCardItem(QPoint pos);
     TodoItem *createTodoItem(QPoint pos);
     GroupBoxItem *createGroupBoxItem(QPoint pos, const QString& title);
-    void connectItem(PanelItemBase* item);
-    void deleteItem(PanelItemBase* item);
+    void createItemEvent(PanelItemBase* item);
+    void deleteItemEvent(PanelItemBase* item);
     bool isMouseInPanel() const;
     bool hasItemUsing() const;
     void keepPanelState(FuncType func);

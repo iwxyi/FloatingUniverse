@@ -34,8 +34,11 @@ public:
     virtual MyJson toJson() const;
     virtual void fromJson(const MyJson& json);
 
+    qint64 getItemId() const;
     void setType(PanelItemType type);
     PanelItemType getType() const;
+    void setGroupId(qint64 id);
+    qint64 getGroupId() const;
 
     bool isSelected() const;
     bool isHovered() const;
@@ -61,6 +64,7 @@ signals:
     void cancelEditMe();
     void hidePanel();
     void moveItems(QPoint delta);
+    void moveFinished();
     void facileMenuUsed(FacileMenu* menu);
     void useFinished();
     void deleteMe();
@@ -99,7 +103,9 @@ public:
     static bool _blockPress;
 
 protected:
-    QWidget* selectWidget;
+    qint64 itemId = 0;
+    qint64 groupId = 0;
+    QWidget* selectWidget = nullptr;
 
     const int selectBorder = 2;
     QPoint pressPos;

@@ -1,6 +1,7 @@
 #include "groupboxitem.h"
 #include "pointmenubutton.h"
 #include "facilemenu.h"
+#include "runtime.h"
 #include <QVBoxLayout>
 
 GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
@@ -11,10 +12,10 @@ GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
     label->setText(title);
     label->setAlignment(Qt::AlignLeft);
 
-    scroll_area = new QScrollArea(this);
-    scroll_area->setWidgetResizable(true);
-    content_widget = new QWidget(scroll_area);
-    scroll_area->setWidget(content_widget);
+    scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+    contentWidget = new QWidget(scrollArea);
+    scrollArea->setWidget(contentWidget);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(9,9,9,9);
@@ -25,12 +26,18 @@ GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
     h_layout->addWidget(label);
     h_layout->addWidget(menu_button);
     layout->addLayout(h_layout);
-    layout->addWidget(scroll_area);
+    layout->addWidget(scrollArea);
 
     menu_button->setSquareSize();
     menu_button->setLeaveAfterClick(true);
 
     connect(menu_button, &InteractiveButtonBase::clicked, this, &GroupBoxItem::slotShowGroupMenu);
+}
+
+void GroupBoxItem::initResource()
+{
+    itemId = rt->getRandomId();
+    qInfo() << "创建分组，ID=" << itemId;
 }
 
 MyJson GroupBoxItem::toJson() const
@@ -56,6 +63,11 @@ void GroupBoxItem::setTitle(const QString& title)
 {
     this->title = title;
     this->label->setText(title);
+}
+
+QWidget *GroupBoxItem::getGroupArea() const
+{
+    return scrollArea->widget();
 }
 /**
  * 获取里面的所有子项
