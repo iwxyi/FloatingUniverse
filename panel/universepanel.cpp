@@ -12,10 +12,6 @@
 #include <QInputDialog>
 #include <QFileDialog>
 #include <QClipboard>
-#ifdef Q_OS_WIN32
-#include <windows.h>
-#include <windowsx.h>
-#endif
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
@@ -32,10 +28,6 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
     setObjectName("UniversePanel");
     setWindowTitle("悬浮宇宙");
     setMinimumSize(45,45);
-    setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
-    setWindowFlag(Qt::WindowStaysOnTopHint, true);
-    setAttribute(Qt::WA_TranslucentBackground, true);
-    setAutoFillBackground(true);
     setAcceptDrops(true);
     setFocusPolicy(Qt::ClickFocus);
 
@@ -52,10 +44,6 @@ UniversePanel::~UniversePanel()
 /// 初始化面板所有数据
 void UniversePanel::initPanel()
 {
-    QRect screen = screenGeometry();
-    resize(us->panelWidth, us->panelHeight);
-    move((screen.width() - width()) / 2 + us->panelCenterOffset, -height() + us->panelBangHeight);
-
     saveTimer = new QTimer(this);
     saveTimer->setInterval(1000);
     saveTimer->setSingleShot(true);
@@ -65,7 +53,7 @@ void UniversePanel::initPanel()
     keepTopTimer->setInterval(60000);
     keepTopTimer->setSingleShot(false);
     connect(keepTopTimer, &QTimer::timeout, this, [=]{
-        if (this->expanding)
+        if (*rt->panel_expading)
             return ;
 
         // 在后台的时候
@@ -76,20 +64,6 @@ void UniversePanel::initPanel()
     });
 
     readItems();
-
-    // 没有项目，展示一下这里有东西
-    QTimer::singleShot(1000, [=]{
-        if (!items.size())
-        {
-            // 自动展开，吸引用户
-            expandPanel();
-            QTimer::singleShot(1000, [=]{
-                // 如果用户没有管它，则1秒后自动隐藏
-                if (!this->geometry().contains(QCursor::pos()))
-                    foldPanel();
-            });
-        }
-    });
 }
 
 void UniversePanel::initAction()
@@ -408,14 +382,14 @@ void UniversePanel::connectItem(PanelItemBase *item)
                     && !this->hasItemUsing()
                     && !menu->isClosedByClick())
             {
-                foldPanel();
+                emit signalFoldPanel();
             }
             currentMenu = nullptr;
         });
     });
 
     connect(item, &PanelItemBase::hidePanel, this, [=]{
-        foldPanel();
+        emit signalFoldPanel();
     });
 
     connect(item, &PanelItemBase::useFinished, this, [=]{
@@ -439,15 +413,11 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::keepPanelFixing, this, [=]{
-        _prev_fixing = fixing;
-        fixing = true;
+        emit signalSetKeepFix(true);
     });
 
     connect(item, &PanelItemBase::restorePanelFixing, this, [=]{
-        auto f = _prev_fixing;
-        QTimer::singleShot(0, [=]{
-            fixing = f;
-        });
+        emit signalSetKeepFix(false);
     });
 }
 
@@ -461,9 +431,7 @@ void UniversePanel::deleteItem(PanelItemBase *item)
 
 bool UniversePanel::isMouseInPanel() const
 {
-    if (!geometry().contains(QCursor::pos())) // 这里包含了触发条的高度
-        return false;
-    if (QCursor::pos().y() > geometry().height() - us->panelBangHeight)
+    if (!rect().contains(mapFromGlobal(QCursor::pos()))) // 这里包含了触发条的高度
         return false;
     return true;
 }
@@ -478,7 +446,7 @@ bool UniversePanel::hasItemUsing() const
         return true;
 
     // 鼠标是否在面板上
-    /* bool ct = geometry().contains(QCursor::pos()); // 这里包含了触发条的高度
+    /* bool ct = rect().contains(QCursor::pos()); // 这里包含了触发条的高度
     if (!ct)
         return false; */
 
@@ -487,102 +455,6 @@ bool UniversePanel::hasItemUsing() const
             return true;
 
     return false;
-}
-
-void UniversePanel::keepPanelState(FuncType func)
-{
-    bool _fixing = fixing;
-    fixing = true;
-
-    func();
-
-    fixing = _fixing;
-}
-
-/// 从收起状态展开面板
-void UniversePanel::expandPanel()
-{
-    // 动态背景
-    if (us->panelBlur && this->pos().y() <= -this->height() + 1)
-    {
-        // 截图
-        int radius = us->panelBlurRadius;
-        QScreen* screen = QApplication::screenAt(QCursor::pos());
-        QPixmap bg = screen->grabWindow(0,
-                                        pos().x() - radius,
-                                        0 - radius,
-                                        width() + radius * 2,
-                                        height() + radius * 2);
-
-        // 模糊
-        QT_BEGIN_NAMESPACE
-            extern Q_WIDGETS_EXPORT void qt_blurImage( QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0 );
-        QT_END_NAMESPACE
-
-        QPixmap pixmap = bg;
-        QPainter painter( &pixmap );
-        QImage img = pixmap.toImage(); // img -blur-> painter(pixmap)
-        qt_blurImage( &painter, img, radius, true, false );
-
-        QPixmap blured(pixmap.size());
-        blured.fill(Qt::transparent);
-        QPainter painter2(&blured);
-        painter2.setOpacity(us->panelBlurOpacity / 255.0);
-        painter2.drawPixmap(blured.rect(), pixmap);
-
-        // 裁剪掉边缘（模糊后会有黑边）
-        int c = qMin(bg.width(), bg.height());
-        c = qMin(c/2, radius);
-        panelBlurPixmap = blured.copy(c, c, blured.width()-c*2, blured.height()-c*2);
-    }
-
-    // 展示动画
-    QPropertyAnimation* ani = new QPropertyAnimation(this, "pos");
-    ani->setStartValue(pos());
-    ani->setEndValue(QPoint(pos().x(), 0));
-    ani->setDuration(300);
-    ani->setEasingCurve(QEasingCurve::OutCubic);
-    if (us->panelBlur)
-    {
-        connect(ani, &QPropertyAnimation::valueChanged, this, [=]{
-            update();
-        });
-    }
-    connect(ani, &QPropertyAnimation::finished, this, [=]{
-        ani->deleteLater();
-        PanelItemBase::_blockPress = animating = false;
-        update();
-    });
-    ani->start();
-    expanding = true;
-    PanelItemBase::_blockPress = animating = true;
-}
-
-/// 从显示状态收起面板
-void UniversePanel::foldPanel()
-{
-    if (fixing) // 固定不隐藏
-        return ;
-
-    QPropertyAnimation* ani = new QPropertyAnimation(this, "pos");
-    ani->setStartValue(pos());
-    ani->setEndValue(QPoint(pos().x(), -height() + us->panelBangHeight));
-    ani->setDuration(300);
-    ani->setEasingCurve(QEasingCurve::InOutCubic);
-    if (us->panelBlur)
-    {
-        connect(ani, &QPropertyAnimation::valueChanged, this, [=]{
-            update();
-        });
-    }
-    connect(ani, &QPropertyAnimation::finished, this, [=]{
-        ani->deleteLater();
-        PanelItemBase::_blockPress = animating = false;
-        update();
-    });
-    ani->start();
-    expanding = false;
-    PanelItemBase::_blockPress = animating = true;
 }
 
 /// 延迟保存
@@ -731,7 +603,7 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
                 QString path = urls.at(i).url();
                 QString pageName;
                 QPixmap pixmap;
-                keepPanelState([&]{
+                emit signalKeepPanelState([&]{
                     getWebPageNameAndIcon(path, pageName, pixmap);
                     if (pageName.isEmpty() && urls.count() == 1) // 空名字，并且获取不到
                     {
@@ -820,17 +692,6 @@ void UniversePanel::insertMimeData(const QMimeData *mime, QPoint pos)
     }
 }
 
-QRect UniversePanel::screenGeometry() const
-{
-    auto screens = QGuiApplication::screens();
-    int index = 0;
-    if (index >= screens.size())
-        index = screens.size() - 1;
-    if (index < 0)
-        return QRect();
-    return screens.at(index)->geometry();
-}
-
 bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixmap &pageIcon)
 {
     // 获取网页标题
@@ -890,61 +751,6 @@ bool UniversePanel::getWebPageNameAndIcon(QString url, QString &pageName, QPixma
     return true;
 }
 
-void UniversePanel::closeEvent(QCloseEvent *)
-{
-    return ;
-}
-
-void UniversePanel::enterEvent(QEvent *event)
-{
-    QWidget::enterEvent(event);
-
-    if (expanding)
-        return ;
-
-    // 根据位置，判断是否需要展示位置
-    int x = QCursor::pos().x() - this->x();
-    if (x >= us->panelBangMarginLeft && x <= width() - us->panelBangMarginRight)
-        expandPanel();
-}
-
-void UniversePanel::leaveEvent(QEvent *event)
-{
-    // 拖拽到外面的时候，左键没事leave在release之后
-    // 右边就在release之前leave了
-    // 所以直接判断pressing状态
-    if (us->allowMoveOut && (pressing || scening))
-    {
-        return ;
-    }
-
-    // 是否是拖拽的时候移到了外面去了
-    // 因为有人对这个操作机制感到迷惑，所以在设置里加了，默认开启
-    // 拖拽到外面松开，触发了 leaveEvent
-    if (us->allowMoveOut && _release_outter)
-    {
-        _release_outter = false;
-        return ;
-    }
-
-    // 鼠标正在面板内，大概率是由于菜单引起的
-    /* if (isMouseInPanel())
-        return ; */
-
-    // 是否有item正在使用
-    if (us->keepOnItemUsing && hasItemUsing())
-        return ;
-
-    // 弹出菜单，也会触发
-    if (currentMenu && currentMenu->hasFocus())
-        return ;
-
-    QWidget::leaveEvent(event);
-
-    if (expanding)
-        foldPanel();
-}
-
 void UniversePanel::focusOutEvent(QFocusEvent *event)
 {
     if (pressing)
@@ -962,30 +768,6 @@ void UniversePanel::paintEvent(QPaintEvent *)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    // 画主面板
-    {
-        QPainterPath path;
-        path.addRoundedRect(QRect(0, 0, width(), height() - us->panelBangHeight), us->fluentRadius, us->fluentRadius);
-        painter.fillPath(path, us->panelBgColor);
-
-        if (us->panelBlur && us->panelBlurOpacity && !panelBlurPixmap.isNull())
-        {
-            QRect rect = this->rect();
-            rect.moveTop(-this->y());
-            painter.drawPixmap(rect, panelBlurPixmap);
-        }
-    }
-
-    // 画刘海
-    if (this->pos().y() <= -this->height() + us->panelBangHeight)
-    {
-        QPainterPath path;
-        path.addRect(us->panelBangMarginLeft, height() - us->panelBangHeight, qAbs(width() - us->panelBangMarginLeft - us->panelBangMarginRight), us->panelBangHeight);
-        // int w = qMax(16, width() - us->panelBangMarginLeft - us->panelBangMarginRight);
-        // path.addRect(QRect((width() - w) / 2, height() - us->panelBangHeight, w, us->panelBangHeight));
-        painter.fillPath(path, us->panelBangBg);
-    }
-
     // 画选中
     if (pressing)
     {
@@ -1001,7 +783,7 @@ void UniversePanel::paintEvent(QPaintEvent *)
 
 void UniversePanel::mousePressEvent(QMouseEvent *event)
 {
-    if (animating) // 动画中禁止按下的误操作
+    if (*rt->panel_animating) // 动画中禁止按下的误操作
         return ;
     moving = false;
     scening = false;
@@ -1173,14 +955,14 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
 
             // 拖拽到外面，必定会触发 leaveEvent
             // 右键很坑，事件顺序是：leave(pressing) -> release -> leave(unpressing)
-            if (!this->geometry().contains(QCursor::pos()))
+            if (!rect().contains(mapFromGlobal(QCursor::pos())))
                 _release_outter = true;
             return ;
         }
     }
 
     // 拖拽到外面，必定会触发 leaveEvent
-    if (!this->geometry().contains(QCursor::pos()))
+    if (!rect().contains(mapFromGlobal(QCursor::pos())))
         _release_outter = true;
 
     QWidget::mouseReleaseEvent(event);
@@ -1200,7 +982,7 @@ void UniversePanel::mouseDoubleClickEvent(QMouseEvent *event)
     menu->finished([=]{
         currentMenu = nullptr;
         if (!this->hasFocus() && !isMouseInPanel() && !hasItemUsing())
-            foldPanel();
+            emit signalFoldPanel();
     });
 }
 
@@ -1432,8 +1214,8 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
 
         // 面板固定操作
         menu->split()->addAction(QIcon(":/icons/fix"), "固定 (&F)", [=]{
-            fixing = !fixing;
-        })->check(fixing);
+            emit signalSetKeepFix(!*rt->panel_fixing);
+        })->check(*rt->panel_fixing);
 
         menu->addAction(QIcon(":/icons/config"), "设置 (&S)", [=]{
             emit openSettings();
@@ -1456,7 +1238,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
                 && !this->hasFocus()) // 这个判断并没有任何用处，就意思一下
         {
             // 鼠标外面隐藏菜单，隐藏面板
-            foldPanel();
+            emit signalFoldPanel();
         }
 
         // 获取焦点后，鼠标外面操作菜单后，点击外面区域会触发 leaveEvent
@@ -1655,7 +1437,7 @@ void UniversePanel::keyPressEvent(QKeyEvent *event)
         if (selectedItems.size())   // 如果有选中，则取消选中
             unselectAll();
         else                        // 没有选中，隐藏面板
-            foldPanel();
+            emit signalFoldPanel();
 
         event->ignore();
     }
@@ -1670,10 +1452,7 @@ void UniversePanel::dragEnterEvent(QDragEnterEvent *event)
     unselectAll();
 
     auto mime = event->mimeData();
-    if (!expanding)
-    {
-        expandPanel();
-    }
+    emit signalExpandPanel();
 
     if(mime->hasUrls())//判断数据类型
     {
@@ -1738,53 +1517,4 @@ void UniversePanel::dropEvent(QDropEvent *event)
     QPoint pos = event->pos();
     auto mime = event->mimeData();
     insertMimeData(mime, pos);
-}
-
-bool UniversePanel::nativeEvent(const QByteArray &eventType, void *message, long *result)
-{
-#ifdef Q_OS_WIN32
-    Q_UNUSED(eventType)
-    MSG* msg = static_cast<MSG*>(message);
-    switch(msg->message)
-    {
-    case WM_NCHITTEST:
-        if (!fixing) // 只有固定的时候才能调整
-            return false;
-        const auto ratio = devicePixelRatioF(); // 解决4K下的问题
-        int xPos = static_cast<int>(GET_X_LPARAM(msg->lParam) / ratio - this->frameGeometry().x());
-        int yPos = static_cast<int>(GET_Y_LPARAM(msg->lParam) / ratio - this->frameGeometry().y());
-        if(xPos < boundaryWidth && yPos < boundaryWidth)                    //左上角
-            *result = HTTOPLEFT;
-        else if(xPos >= width() - boundaryWidth && yPos < boundaryWidth)          //右上角
-            *result = HTTOPRIGHT;
-        else if(xPos < boundaryWidth && yPos >= height() - boundaryWidth)         //左下角
-            *result = HTBOTTOMLEFT;
-        else if(xPos >= width() - boundaryWidth && yPos >= height() - boundaryWidth)//右下角
-            *result = HTBOTTOMRIGHT;
-        else if(xPos < boundaryWidth)                                     //左边
-            *result =  HTLEFT;
-        else if(xPos >= width() - boundaryWidth)                              //右边
-            *result = HTRIGHT;
-        /*else if(yPos<boundaryWidth)                                       //上边
-            *result = HTTOP;*/
-        else if(yPos >= height() - boundaryWidth)                             //下边
-        {
-            /* if (xPos >= (width() - us->panelBangWidth) / 2 && xPos <= (width() + us->panelBangWidth) / 2) // 刘海部分
-                return false; */
-            *result = HTBOTTOM;
-        }
-        else              //其他部分不做处理，返回false，留给其他事件处理器处理
-           return false;
-
-        QRect screen = screenGeometry();
-        us->set("panel/centerOffset", geometry().center().x() - screen.center().x());
-        us->set("panel/width", width());
-        us->set("panel/height", height());
-
-        return true;
-    }
-#else
-    return QWidget::nativeEvent(eventType, message, result);
-#endif
-    return false;         //此处返回false，留给其他事件处理器处理
 }
