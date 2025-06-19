@@ -22,8 +22,10 @@ public:
 
     bool flag_readingItems = false; // 是否正在读取item，可能会触发一些信号
 
-private:
     const QString imageSuffix = ".png";
+    bool* panel_expading = nullptr;
+    bool* panel_animating = nullptr;
+    bool* panel_fixing = nullptr;
 };
 
 extern Runtime* rt;

@@ -8,6 +8,7 @@
 #include "qxtglobalshortcut.h"
 #endif
 #include "watercirclebutton.h"
+#include "panel/floatpanel.h"
 #include "panel/universepanel.h"
 #include "settingscontroller.h"
 
@@ -61,7 +62,7 @@ private:
 #ifdef Q_OS_WIN32
     HWND prevWindow = nullptr;
 #endif
-    UniversePanel* panel = nullptr;
+    FloatPanel* panel = nullptr;
     QSystemTrayIcon* tray = nullptr;
     WaterCircleButton *confirmButton = nullptr;
     bool drawering = true; // 是否显示Drawer（动画中则为动画结束后的状态）

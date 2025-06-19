@@ -248,8 +248,9 @@ void MainWindow::initKey()
 
 void MainWindow::initPanel()
 {
-    panel = new UniversePanel(nullptr);
+    panel = new FloatPanel(nullptr);
     connect(panel, SIGNAL(openSettings()), this, SLOT(show()));
+    panel->initPanel();
     panel->show();
     connect(ui->settingsBody, SIGNAL(updatePanel()), panel, SLOT(update()));
 }

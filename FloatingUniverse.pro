@@ -43,6 +43,7 @@ SOURCES += \
     panel/carditem.cpp \
     panel/customedit.cpp \
     panel/customlistwidget.cpp \
+    panel/floatpanel.cpp \
     panel/icontextitem.cpp \
     panel/imageitem.cpp \
     panel/longtextitem.cpp \
@@ -97,6 +98,7 @@ HEADERS += \
     panel/carditem.h \
     panel/customedit.h \
     panel/customlistwidget.h \
+    panel/floatpanel.h \
     panel/icontextitem.h \
     panel/imageitem.h \
     panel/longtextitem.h \

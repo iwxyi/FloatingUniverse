@@ -20,6 +20,7 @@
 class UniversePanel : public QWidget
 {
     Q_OBJECT
+    friend class FloatPanel;
 public:
     explicit UniversePanel(QWidget *parent = nullptr);
     ~UniversePanel() override;
@@ -39,14 +40,16 @@ private:
     void deleteItem(PanelItemBase* item);
     bool isMouseInPanel() const;
     bool hasItemUsing() const;
-    void keepPanelState(FuncType func);
 
 signals:
     void openSettings();
+    void signalExpandPanel();
+    void signalFoldPanel();
+    void signalSetKeepFix(bool keep);
+    void signalKeepPanelState(FuncType func);
 
 public slots:
-    void expandPanel();
-    void foldPanel();
+
     void saveLater();
     void save();
     void selectAll(bool containIgnored = true);
@@ -63,13 +66,9 @@ private slots:
     void insertMimeData(const QMimeData *mime, QPoint pos);
 
 public:
-    QRect screenGeometry() const;
     bool getWebPageNameAndIcon(QString url, QString& pageName, QPixmap &pageIcon);
 
 protected:
-    void closeEvent(QCloseEvent *) override;
-    void enterEvent(QEvent *event) override;
-    void leaveEvent(QEvent *event) override;
     void focusOutEvent(QFocusEvent *event) override;
 
     void paintEvent(QPaintEvent *) override;
@@ -88,13 +87,7 @@ protected:
     void dragMoveEvent(QDragMoveEvent *event) override;
     void dropEvent(QDropEvent *event) override;
 
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
-
 private:
-    bool expanding = false;
-    bool animating = false;
-    bool fixing = false;
-    int boundaryWidth = 8;
     bool pressing = false; // 左键按下
     QPoint pressPos;
     bool moving = false; // 正在移动items
@@ -103,8 +96,6 @@ private:
     FacileMenu* currentMenu = nullptr;
     bool _block_menu = false;
     bool _release_outter = false; // 鼠标松开的时候，是不是在外面
-    bool _prev_fixing = false;
-    QPixmap panelBlurPixmap;
     QTimer* saveTimer;
     QTimer* keepTopTimer;
 
