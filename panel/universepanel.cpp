@@ -412,7 +412,8 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
             QPoint pos = mapFromGlobal(QCursor::pos()); // 相对于面板的坐标
             eachitem(
                 QRect geo = item->geometry(); // item的parent的坐标，要转换为相对于面板的坐标
-                geo.moveTopLeft(item->parentWidget()->mapTo(this, geo.topLeft()));
+                if (item->parentWidget() != this)
+                    geo.moveTopLeft(item->parentWidget()->mapTo(this, geo.topLeft()));
 
                 if (geo.contains(pos))
                 {
@@ -684,16 +685,29 @@ void UniversePanel::save()
 
 void UniversePanel::selectAll(bool containIgnored)
 {
+    QList<PanelItemBase*> noGroupChildItems = items;
+    QList<PanelItemBase*> groupChildItems;
+    for (int i = 0; i < noGroupChildItems.size(); i++)
+    {
+        auto item = noGroupChildItems.at(i);
+        if (item->getGroupId() > 0)
+        {
+            noGroupChildItems.removeAt(i--);
+            groupChildItems.append(item);
+        }
+    }
+    unselectItems(groupChildItems);
+    
     if (containIgnored)
     {
-        foreach (auto item, items)
+        foreach (auto item, noGroupChildItems)
             item->setSelect(true);
-        selectedItems = items.toSet();
+        selectedItems = noGroupChildItems.toSet();
     }
     else
     {
         selectedItems.clear();
-        foreach (auto item, items)
+        foreach (auto item, noGroupChildItems)
         {
             if (item->isIgnoreSelect())
                 continue;
@@ -720,6 +734,28 @@ void UniversePanel::unselectItem(PanelItemBase *item)
 {
     item->setSelect(false);
     selectedItems.remove(item);
+}
+
+void UniversePanel::unselectItems(const QList<PanelItemBase*>& items)
+{
+    foreach (auto item, items)
+        unselectItem(item);
+}
+
+void UniversePanel::unselectGroupItems()
+{
+    foreach (auto item, selectedItems)
+    {
+        if (item->getType() == GroupBox)
+        {
+            ItemIdType groupId = item->getItemId();
+            foreach (auto childItem, selectedItems)
+            {
+                if (childItem->getGroupId() == groupId)
+                    unselectItem(childItem);
+            }
+        }
+    }
 }
 
 void UniversePanel::triggerItem(PanelItemBase *item)
@@ -1112,6 +1148,9 @@ void UniversePanel::mouseReleaseEvent(QMouseEvent *event)
                         selectedItems.insert(item);
                     }
                 }
+
+                // 如果有选中group，那么取消选中其中的item
+                unselectGroupItems();
             }
             else // 单击
             {

@@ -53,13 +53,14 @@ signals:
     void signalKeepPanelState(FuncType func);
 
 public slots:
-
     void saveLater();
     void save();
     void selectAll(bool containIgnored = true);
     void unselectAll();
     void selectItem(PanelItemBase* item, const QPoint& pos = UNDEFINED_POS);
     void unselectItem(PanelItemBase* item);
+    void unselectItems(const QList<PanelItemBase*>& items);
+    void unselectGroupItems();
     void triggerItem(PanelItemBase* item);
     void raiseItem(PanelItemBase* item);
     void lowerItem(PanelItemBase* item);
