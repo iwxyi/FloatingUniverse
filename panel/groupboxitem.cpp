@@ -36,8 +36,11 @@ GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
 
 void GroupBoxItem::initResource()
 {
-    itemId = rt->getRandomId();
-    qInfo() << "创建分组，ID=" << itemId;
+    if (itemId == 0)
+    {
+        itemId = rt->getRandomId();
+        qInfo() << "创建分组，ID=" << itemId;
+    }
 }
 
 MyJson GroupBoxItem::toJson() const
@@ -67,7 +70,7 @@ void GroupBoxItem::setTitle(const QString& title)
 
 QWidget *GroupBoxItem::getGroupArea() const
 {
-    return scrollArea->widget();
+    return contentWidget;
 }
 /**
  * 获取里面的所有子项

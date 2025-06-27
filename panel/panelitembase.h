@@ -6,6 +6,8 @@
 #include <QMimeData>
 #include "myjson.h"
 
+#define ItemIdType qint64
+
 class FacileMenu;
 
 enum PanelItemType
@@ -103,8 +105,8 @@ public:
     static bool _blockPress;
 
 protected:
-    qint64 itemId = 0;
-    qint64 groupId = 0;
+    ItemIdType itemId = 0;
+    ItemIdType groupId = 0;
     QWidget* selectWidget = nullptr;
 
     const int selectBorder = 2;

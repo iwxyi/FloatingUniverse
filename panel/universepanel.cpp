@@ -45,9 +45,9 @@ UniversePanel::~UniversePanel()
 
 void UniversePanel::initGlobal()
 {
-    rt->getRandomId = [this]() -> qint64{
-        qint64 randomId;
-        QList<qint64> ids;
+    rt->getRandomId = [this]() -> ItemIdType{
+        ItemIdType randomId;
+        QList<ItemIdType> ids;
         foreach (auto item, items)
         {
             if (item->getItemId() != 0)
@@ -204,11 +204,40 @@ void UniversePanel::readItems()
             item->fromJson(json);
             item->show();
             items.append(item);
-            createItemEvent(item);
+            createItemEvent(item, false);
             if (json.b("selected"))
                 selectItem(item);
         }
     }
+
+    // 分配分组
+    auto groupItems = getGroupItems();
+    if (groupItems.size() > 0)
+    {
+        QMap<ItemIdType, GroupBoxItem*> groupMap;
+        foreach (auto groupItem, groupItems)
+        {
+            groupMap[groupItem->getItemId()] = groupItem;
+        }
+        foreach (auto item, items)
+        {
+            if (item->getType() == GroupBox)
+                continue;
+
+            if (item->getGroupId() > 0)
+            {
+                qDebug() << "设置回上次分组" << item->getItemId() << "至" << item->getGroupId();
+                auto groupItem = groupMap[item->getGroupId()];
+                if (groupItem)
+                {
+                    item->setParent(groupItem->getGroupArea());
+                }
+                else
+                    qWarning() << "无法找到分组" << item->getGroupId();
+            }
+        }
+    }
+
     QTimer::singleShot(0, [=]{
         // widget 的 resize 可能会在 show 之后一些事件调用
         // 所以这里关闭状态有需要延迟
@@ -250,7 +279,7 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, bool center, const QStri
     item->move(pos);
 
     items.append(item);
-    createItemEvent(item);
+    createItemEvent(item, true);
     saveLater();
     selectItem(item);
     return item;
@@ -270,7 +299,7 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
     item->move(pos - item->contentsRect().topLeft() - QPoint(2, fm.height() / 2 + 2));
 
     items.append(item);
-    createItemEvent(item);
+    createItemEvent(item, true);
 
     saveLater();
     selectItem(item);
@@ -297,7 +326,7 @@ ImageItem *UniversePanel::createImageItem(QPoint pos, const QString &image)
     item->move(pos - QPoint(item->width() / 2, item->height() / 2));
 
     items.append(item);
-    createItemEvent(item);
+    createItemEvent(item, true);
     saveLater();
     selectItem(item);
     return item;
@@ -323,7 +352,7 @@ CardItem *UniversePanel::createCardItem(QPoint pos)
     item->move(pos);
 
     items.append(item);
-    createItemEvent(item);
+    createItemEvent(item, true);
     saveLater();
     selectItem(item);
     return item;
@@ -341,7 +370,7 @@ TodoItem *UniversePanel::createTodoItem(QPoint pos)
     item->move(pos - item->contentsRect().topLeft() - QPoint(2, 2));
 
     items.append(item);
-    createItemEvent(item);
+    createItemEvent(item, true);
 
     saveLater();
     selectItem(item);
@@ -357,15 +386,18 @@ GroupBoxItem *UniversePanel::createGroupBoxItem(QPoint pos, const QString& title
     item->move(pos);
 
     items.append(item);
-    createItemEvent(item);
+    createItemEvent(item, true);
     saveLater();
     selectItem(item);
     return item;
 }
 
-void UniversePanel::createItemEvent(PanelItemBase *item)
+void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
 {
-    item->initResource();
+    if (first)
+    {
+        item->initResource();
+    }
 
     connect(item, &PanelItemBase::triggered, this, [=]{
         triggerItem(item);
@@ -430,16 +462,16 @@ void UniversePanel::createItemEvent(PanelItemBase *item)
     connect(item, &PanelItemBase::moveFinished, this, [=]() {
         // 判断是否移动到group中，或者从group中移出来
         // 以及要注意混合移动、带有group等。如果有混合，那么就不处理group
-        qint64 itemGroupId = -1;
+        ItemIdType itemGroupId = -1;
         bool is_all_same_group = true;
         bool has_group_item = false;
         foreach (auto item, selectedItems)
         {
-            qint64 groupId = item->getGroupId();
+            ItemIdType groupId = item->getGroupId();
             if (item->getType() == GroupBox)
             {
                 has_group_item = true;
-                qDebug() << "[分组判断] 包含分组";
+                qInfo() << "[分组判断] 包含分组";
                 break;
             }
             if (itemGroupId == -1)
@@ -447,7 +479,7 @@ void UniversePanel::createItemEvent(PanelItemBase *item)
             else if (groupId != itemGroupId)
             {
                 is_all_same_group = false;
-                qDebug() << "[分组判断] 不都是同一分组的";
+                qInfo() << "[分组判断] 不都是同一分组的";
                 break;
             }
         }
@@ -470,16 +502,29 @@ void UniversePanel::createItemEvent(PanelItemBase *item)
         if (groupItems.size() == 0)
             return;
         auto moveItemToGroup = [=](PanelItemBase* item, GroupBoxItem* group) {
-            item->setGroupId(group->getGroupId());
-            item->setParent(group->getGroupArea());
+            QWidget* prevGroup = item->parentWidget();
+            QPoint universalPos = item->pos() + prevGroup->mapTo(this, QPoint(0, 0));
+            if (!group)
+            {
+                qDebug() << "移动到无分组" << item->getItemId();
+                item->setGroupId(0);
+                item->setParent(this);
+            }
+            else
+            {
+                qDebug() << "移动到分组" << group->getItemId();
+                item->setGroupId(group->getItemId());
+                item->setParent(group->getGroupArea());
+                universalPos -= group->getGroupArea()->mapTo(this, QPoint(0, 0));
+            }
             item->show();
-            qDebug() << group->getGroupArea()->size() << group->getGroupArea()->children();
+            item->move(universalPos);
         };
         if (itemGroupId == -1) // 原先没有分组，检测有没有到新的分组
         {
             if (targetGroupItem)
             {
-                qInfo() << "[分组判断] 移入分组";
+                qInfo() << "[分组判断] 移入分组" << targetGroupItem;
                 itemGroupId = targetGroupItem->getItemId();
                 foreach (auto item, selectedItems)
                 {
@@ -493,17 +538,16 @@ void UniversePanel::createItemEvent(PanelItemBase *item)
             {
                 if (itemGroupId > 0)
                 {
-                    qInfo() << "[分组判断] 移出分组";
+                    qInfo() << "[分组判断] 移出分组" << itemGroupId;
                     foreach (auto item, selectedItems)
                     {
-                        item->setGroupId(0);
-                        item->setParent(this);
+                        moveItemToGroup(item, nullptr);
                     }
                 }
             }
             else if (targetGroupItem->getItemId() != itemGroupId)
             {
-                qInfo() << "[分组判断] 更换分组";
+                qInfo() << "[分组判断] 更换分组" << itemGroupId << "->" << targetGroupItem->getItemId();
                 foreach (auto item, selectedItems)
                 {
                     moveItemToGroup(item, targetGroupItem);

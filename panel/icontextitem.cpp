@@ -692,7 +692,7 @@ void IconTextItem::showFacileDir(QString path, FacileMenu *parentMenu, int level
                 qWarning() << "无法获取到目录路径" << path;
                 return;
             }
-            qInfo() << "动态加载目录列表：" << path;
+            qDebug() << "动态加载目录列表：" << path;
             showFacileDir(path, item->subMenu(), -1);
         });
     };

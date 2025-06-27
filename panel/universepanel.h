@@ -40,7 +40,7 @@ private:
     CardItem *createCardItem(QPoint pos);
     TodoItem *createTodoItem(QPoint pos);
     GroupBoxItem *createGroupBoxItem(QPoint pos, const QString& title);
-    void createItemEvent(PanelItemBase* item);
+    void createItemEvent(PanelItemBase* item, bool first);
     void deleteItemEvent(PanelItemBase* item);
     bool isMouseInPanel() const;
     bool hasItemUsing() const;

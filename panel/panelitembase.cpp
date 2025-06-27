@@ -31,6 +31,8 @@ MyJson PanelItemBase::toJson() const
     MyJson json;
     if (itemId != 0)
         json.insert("id", this->itemId);
+    if (groupId != 0)
+        json.insert("group_id", this->groupId);
 
     QRect rect(this->geometry());
     json.insert("left", rect.left());
@@ -48,6 +50,8 @@ MyJson PanelItemBase::toJson() const
 void PanelItemBase::fromJson(const MyJson &json)
 {
     // 位置
+    this->itemId = json.l("id", 0);
+    this->groupId = json.l("group_id", 0);
     move(QPoint(json.i("left"), json.i("top")));
 
     // 类型
@@ -136,11 +140,13 @@ void PanelItemBase::triggerEvent()
 
 }
 
+/// 每次创建时初始化资源
 void PanelItemBase::initResource()
 {
 
 }
 
+/// 删除item时释放资源
 void PanelItemBase::releaseResource()
 {
 
