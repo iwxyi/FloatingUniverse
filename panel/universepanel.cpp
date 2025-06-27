@@ -409,9 +409,12 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
 
         if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) // 多选
         {
-            QPoint pos = mapFromGlobal(QCursor::pos());
+            QPoint pos = mapFromGlobal(QCursor::pos()); // 相对于面板的坐标
             eachitem(
-                if (item->geometry().contains(pos))
+                QRect geo = item->geometry(); // item的parent的坐标，要转换为相对于面板的坐标
+                geo.moveTopLeft(item->parentWidget()->mapTo(this, geo.topLeft()));
+
+                if (geo.contains(pos))
                 {
                     if (selectedItems.contains(item))
                         unselectItem(item);
@@ -506,13 +509,11 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
             QPoint universalPos = item->pos() + prevGroup->mapTo(this, QPoint(0, 0));
             if (!group)
             {
-                qDebug() << "移动到无分组" << item->getItemId();
                 item->setGroupId(0);
                 item->setParent(this);
             }
             else
             {
-                qDebug() << "移动到分组" << group->getItemId();
                 item->setGroupId(group->getItemId());
                 item->setParent(group->getGroupArea());
                 universalPos -= group->getGroupArea()->mapTo(this, QPoint(0, 0));
