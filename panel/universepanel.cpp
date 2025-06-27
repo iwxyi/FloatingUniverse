@@ -31,6 +31,8 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
     setAcceptDrops(true);
     setFocusPolicy(Qt::ClickFocus);
 
+    initGlobal();
+
     initPanel();
 
     initAction();
@@ -39,6 +41,25 @@ UniversePanel::UniversePanel(QWidget *parent) : QWidget(parent)
 UniversePanel::~UniversePanel()
 {
     save();
+}
+
+void UniversePanel::initGlobal()
+{
+    rt->getRandomId = [this]() -> qint64{
+        qint64 randomId;
+        QList<qint64> ids;
+        foreach (auto item, items)
+        {
+            if (item->getItemId() != 0)
+                ids.append(item->getItemId());
+        }
+        do
+        {
+            // 生成8位数ID
+            randomId = qrand() % 90000000 + 10000000;
+        } while (ids.contains(randomId));
+        return randomId;
+    };
 }
 
 /// 初始化面板所有数据
@@ -86,7 +107,7 @@ void UniversePanel::initAction()
     });
     createAction("delete", [=]{
         foreach (auto item, selectedItems)
-            deleteItem(item);
+            deleteItemEvent(item);
         saveLater();
     });
 }
@@ -183,7 +204,7 @@ void UniversePanel::readItems()
             item->fromJson(json);
             item->show();
             items.append(item);
-            connectItem(item);
+            createItemEvent(item);
             if (json.b("selected"))
                 selectItem(item);
         }
@@ -194,6 +215,18 @@ void UniversePanel::readItems()
         rt->flag_readingItems = false;
     });
 }
+
+QList<GroupBoxItem*> UniversePanel::getGroupItems() const
+{
+    QList<GroupBoxItem*> groupItems;
+    foreach (auto item, items)
+    {
+        if (item->getType() == GroupBox)
+            groupItems.append(static_cast<GroupBoxItem*>(item));
+    }
+    return groupItems;
+}
+
 
 IconTextItem *UniversePanel::createLinkItem(QPoint pos, bool center, const QIcon &icon, const QString &text, const QString &link, PanelItemType type)
 {
@@ -217,7 +250,7 @@ IconTextItem *UniversePanel::createLinkItem(QPoint pos, bool center, const QStri
     item->move(pos);
 
     items.append(item);
-    connectItem(item);
+    createItemEvent(item);
     saveLater();
     selectItem(item);
     return item;
@@ -237,7 +270,7 @@ LongTextItem *UniversePanel::createTextItem(QPoint pos, const QString &text, boo
     item->move(pos - item->contentsRect().topLeft() - QPoint(2, fm.height() / 2 + 2));
 
     items.append(item);
-    connectItem(item);
+    createItemEvent(item);
 
     saveLater();
     selectItem(item);
@@ -264,7 +297,7 @@ ImageItem *UniversePanel::createImageItem(QPoint pos, const QString &image)
     item->move(pos - QPoint(item->width() / 2, item->height() / 2));
 
     items.append(item);
-    connectItem(item);
+    createItemEvent(item);
     saveLater();
     selectItem(item);
     return item;
@@ -290,7 +323,7 @@ CardItem *UniversePanel::createCardItem(QPoint pos)
     item->move(pos);
 
     items.append(item);
-    connectItem(item);
+    createItemEvent(item);
     saveLater();
     selectItem(item);
     return item;
@@ -308,7 +341,7 @@ TodoItem *UniversePanel::createTodoItem(QPoint pos)
     item->move(pos - item->contentsRect().topLeft() - QPoint(2, 2));
 
     items.append(item);
-    connectItem(item);
+    createItemEvent(item);
 
     saveLater();
     selectItem(item);
@@ -324,14 +357,16 @@ GroupBoxItem *UniversePanel::createGroupBoxItem(QPoint pos, const QString& title
     item->move(pos);
 
     items.append(item);
-    connectItem(item);
+    createItemEvent(item);
     saveLater();
     selectItem(item);
     return item;
 }
 
-void UniversePanel::connectItem(PanelItemBase *item)
+void UniversePanel::createItemEvent(PanelItemBase *item)
 {
+    item->initResource();
+
     connect(item, &PanelItemBase::triggered, this, [=]{
         triggerItem(item);
     });
@@ -392,6 +427,92 @@ void UniversePanel::connectItem(PanelItemBase *item)
         saveLater();
     });
 
+    connect(item, &PanelItemBase::moveFinished, this, [=]() {
+        // 判断是否移动到group中，或者从group中移出来
+        // 以及要注意混合移动、带有group等。如果有混合，那么就不处理group
+        qint64 itemGroupId = -1;
+        bool is_all_same_group = true;
+        bool has_group_item = false;
+        foreach (auto item, selectedItems)
+        {
+            qint64 groupId = item->getGroupId();
+            if (item->getType() == GroupBox)
+            {
+                has_group_item = true;
+                qDebug() << "[分组判断] 包含分组";
+                break;
+            }
+            if (itemGroupId == -1)
+                itemGroupId = groupId;
+            else if (groupId != itemGroupId)
+            {
+                is_all_same_group = false;
+                qDebug() << "[分组判断] 不都是同一分组的";
+                break;
+            }
+        }
+        if (has_group_item || !is_all_same_group)
+            return;
+
+        // 剩下的都是相同的分组，或者都没有分组
+        // 判断光标所在的分组
+        auto groupItems = getGroupItems();
+        GroupBoxItem* targetGroupItem = nullptr;
+        QPoint pos = mapFromGlobal(QCursor::pos());
+        foreach (auto groupItem, groupItems)
+        {
+            if (groupItem->geometry().contains(pos))
+            {
+                targetGroupItem = groupItem;
+                break;
+            }
+        }
+        if (groupItems.size() == 0)
+            return;
+        auto moveItemToGroup = [=](PanelItemBase* item, GroupBoxItem* group) {
+            item->setGroupId(group->getGroupId());
+            item->setParent(group->getGroupArea());
+            item->show();
+            qDebug() << group->getGroupArea()->size() << group->getGroupArea()->children();
+        };
+        if (itemGroupId == -1) // 原先没有分组，检测有没有到新的分组
+        {
+            if (targetGroupItem)
+            {
+                qInfo() << "[分组判断] 移入分组";
+                itemGroupId = targetGroupItem->getItemId();
+                foreach (auto item, selectedItems)
+                {
+                    moveItemToGroup(item, targetGroupItem);
+                }
+            }
+        }
+        else // 原先有分组，检测是否移出或更换分组
+        {
+            if (!targetGroupItem)
+            {
+                if (itemGroupId > 0)
+                {
+                    qInfo() << "[分组判断] 移出分组";
+                    foreach (auto item, selectedItems)
+                    {
+                        item->setGroupId(0);
+                        item->setParent(this);
+                    }
+                }
+            }
+            else if (targetGroupItem->getItemId() != itemGroupId)
+            {
+                qInfo() << "[分组判断] 更换分组";
+                foreach (auto item, selectedItems)
+                {
+                    moveItemToGroup(item, targetGroupItem);
+                }
+            }
+        }
+        saveLater();
+    });
+
     connect(item, &PanelItemBase::facileMenuUsed, this, [=](FacileMenu* menu) {
         currentMenu = menu;
         menu->finished([=]{
@@ -415,7 +536,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 
     connect(item, &PanelItemBase::deleteMe, this, [=]{
-        deleteItem(item);
+        deleteItemEvent(item);
         saveLater();
     });
 
@@ -438,7 +559,7 @@ void UniversePanel::connectItem(PanelItemBase *item)
     });
 }
 
-void UniversePanel::deleteItem(PanelItemBase *item)
+void UniversePanel::deleteItemEvent(PanelItemBase *item)
 {
     items.removeOne(item);
     selectedItems.remove(item);
@@ -1214,7 +1335,7 @@ void UniversePanel::contextMenuEvent(QContextMenuEvent *)
         menu->addAction(QIcon(":/icons/delete"), "删除 (&D)", [=]{
             foreach (auto item, selectedItems)
             {
-                deleteItem(item);
+                deleteItemEvent(item);
             }
             saveLater();
         });
