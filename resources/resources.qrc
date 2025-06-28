@@ -98,6 +98,9 @@
         <file>st/mouseMove.png</file>
         <file>st/dragFile.png</file>
         <file alias="group">icons/group.png</file>
+        <file alias="header">icons/header.png</file>
+        <file alias="layout">icons/layout.png</file>
+        <file alias="fold">icons/fold.png</file>
     </qresource>
     <qresource prefix="/documents">
         <file alias="wx_qr">documents/wx_qr.png</file>

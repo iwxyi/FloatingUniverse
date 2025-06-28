@@ -25,18 +25,25 @@ public:
     QWidget* getGroupArea() const;
     QList<PanelItemBase*> getSubItems() const;
     void autoArrange();
+    bool isFold() const;
 
 signals:
     void signalGetSubItems(QList<PanelItemBase*>* items) const;
 
+protected:
+    void facileMenuEvent(FacileMenu* menu) override;
+    void resizeEvent(QResizeEvent* e) override;
+
 public slots:
-    void slotShowGroupMenu();
+    void fold();
+    void unfold();
 
 private:
     QString title;
     QLabel* label = nullptr;
     QScrollArea* scrollArea = nullptr;
     QWidget* contentWidget = nullptr;
+    int scrollHeight = 0;
 };
 
 #endif // GROUPBOXITEM_H

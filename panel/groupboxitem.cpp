@@ -3,12 +3,12 @@
 #include "facilemenu.h"
 #include "runtime.h"
 #include <QVBoxLayout>
+#include <QInputDialog>
 
 GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
 {
     setType(PanelItemType::GroupBox);
     label = new QLabel(this);
-    PointMenuButton* menu_button = new PointMenuButton(this);
     label->setText(title);
     label->setAlignment(Qt::AlignLeft);
 
@@ -17,21 +17,15 @@ GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
     contentWidget = new QWidget(scrollArea);
     scrollArea->setWidget(contentWidget);
 
+    scrollArea->setMinimumSize(0, 0);
+
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(9,9,9,9);
     layout->setSpacing(6);
     layout->setAlignment(Qt::AlignTop);
     layout->setSizeConstraint(QLayout::SetMinimumSize);
-    QHBoxLayout* h_layout = new QHBoxLayout();
-    h_layout->addWidget(label);
-    h_layout->addWidget(menu_button);
-    layout->addLayout(h_layout);
+    layout->addWidget(label);
     layout->addWidget(scrollArea);
-
-    menu_button->setSquareSize();
-    menu_button->setLeaveAfterClick(true);
-
-    connect(menu_button, &InteractiveButtonBase::clicked, this, &GroupBoxItem::slotShowGroupMenu);
 }
 
 void GroupBoxItem::initResource()
@@ -47,6 +41,9 @@ MyJson GroupBoxItem::toJson() const
 {
     MyJson json = ResizeableItemBase::toJson();
     json.insert("title", title);
+    if (isFold())
+        json.insert("fold", true);
+    json.insert("scroll_height", scrollHeight);
     return json;
 }
 
@@ -55,6 +52,13 @@ void GroupBoxItem::fromJson(const MyJson &json)
     ResizeableItemBase::fromJson(json);
     title = json.s("title");
     label->setText(title);
+
+    bool fold = json.b("fold");
+    if (fold)
+    {
+        scrollArea->hide();
+    }
+    scrollHeight = json.i("scroll_height");
 }
 
 QString GroupBoxItem::getTitle() const
@@ -89,22 +93,66 @@ void GroupBoxItem::autoArrange()
 {
 }
 
-void GroupBoxItem::slotShowGroupMenu()
+bool GroupBoxItem::isFold() const
 {
-    newFacileMenu;
+    return !scrollArea->isVisible();
+}
 
-    menu->addAction("折叠/展开", [=]{
+void GroupBoxItem::facileMenuEvent(FacileMenu *menu)
+{
+    menu->addAction(QIcon(":/icons/fold"), "折叠/展开", [=]{
+            if (isFold())
+                unfold();
+            else
+                fold();
+        });
+    menu->addAction(QIcon(":/icons/header"), "修改标题", [=]{
+            bool ok;
+            QString title = QInputDialog::getText(this, "修改标题", "请输入新的标题", QLineEdit::Normal, getTitle(), &ok);
+            if (!ok)
+                return;
+            setTitle(title);
+            label->setVisible(!title.isEmpty());
+            emit modified();
+        });
+    menu->split()->addAction(QIcon(":/icons/layout"), "整理", [=]{
 
-    })->disable();
-    menu->addAction("修改标题", [=]{
+        })->disable();
+}
 
-    })->disable();
-    menu->split()->addAction("整理", [=]{
+void GroupBoxItem::resizeEvent(QResizeEvent *e)
+{
+    ResizeableItemBase::resizeEvent(e);
 
-    })->disable();
-    menu->addAction("自动整理", [=]{
+    if (!isFold())
+        scrollHeight = layout()->spacing() + scrollArea->height();
+}
 
-    })->disable()->check(false);
+void GroupBoxItem::fold()
+{
+    if (isFold())
+        return;
+    if (scrollHeight <= 0)
+        scrollHeight = layout()->spacing() + scrollArea->height();
+    qInfo() << "折叠分组  高度-" + QString::number(scrollHeight);
+    scrollArea->hide();
+    QTimer::singleShot(0, this, [=]{
+        setGeometry(pos().x(), pos().y(), width(), height() - scrollHeight);
+    });
+    emit modified();
+}
 
-    menu->exec();
+void GroupBoxItem::unfold()
+{
+    if (!isFold())
+        return;
+    if (scrollHeight <= 0)
+        scrollHeight = layout()->spacing() + scrollArea->height();
+    qInfo() << "展开分组  高度+" + QString::number(scrollHeight);
+    int currentHeight = height(); // show之后高度会自动变，需要先保存一下
+    scrollArea->show();
+    QTimer::singleShot(0, this, [=]{
+        setGeometry(pos().x(), pos().y(), width(), currentHeight + scrollHeight);
+    });
+    emit modified();
 }
