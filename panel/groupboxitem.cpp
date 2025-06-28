@@ -17,7 +17,16 @@ GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
     contentWidget = new QWidget(scrollArea);
     scrollArea->setWidget(contentWidget);
 
+    setObjectName("GroupBox");
+    label->setObjectName("TitleLabel");
+    scrollArea->setObjectName("ScrollArea");
+    contentWidget->setObjectName("ScrollContainer");
     scrollArea->setMinimumSize(0, 0);
+
+#ifdef Q_OS_MAC
+    scrollArea->setAttribute(Qt::WA_MacShowFocusRect, false);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+#endif
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(9,9,9,9);

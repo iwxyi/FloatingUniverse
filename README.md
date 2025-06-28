@@ -224,8 +224,44 @@ QQ交流群：[280517990](https://qm.qq.com/cgi-bin/qm/qr?k=a3rJlTLgGAhgx5PqvHz0
     ```
     
     ![自定义样式](screenshots/自定义样式_渐.png)
+  
+- 分组
 
-
+  - GroupBox：整个分组控件
+  
+  - TitleLabel：标题
+  
+  - ScrollArea：可见的滚动视图区域
+  
+  - ScrollContainer：无限大的可滚动容器
+  
+  - 补充：可以额外添加设置子控件的样式，会**覆盖全局**
+    ```css
+     /* 主滚动区域 */
+    #ScrollArea {
+        background: palette(base);
+        border-radius: 8px;
+    }
+    
+    /* 内容部件 */
+    #ScrollContainer {
+        background: transparent;
+    }
+    
+    /* 标题标签 */
+    #TitleLabel {
+        font-size: 16px;
+        font-weight: bold;
+        color: palette(windowText);
+        padding-bottom: 2px;
+    }
+    #TitleLabel:hover {
+        color: palette(highlight);
+    }
+    ```
+  
+    
+  
 
 
 

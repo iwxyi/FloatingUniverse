@@ -410,7 +410,16 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
 
         if (QGuiApplication::keyboardModifiers() & Qt::ControlModifier) // 多选
         {
+            auto operateSelect = [=](PanelItemBase* item) {
+                item->saveSelectStateOnPress();
+                selectItem(item, pos);
+            };
+
+            // *这里我遇到过一个奇怪的问题（Mac），就是文件夹图标点击后显示快速展开的动态目录菜单
+            // 会导致按住Ctrl时的坐标判定问题，x没变，但是y会异常提高，导致无法选中item。其他菜单没有这个情况
             QPoint pos = mapFromGlobal(QCursor::pos()); // 相对于面板的坐标
+            // 这里进行遍历是为了从上到下的层次优先级，否则容易误点击
+            bool find = false;
             eachitem(
                 QRect geo = item->geometry(); // item的parent的坐标，要转换为相对于面板的坐标
                 if (item->parentWidget() != this)
@@ -418,11 +427,17 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
 
                 if (geo.contains(pos))
                 {
-                    item->saveSelectStateOnPress();
-                    selectItem(item, pos);
+                    operateSelect(item);
+                    find = true;
                     break;
                 }
             )
+
+            // 理论上肯定能找到的，但是由于上面坐标系等种种问题，还是加个容错吧
+            if (!find) // 那就操作这个item
+            {
+                operateSelect(item);
+            }
         }
         else
         {

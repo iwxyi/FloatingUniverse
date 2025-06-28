@@ -218,7 +218,7 @@ void PanelItemBase::mouseReleaseEvent(QMouseEvent *event)
     {
         if (event->modifiers() & Qt::ControlModifier) // 多选，不进行操作
         {
-            if (isSelected() && hasSelectedBeforePress)
+            if (!dragged && isSelected() && hasSelectedBeforePress)
             {
                 emit unselectMe();
             }
