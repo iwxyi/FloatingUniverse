@@ -418,10 +418,8 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
 
                 if (geo.contains(pos))
                 {
-                    if (selectedItems.contains(item))
-                        unselectItem(item);
-                    else
-                        selectItem(item, pos);
+                    item->saveSelectStateOnPress();
+                    selectItem(item, pos);
                     break;
                 }
             )
@@ -442,6 +440,10 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
             unselectAll();
             selectItem(item);
         }
+    });
+
+    connect(item, &PanelItemBase::unselectMe, this, [=]{
+        unselectItem(item);
     });
 
     connect(item, &PanelItemBase::cancelEditMe, this, [=]{

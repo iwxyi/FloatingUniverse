@@ -185,6 +185,11 @@ void PanelItemBase::setHover(bool sh, const QPoint &startPos)
     hovered = sh;
 }
 
+void PanelItemBase::saveSelectStateOnPress()
+{
+    hasSelectedBeforePress = this->isSelected();
+}
+
 void PanelItemBase::mousePressEvent(QMouseEvent *event)
 {
     // 动画中，忽略按下操作
@@ -212,7 +217,13 @@ void PanelItemBase::mouseReleaseEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton)
     {
         if (event->modifiers() & Qt::ControlModifier) // 多选，不进行操作
+        {
+            if (isSelected() && hasSelectedBeforePress)
+            {
+                emit unselectMe();
+            }
             return ;
+        }
 
         if (dragged) // 拖拽移动结束
         {
@@ -242,11 +253,11 @@ void PanelItemBase::mouseMoveEvent(QMouseEvent *event)
         {
             if (delta.manhattanLength() > QApplication::startDragDistance())
             {
+                dragged = true;
                 bool drag = false;
                 emit moveStart(&drag);
-                if (drag)
+                if (drag) // MimeData拖拽
                     return ;
-                dragged = true;
             }
         }
 

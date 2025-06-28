@@ -79,6 +79,7 @@ signals:
 public slots:
     void setSelect(bool sh, const QPoint& startPos = UNDEFINED_POS);
     void setHover(bool sh, const QPoint& startPos = UNDEFINED_POS);
+    void saveSelectStateOnPress();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -116,6 +117,7 @@ protected:
     bool dragged = false; // 按压下来有没有拖拽过
     bool selected = false;
     bool hovered = false;
+    bool hasSelectedBeforePress = false; // 按住Ctrl键多选前的状态
 
     PanelItemType type;
     bool autoRaise = true; // press自动置顶
