@@ -66,7 +66,7 @@ public slots:
     void lowerItem(PanelItemBase* item);
 
 private slots:
-    void startDragSelectedItems();
+    void startDragSelectedItems(PanelItemBase* eventItem);
     void pasteFromClipboard(QPoint pos);
     void insertMimeData(const QMimeData *mime, QPoint pos);
 

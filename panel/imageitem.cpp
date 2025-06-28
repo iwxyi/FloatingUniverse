@@ -75,6 +75,11 @@ void ImageItem::setImage(const QString& imageName)
     }
 }
 
+QPixmap ImageItem::getPixmap() const
+{
+    return originPixmap;
+}
+
 QString ImageItem::saveImageFile(const QPixmap &pixmap)
 {
     // 保存到本地

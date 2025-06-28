@@ -13,7 +13,7 @@ public:
     virtual void releaseResource() override;
 
     void setImage(const QString &imageName);
-
+    QPixmap getPixmap() const;
     static QString saveImageFile(const QPixmap& pixmap);
 
     void adjustSizeByImage(QSize maxxSize);

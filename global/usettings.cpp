@@ -33,6 +33,7 @@ void USettings::restoreSettings()
 
     beginGroup("interactive");
     assign(allowMoveOut, "allowMoveOut");
+    assign(dragOnModifierKey, "dragOnModifierKey");
     assign(spatialMoveRatio, "spatialMoveRatio");
     assign(autoReboot, "autoReboot");
     assign(keepOnItemUsing, "keepOnItemUsing");

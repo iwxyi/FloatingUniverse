@@ -58,8 +58,9 @@ public:
     QSize moduleSize_Card;
 
     // 交互
-    int spatialMoveRatio = 1; // 控件移动倍率
     bool allowMoveOut = true; // 允许拖拽到面板外面，而不隐藏
+    bool dragOnModifierKey = false; // 按住修饰键才允许移动
+    int spatialMoveRatio = 1; // 控件移动倍率
     QColor themeMainColor = QColor(51, 103, 214); // #3367D6
     bool autoReboot = false; // 开机自启
     bool keepOnItemUsing = true; // 组件正在使用时不隐藏面板

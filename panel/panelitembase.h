@@ -65,6 +65,7 @@ signals:
     void unselectMe();
     void cancelEditMe();
     void hidePanel();
+    void moveStart(bool* drag);
     void moveItems(QPoint delta);
     void moveFinished();
     void facileMenuUsed(FacileMenu* menu);

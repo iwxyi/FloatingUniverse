@@ -64,6 +64,7 @@ void SettingsController::initItems()
     // 用户交互
     w = new SettingsItemListBox(ui->scrollAreaWidgetContents);
     w->add(QPixmap(":/icons/st/moveOut"), "允许拖拽到外面", "鼠标拖拽到悬浮面板外面，不自动隐藏面板", "interactive/allowMoveOut", &us->allowMoveOut);
+    w->add(QPixmap(":/icons/st/dragFile"), "按住Ctrl时移动", "是否需要按住Ctrl键才能移动，不按则可进行拖拽文件", "interactive/dragOnModifierKey", &us->dragOnModifierKey);
     w->add(QPixmap(":/icons/st/editing"), "使用时保持显示", "编辑文本时鼠标移到面板外面也保持显示", "interactive/keepOnItemUsing", &us->keepOnItemUsing);
     w->add(QPixmap(":/icons/st/clickGesture"), "交换托盘手势", "右下角托盘单击时打开面板，菜单中唤出设置", "interactive/trayClickOpenPanel", &us->trayClickOpenPanel);
     addGroup(w, "面板交互");

@@ -12,6 +12,7 @@
 #include <QInputDialog>
 #include <QFileDialog>
 #include <QClipboard>
+#include <QDrag>
 #include "universepanel.h"
 #include "runtime.h"
 #include "usettings.h"
@@ -455,6 +456,18 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
         saveLater();
     });
 
+    connect(item, &PanelItemBase::moveStart, this, [=](bool* drag){
+        if (us->dragOnModifierKey)
+        {
+            if (!(QGuiApplication::keyboardModifiers() & Qt::ControlModifier))
+            {
+                *drag = true;
+                startDragSelectedItems(item);
+                // unselectAll();
+            }
+        }
+    });
+
     connect(item, &PanelItemBase::moveItems, this, [=](QPoint delta) {
         foreach (auto item, selectedItems)
         {
@@ -685,6 +698,8 @@ void UniversePanel::save()
 
 void UniversePanel::selectAll(bool containIgnored)
 {
+    // 获取无分组子项
+    // 这里这么麻烦是因为如果选中有分组的子项再取消，但还是会显示动画
     QList<PanelItemBase*> noGroupChildItems = items;
     QList<PanelItemBase*> groupChildItems;
     for (int i = 0; i < noGroupChildItems.size(); i++)
@@ -778,9 +793,91 @@ void UniversePanel::lowerItem(PanelItemBase *item)
 }
 
 /// 选中多项，开始拖拽
-void UniversePanel::startDragSelectedItems()
+void UniversePanel::startDragSelectedItems(PanelItemBase* eventItem)
 {
+    if (selectedItems.size() == 0)
+    {
+        qWarning() << "没有选中Item，无法拖拽";
+        return;
+    }
+    qInfo() << "开始拖拽" << selectedItems.size() << "项";
+    // 开始拖拽
+    QDrag* drag = new QDrag(this);
+    QMimeData* mimeData = new QMimeData;
+    auto items = QList<PanelItemBase*>(selectedItems.begin(), selectedItems.end());
+    // 按照left+right的和从小到大排序
+    std::sort(items.begin(), items.end(), [](PanelItemBase* a, PanelItemBase* b) {
+        return a->geometry().left() + a->geometry().right() < b->geometry().left() + b->geometry().right();
+    });
 
+    // 判断是否都是同一个类型
+    if (eventItem == nullptr)
+        eventItem = items.first();
+    auto firstType = eventItem->getType();
+    foreach (auto item, items)
+    {
+        if (item->getType() != firstType)
+        {
+            qInfo() << "拖拽的类型不一致，仅移动";
+            return;
+        }
+    }
+    // 同一类的，判断拖拽条件
+    if (firstType == IconText || firstType == LocalFile || firstType == WebUrl)
+    {
+        qInfo() << "拖拽IconText";
+        QStringList paths;
+        foreach (auto item, items)
+        {
+            QString path = static_cast<IconTextItem*>(item)->getLink();
+            if (path.isEmpty() || path.contains("\n"))
+                continue;
+            if (path.startsWith(FILE_PREFIX))
+                path = path.right(path.length() - FILE_PREFIX.length());
+            paths.append(path);
+        }
+        QList<QUrl> urls;
+        foreach (auto path, paths)
+        {
+            urls.append(QUrl::fromLocalFile(path));
+        }
+        mimeData->setUrls(urls);
+        mimeData->setText(paths.join("\n"));
+    }
+    else if (firstType == ImageView)
+    {
+        qInfo() << "拖拽ImageView";
+        // 图像的话，只允许一张
+        QPixmap pixmap = static_cast<ImageItem*>(eventItem)->getPixmap();
+        mimeData->setImageData(pixmap);
+    }
+    else if (firstType == LongText)
+    {
+        qInfo() << "拖拽LongText";
+
+        QStringList list;
+        foreach (auto item, items)
+        {
+            list.append(static_cast<LongTextItem*>(item)->getText());
+        }
+        mimeData->setText(list.join("\n\n"));
+    }
+    else
+    {
+        qWarning() << "未知的拖拽类型：" << firstType;
+        return;
+    }
+    drag->setMimeData(mimeData);
+
+    Qt::DropAction action = drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+    if (action == Qt::MoveAction)
+    {
+        foreach (auto item, selectedItems)
+        {
+            deleteItemEvent(item);
+        }
+        saveLater();
+    }
 }
 
 void UniversePanel::pasteFromClipboard(QPoint pos)

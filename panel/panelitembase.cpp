@@ -241,7 +241,13 @@ void PanelItemBase::mouseMoveEvent(QMouseEvent *event)
         if (!dragged) // 第一次拖拽
         {
             if (delta.manhattanLength() > QApplication::startDragDistance())
+            {
+                bool drag = false;
+                emit moveStart(&drag);
+                if (drag)
+                    return ;
                 dragged = true;
+            }
         }
 
         if (dragged)
