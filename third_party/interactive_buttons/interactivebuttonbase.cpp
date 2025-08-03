@@ -1,4 +1,5 @@
 #include "interactivebuttonbase.h"
+#include <QPainterPath>
 
 /**
  * 所有内容的初始化
