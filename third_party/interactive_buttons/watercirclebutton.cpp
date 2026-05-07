@@ -1,4 +1,5 @@
 #include "watercirclebutton.h"
+#include <QPainterPath>
 
 WaterCircleButton::WaterCircleButton(QWidget* parent) : InteractiveButtonBase (parent), in_circle(false), radius(16)
 {

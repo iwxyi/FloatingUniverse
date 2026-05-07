@@ -4,6 +4,7 @@
 #include "signaltransfer.h"
 #include "universepanel.h"
 #include <QScreen>
+#include <QPainterPath>
 #ifdef Q_OS_WIN32
 #include <windows.h>
 #include <windowsx.h>

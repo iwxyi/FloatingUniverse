@@ -1,5 +1,6 @@
 #include <QLabel>
 #include <QRadialGradient>
+#include <QPainterPath>
 #include "facilemenu.h"
 #include "imageutil.h"
 

@@ -1,4 +1,5 @@
 #include "facilemenuitem.h"
+#include <QPainterPath>
 
 FacileMenuItem::FacileMenuItem(QWidget *parent) : InteractiveButtonBase(parent)
 {
