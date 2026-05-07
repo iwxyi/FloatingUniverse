@@ -4,6 +4,7 @@
 #include "runtime.h"
 #include <QVBoxLayout>
 #include <QInputDialog>
+#include <QTimer>
 
 GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
 {
@@ -13,8 +14,9 @@ GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
     label->setAlignment(Qt::AlignLeft);
 
     scrollArea = new QScrollArea(this);
-    scrollArea->setWidgetResizable(true);
+    scrollArea->setWidgetResizable(false);  // 改为false，让contentWidget大小由我们自己管理
     contentWidget = new QWidget(scrollArea);
+    contentWidget->setMinimumSize(200, 100);
     scrollArea->setWidget(contentWidget);
 
     setObjectName("GroupBox");
@@ -31,10 +33,9 @@ GroupBoxItem::GroupBoxItem(QWidget* parent) : ResizeableItemBase(parent)
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(9,9,9,9);
     layout->setSpacing(6);
-    layout->setAlignment(Qt::AlignTop);
     layout->setSizeConstraint(QLayout::SetMinimumSize);
-    layout->addWidget(label);
-    layout->addWidget(scrollArea);
+    layout->addWidget(label, 0);       // label不拉伸
+    layout->addWidget(scrollArea, 1);  // scrollArea填充剩余空间
 }
 
 void GroupBoxItem::initResource()
@@ -107,6 +108,32 @@ bool GroupBoxItem::isFold() const
     return !scrollArea->isVisible();
 }
 
+void GroupBoxItem::updateContentSize()
+{
+    if (!contentWidget)
+        return;
+
+    // 计算所有子widget的边界矩形
+    QRect contentBounds;
+    foreach (QObject* obj, contentWidget->children())
+    {
+        QWidget* child = qobject_cast<QWidget*>(obj);
+        if (child)
+        {
+            QRect childRect = child->geometry();
+            contentBounds = contentBounds.united(childRect);
+        }
+    }
+
+    // 确保至少填充viewport
+    QSize viewportSize = scrollArea->viewport()->size();
+    int newWidth = qMax(contentBounds.right(), viewportSize.width());
+    int newHeight = qMax(contentBounds.bottom(), viewportSize.height());
+
+    if (contentWidget->size() != QSize(newWidth, newHeight))
+        contentWidget->resize(newWidth, newHeight);
+}
+
 void GroupBoxItem::facileMenuEvent(FacileMenu *menu)
 {
     menu->addAction(QIcon(":/icons/fold"), "折叠/展开", [=]{
@@ -132,6 +159,11 @@ void GroupBoxItem::facileMenuEvent(FacileMenu *menu)
 void GroupBoxItem::resizeEvent(QResizeEvent *e)
 {
     ResizeableItemBase::resizeEvent(e);
+
+    // 延迟调用，等Qt的layout完成后viewport大小才是正确的
+    QTimer::singleShot(0, this, [=]{
+        updateContentSize();
+    });
 
     if (!isFold())
         scrollHeight = layout()->spacing() + scrollArea->height();

@@ -231,7 +231,11 @@ void UniversePanel::readItems()
                 auto groupItem = groupMap[item->getGroupId()];
                 if (groupItem)
                 {
+                    QPoint savedPos = item->pos();
                     item->setParent(groupItem->getGroupArea());
+                    item->move(savedPos);
+                    item->show();
+                    groupItem->updateContentSize();
                 }
                 else
                     qWarning() << "无法找到分组" << item->getGroupId();
@@ -505,7 +509,6 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
             if (item->getType() == GroupBox)
             {
                 has_group_item = true;
-                qInfo() << "[分组判断] 包含分组";
                 break;
             }
             if (itemGroupId == -1)
@@ -551,6 +554,8 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
             }
             item->show();
             item->move(universalPos);
+            if (group)
+                group->updateContentSize();
         };
         if (itemGroupId == -1) // 原先没有分组，检测有没有到新的分组
         {
@@ -633,6 +638,19 @@ void UniversePanel::createItemEvent(PanelItemBase *item, bool first)
     connect(item, &PanelItemBase::restorePanelFixing, this, [=]{
         emit signalSetKeepFix(false);
     });
+    
+    if (item->getType() == GroupBox)
+    {
+        connect(static_cast<GroupBoxItem*>(item), &GroupBoxItem::signalGetSubItems, this, [=](QList<PanelItemBase *> *subItems) {
+            subItems->clear();
+            foreach (auto it, items)
+            {
+                if (it->getGroupId() == item->getItemId())
+                    subItems->append(it);
+            }
+        });
+    }
+
 }
 
 void UniversePanel::deleteItemEvent(PanelItemBase *item)
@@ -821,7 +839,7 @@ void UniversePanel::startDragSelectedItems(PanelItemBase* eventItem)
     // 开始拖拽
     QDrag* drag = new QDrag(this);
     QMimeData* mimeData = new QMimeData;
-    auto items = QList<PanelItemBase*>(selectedItems.begin(), selectedItems.end());
+    auto items = selectedItems.values();
     // 按照left+right的和从小到大排序
     std::sort(items.begin(), items.end(), [](PanelItemBase* a, PanelItemBase* b) {
         return a->geometry().left() + a->geometry().right() < b->geometry().left() + b->geometry().right();

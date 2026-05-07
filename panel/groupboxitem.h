@@ -26,6 +26,7 @@ public:
     QList<PanelItemBase*> getSubItems() const;
     void autoArrange();
     bool isFold() const;
+    void updateContentSize();  // 根据子item更新contentWidget大小
 
 signals:
     void signalGetSubItems(QList<PanelItemBase*>* items) const;
